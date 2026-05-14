@@ -1,178 +1,178 @@
 {
   "buffett": {
     "agent_id": "buffett",
-    "cash": 8486299.0,
-    "total_value": 8628800.5,
+    "cash": 8466280.0,
+    "total_value": 8628525.5,
     "holdings": [
       {
         "ticker": "AAPL",
         "name": "Apple Inc.",
         "shares": 150,
         "avg_cost": 170.0,
-        "current_price": 191.36,
-        "value": 28704.0,
-        "gain_pct": 12.56
+        "current_price": 188.01,
+        "value": 28201.5,
+        "gain_pct": 10.59
       },
       {
         "ticker": "KO",
         "name": "Coca-Cola Co",
-        "shares": 600,
-        "avg_cost": 58.63,
-        "current_price": 61.06,
-        "value": 36636.0,
-        "gain_pct": 4.14
+        "shares": 800,
+        "avg_cost": 59.52,
+        "current_price": 61.97,
+        "value": 49576.0,
+        "gain_pct": 4.12
       },
       {
         "ticker": "JNJ",
         "name": "Johnson & Johnson",
-        "shares": 250,
-        "avg_cost": 154.08,
-        "current_price": 148.95,
-        "value": 37237.5,
-        "gain_pct": -3.33
+        "shares": 300,
+        "avg_cost": 153.67,
+        "current_price": 148.49,
+        "value": 44547.0,
+        "gain_pct": -3.37
       },
       {
         "ticker": "BRK.B",
         "name": "Berkshire Hathaway B",
         "shares": 100,
         "avg_cost": 350.0,
-        "current_price": 399.24,
-        "value": 39924.0,
-        "gain_pct": 14.07
+        "current_price": 399.21,
+        "value": 39921.0,
+        "gain_pct": 14.06
       }
     ],
     "performance": {
       "total_return_pct": 8.2,
-      "daily_pnl": 787.5,
+      "daily_pnl": -503.0,
       "weekly_pnl": 180000,
       "monthly_pnl": 720000
     }
   },
   "soros": {
     "agent_id": "soros",
-    "cash": 11891160.5,
-    "total_value": 12161834.7,
+    "cash": 11673764.0,
+    "total_value": 12164735.2,
     "holdings": [
       {
         "ticker": "NVDA",
         "name": "NVIDIA Corp",
-        "shares": 180,
-        "avg_cost": 697.55,
-        "current_price": 865.69,
-        "value": 155824.2,
-        "gain_pct": 24.1
+        "shares": 380,
+        "avg_cost": 789.25,
+        "current_price": 875.64,
+        "value": 332743.2,
+        "gain_pct": 10.95
       },
       {
         "ticker": "GLD",
         "name": "SPDR Gold ETF",
-        "shares": 400,
-        "avg_cost": 189.2,
-        "current_price": 218.35,
-        "value": 87340.0,
-        "gain_pct": 15.41
+        "shares": 600,
+        "avg_cost": 197.88,
+        "current_price": 218.18,
+        "value": 130908.0,
+        "gain_pct": 10.26
       },
       {
         "ticker": "UUP",
         "name": "Invesco DB USD Index",
         "shares": 1000,
         "avg_cost": 28.5,
-        "current_price": 27.51,
-        "value": 27510.0,
-        "gain_pct": -3.47
+        "current_price": 27.32,
+        "value": 27320.0,
+        "gain_pct": -4.14
       }
     ],
     "performance": {
       "total_return_pct": 18.7,
-      "daily_pnl": 290.0,
+      "daily_pnl": 180.0,
       "weekly_pnl": 390000,
       "monthly_pnl": 1580000
     }
   },
   "lynch": {
     "agent_id": "lynch",
-    "cash": 5114870.5,
-    "total_value": 5323341.7,
+    "cash": 4946869.0,
+    "total_value": 5318345.8,
     "holdings": [
       {
         "ticker": "SBUX",
         "name": "Starbucks Corp",
         "shares": 300,
         "avg_cost": 92.0,
-        "current_price": 90.09,
-        "value": 27027.0,
-        "gain_pct": -2.08
+        "current_price": 87.14,
+        "value": 26142.0,
+        "gain_pct": -5.28
       },
       {
         "ticker": "NKE",
         "name": "Nike Inc",
-        "shares": 350,
-        "avg_cost": 99.04,
-        "current_price": 109.44,
-        "value": 38304.0,
-        "gain_pct": 10.5
+        "shares": 550,
+        "avg_cost": 102.06,
+        "current_price": 105.96,
+        "value": 58278.0,
+        "gain_pct": 3.82
       },
       {
         "ticker": "COST",
         "name": "Costco Wholesale",
-        "shares": 160,
-        "avg_cost": 658.84,
-        "current_price": 741.47,
-        "value": 118635.2,
-        "gain_pct": 12.54
+        "shares": 360,
+        "avg_cost": 699.86,
+        "current_price": 729.28,
+        "value": 262540.8,
+        "gain_pct": 4.2
       },
       {
         "ticker": "TSLA",
         "name": "Tesla Inc",
         "shares": 100,
         "avg_cost": 220.0,
-        "current_price": 245.05,
-        "value": 24505.0,
-        "gain_pct": 11.39
+        "current_price": 245.16,
+        "value": 24516.0,
+        "gain_pct": 11.44
       }
     ],
     "performance": {
       "total_return_pct": 12.4,
-      "daily_pnl": 749.0,
+      "daily_pnl": -1048.0,
       "weekly_pnl": 210000,
       "monthly_pnl": 890000
     }
   },
   "flat": {
     "agent_id": "flat",
-    "cash": 2946614.0,
-    "total_value": 3158542.0,
+    "cash": 2840776.0,
+    "total_value": 3153873.8,
     "holdings": [
       {
         "ticker": "SPY",
         "name": "SPDR S&P 500 ETF",
-        "shares": 220,
-        "avg_cost": 504.48,
-        "current_price": 536.5,
-        "value": 118030.0,
-        "gain_pct": 6.35
+        "shares": 420,
+        "avg_cost": 516.24,
+        "current_price": 520.64,
+        "value": 218668.8,
+        "gain_pct": 0.85
       },
       {
         "ticker": "QQQ",
         "name": "Invesco QQQ Trust",
         "shares": 100,
         "avg_cost": 400.0,
-        "current_price": 451.12,
-        "value": 45112.0,
-        "gain_pct": 12.78
+        "current_price": 453.09,
+        "value": 45309.0,
+        "gain_pct": 13.27
       },
       {
         "ticker": "VTI",
         "name": "Vanguard Total Market ETF",
         "shares": 200,
         "avg_cost": 220.0,
-        "current_price": 243.93,
-        "value": 48786.0,
-        "gain_pct": 10.88
+        "current_price": 245.6,
+        "value": 49120.0,
+        "gain_pct": 11.64
       }
     ],
     "performance": {
       "total_return_pct": 11.8,
-      "daily_pnl": -1345.0,
+      "daily_pnl": -192.0,
       "weekly_pnl": 195000,
       "monthly_pnl": 810000
     }

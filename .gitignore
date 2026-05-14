@@ -55,3 +55,5 @@ logs/
 dist/
 build/
 .turbo/
+frontend/tsconfig.tsbuildinfo
+frontend/next-env.d.ts

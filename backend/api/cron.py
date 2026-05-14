@@ -37,24 +37,21 @@ async def cron_run_daily(request: Request, background_tasks: BackgroundTasks):
     クロンジョブからのデイリーシミュレーション実行
     CRON_SECRETヘッダーで認証
     """
-    # 認証チェック
-    auth = request.headers.get("Authorization", "")
+    # 認証チェック - CRON_SECRETは必須（spec準拠）
     cron_secret = os.getenv("CRON_SECRET", "")
-
     if not cron_secret:
-        # CRON_SECRETが設定されていない場合はローカル環境として許可
-        if os.getenv("ENV") == "production":
-            raise HTTPException(
-                status_code=500,
-                detail="CRON_SECRETが設定されていません",
-            )
-    else:
-        expected = f"Bearer {cron_secret}"
-        if auth != expected:
-            raise HTTPException(
-                status_code=401,
-                detail="認証に失敗しました。正しいCRON_SECRETを設定してください。",
-            )
+        raise HTTPException(
+            status_code=500,
+            detail="サーバー設定エラー: CRON_SECRET が設定されていません",
+        )
+
+    auth = request.headers.get("Authorization", "")
+    expected = f"Bearer {cron_secret}"
+    if auth != expected:
+        raise HTTPException(
+            status_code=401,
+            detail="認証に失敗しました。Authorization: Bearer <CRON_SECRET> が必要です。",
+        )
 
     date = datetime.now(timezone.utc).strftime("%Y-%m-%d")
 
