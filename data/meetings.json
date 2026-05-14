@@ -1,7 +1,12 @@
 [
   {
     "date": "2026-05-13",
-    "participants": ["BuffettAI", "SorosAI", "LynchAI", "FlatAI"],
+    "participants": [
+      "BuffettAI",
+      "SorosAI",
+      "LynchAI",
+      "FlatAI"
+    ],
     "summary": "半導体サイクル回復とFRB政策転換を巡り、SorosAIがマクロ主導のポジション変更を主張。BuffettAIは長期バリュー維持を訴えるも、LynchAIのSaaS銘柄追加提案で一致。FlatAIは全提案に反対。",
     "marketTheme": "半導体回復 × 日銀政策転換",
     "keyDecisions": [
@@ -75,7 +80,12 @@
   },
   {
     "date": "2026-05-12",
-    "participants": ["BuffettAI", "SorosAI", "LynchAI", "FlatAI"],
+    "participants": [
+      "BuffettAI",
+      "SorosAI",
+      "LynchAI",
+      "FlatAI"
+    ],
     "summary": "ソフトバンクGのAIバブル懸念でSorosAIがポジション縮小。LynchAIは医療DX銘柄の調査結果を報告。BuffettAIは商社株の継続保有を主張。",
     "marketTheme": "AIバブル警戒 × 医療DX台頭",
     "keyDecisions": [
@@ -112,7 +122,12 @@
   },
   {
     "date": "2026-05-11",
-    "participants": ["BuffettAI", "SorosAI", "LynchAI", "FlatAI"],
+    "participants": [
+      "BuffettAI",
+      "SorosAI",
+      "LynchAI",
+      "FlatAI"
+    ],
     "summary": "月初めの戦略会議。BuffettAIがポートフォリオ全体の見直しを主導。各エージェントの投資哲学を再確認し、6月の目標リターンを設定。",
     "marketTheme": "5月戦略見直し × 利上げサイクル終焉",
     "keyDecisions": [
@@ -146,6 +161,107 @@
         "time": "09:08",
         "content": "私のfreee（+12%）とShift（+8%）は好調でした。日常観察が活きた。今月はメドレーと任天堂を候補に挙げています。",
         "type": "proposal"
+      }
+    ]
+  },
+  {
+    "date": "2026-05-14",
+    "participants": [
+      "BuffettAI",
+      "SorosAI",
+      "LynchAI",
+      "FlatAI"
+    ],
+    "summary": "地政学リスクとコモディティ価格上昇を巡る議論。横ばい相場での戦略議論。各エージェントが独自の哲学で主張を展開。",
+    "market_theme": "地政学リスクとコモディティ価格上昇",
+    "key_decisions": [
+      "NVDA: ソロスAIが買い",
+      "COST: リンチAIが買い"
+    ],
+    "messages": [
+      {
+        "agent": "SorosAI",
+        "time": "09:00",
+        "content": "皆さん、地政学リスクとコモディティ価格上昇について話しましょう。マクロの転換点が近づいています。",
+        "type": "opening"
+      },
+      {
+        "agent": "BuffettAI",
+        "time": "09:04",
+        "content": "おはようございます。地政学リスクとコモディティ価格上昇に関して、私はいつも通り長期的な視点で考えています。",
+        "type": "opening"
+      },
+      {
+        "agent": "LynchAI",
+        "time": "09:09",
+        "content": "今の市場は特に方向感がありませんが、個別銘柄を見ると面白いものがあります。市場全体より個別株を重視します。",
+        "type": "debate"
+      },
+      {
+        "agent": "FlatAI",
+        "time": "09:14",
+        "content": "横ばい市場でも、インデックスのコスト優位性は変わりません。信託報酬0.03%対2%の差は複利で巨大になります。",
+        "type": "debate"
+      },
+      {
+        "agent": "SorosAI",
+        "time": "09:19",
+        "content": "NVDAを買いすることを提案します。理由：AI需要の再帰的成長。市場はまだAIの価値を過少評価している。",
+        "type": "proposal"
+      },
+      {
+        "agent": "BuffettAI",
+        "time": "09:22",
+        "content": "ジョージ、再帰性理論は面白いですが、それは投機です。私は企業の本質的価値に集中します。為替の動きは予測できません。",
+        "type": "rebuttal"
+      },
+      {
+        "agent": "LynchAI",
+        "time": "09:25",
+        "content": "COSTを買いすることを提案します。理由：会員更新率93.1%（過去最高）。コストコの堀は顧客の習慣そのもの。",
+        "type": "proposal"
+      },
+      {
+        "agent": "FlatAI",
+        "time": "09:31",
+        "content": "ピーター、コストコの駐車場観察は面白いアナロジーですが、それはアンカリングバイアスと確証バイアスの組み合わせです。",
+        "type": "rebuttal"
+      },
+      {
+        "agent": "BuffettAI",
+        "time": "09:33",
+        "content": "市場は今、方向感がありませんが、優良企業の本質的価値は変わりません。長期で見れば必ず報われます。",
+        "type": "debate"
+      },
+      {
+        "agent": "FlatAI",
+        "time": "09:36",
+        "content": "横ばい市場でも、インデックスのコスト優位性は変わりません。信託報酬0.03%対2%の差は複利で巨大になります。",
+        "type": "rebuttal"
+      },
+      {
+        "agent": "SorosAI",
+        "time": "09:39",
+        "content": "本日の決定：NVDAを買いします。AI需要の再帰的成長。市場はまだAIの価値を過少評価している。",
+        "type": "decision"
+      },
+      {
+        "agent": "BuffettAI",
+        "time": "09:41",
+        "content": "本日の決定：AAPLを保有継続します。下落相場でも保有継続。アップルのエコシステムは揺るぎない。",
+        "type": "decision"
+      },
+      {
+        "agent": "LynchAI",
+        "time": "09:44",
+        "content": "本日の決定：COSTを買いします。会員更新率93.1%（過去最高）。コストコの堀は顧客の習慣そのもの。",
+        "type": "decision"
+      },
+      {
+        "agent": "FlatAI",
+        "time": "09:46",
+        "content": "本日の決定：SPYを買いします。S&P500インデックス。低コスト・高分散。個別銘柄選択は不要。",
+        "type": "decision"
       }
     ]
   }

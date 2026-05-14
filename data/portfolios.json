@@ -1,50 +1,180 @@
 {
-  "lastUpdated": "2026-05-14T09:00:00Z",
-  "agents": {
-    "buffett": {
-      "agentId": "buffett",
-      "cash": 4250000,
-      "totalValue": 10430000,
-      "holdings": [
-        { "symbol": "2914.T", "name": "JT（日本たばこ産業）", "shares": 1000, "avgCost": 2850, "currentPrice": 3240, "sector": "生活必需品" },
-        { "symbol": "8316.T", "name": "三井住友フィナンシャルグループ", "shares": 500, "avgCost": 7200, "currentPrice": 8950, "sector": "金融" },
-        { "symbol": "9432.T", "name": "日本電信電話", "shares": 2000, "avgCost": 165, "currentPrice": 178, "sector": "通信" },
-        { "symbol": "4502.T", "name": "武田薬品工業", "shares": 800, "avgCost": 3800, "currentPrice": 4120, "sector": "製薬" },
-        { "symbol": "8058.T", "name": "三菱商事", "shares": 600, "avgCost": 2100, "currentPrice": 2580, "sector": "商社" }
-      ]
-    },
-    "soros": {
-      "agentId": "soros",
-      "cash": 3100000,
-      "totalValue": 10820000,
-      "holdings": [
-        { "symbol": "6861.T", "name": "キーエンス", "shares": 50, "avgCost": 65000, "currentPrice": 71200, "sector": "精密機器" },
-        { "symbol": "7267.T", "name": "ホンダ", "shares": 1500, "avgCost": 1450, "currentPrice": 1680, "sector": "輸送機器" },
-        { "symbol": "9984.T", "name": "ソフトバンクグループ", "shares": 800, "avgCost": 7800, "currentPrice": 9200, "sector": "投資会社" },
-        { "symbol": "8035.T", "name": "東京エレクトロン", "shares": 200, "avgCost": 23000, "currentPrice": 28500, "sector": "半導体" }
-      ]
-    },
-    "lynch": {
-      "agentId": "lynch",
-      "cash": 2800000,
-      "totalValue": 11250000,
-      "holdings": [
-        { "symbol": "3697.T", "name": "Shift", "shares": 300, "avgCost": 12000, "currentPrice": 15800, "sector": "IT" },
-        { "symbol": "4478.T", "name": "freee", "shares": 800, "avgCost": 2200, "currentPrice": 3100, "sector": "SaaS" },
-        { "symbol": "3993.T", "name": "PKSHA Technology", "shares": 600, "avgCost": 2800, "currentPrice": 3600, "sector": "AI" },
-        { "symbol": "4689.T", "name": "LINEヤフー", "shares": 5000, "avgCost": 340, "currentPrice": 420, "sector": "IT" },
-        { "symbol": "2413.T", "name": "エムスリー", "shares": 1000, "avgCost": 1800, "currentPrice": 2200, "sector": "医療DX" }
-      ]
-    },
-    "flat": {
-      "agentId": "flat",
-      "cash": 1500000,
-      "totalValue": 10050000,
-      "holdings": [
-        { "symbol": "1306.T", "name": "TOPIX連動型ETF（東証）", "shares": 3000, "avgCost": 2600, "currentPrice": 2850, "sector": "ETF" },
-        { "symbol": "1547.T", "name": "上場インデックスファンド米国株式(S&P500)", "shares": 2000, "avgCost": 2200, "currentPrice": 2580, "sector": "ETF" },
-        { "symbol": "2558.T", "name": "MAXIS米国株式(S&P500)上場投信", "shares": 1500, "avgCost": 1850, "currentPrice": 2100, "sector": "ETF" }
-      ]
+  "buffett": {
+    "agent_id": "buffett",
+    "cash": 8486299.0,
+    "total_value": 8628800.5,
+    "holdings": [
+      {
+        "ticker": "AAPL",
+        "name": "Apple Inc.",
+        "shares": 150,
+        "avg_cost": 170.0,
+        "current_price": 191.36,
+        "value": 28704.0,
+        "gain_pct": 12.56
+      },
+      {
+        "ticker": "KO",
+        "name": "Coca-Cola Co",
+        "shares": 600,
+        "avg_cost": 58.63,
+        "current_price": 61.06,
+        "value": 36636.0,
+        "gain_pct": 4.14
+      },
+      {
+        "ticker": "JNJ",
+        "name": "Johnson & Johnson",
+        "shares": 250,
+        "avg_cost": 154.08,
+        "current_price": 148.95,
+        "value": 37237.5,
+        "gain_pct": -3.33
+      },
+      {
+        "ticker": "BRK.B",
+        "name": "Berkshire Hathaway B",
+        "shares": 100,
+        "avg_cost": 350.0,
+        "current_price": 399.24,
+        "value": 39924.0,
+        "gain_pct": 14.07
+      }
+    ],
+    "performance": {
+      "total_return_pct": 8.2,
+      "daily_pnl": 787.5,
+      "weekly_pnl": 180000,
+      "monthly_pnl": 720000
+    }
+  },
+  "soros": {
+    "agent_id": "soros",
+    "cash": 11891160.5,
+    "total_value": 12161834.7,
+    "holdings": [
+      {
+        "ticker": "NVDA",
+        "name": "NVIDIA Corp",
+        "shares": 180,
+        "avg_cost": 697.55,
+        "current_price": 865.69,
+        "value": 155824.2,
+        "gain_pct": 24.1
+      },
+      {
+        "ticker": "GLD",
+        "name": "SPDR Gold ETF",
+        "shares": 400,
+        "avg_cost": 189.2,
+        "current_price": 218.35,
+        "value": 87340.0,
+        "gain_pct": 15.41
+      },
+      {
+        "ticker": "UUP",
+        "name": "Invesco DB USD Index",
+        "shares": 1000,
+        "avg_cost": 28.5,
+        "current_price": 27.51,
+        "value": 27510.0,
+        "gain_pct": -3.47
+      }
+    ],
+    "performance": {
+      "total_return_pct": 18.7,
+      "daily_pnl": 290.0,
+      "weekly_pnl": 390000,
+      "monthly_pnl": 1580000
+    }
+  },
+  "lynch": {
+    "agent_id": "lynch",
+    "cash": 5114870.5,
+    "total_value": 5323341.7,
+    "holdings": [
+      {
+        "ticker": "SBUX",
+        "name": "Starbucks Corp",
+        "shares": 300,
+        "avg_cost": 92.0,
+        "current_price": 90.09,
+        "value": 27027.0,
+        "gain_pct": -2.08
+      },
+      {
+        "ticker": "NKE",
+        "name": "Nike Inc",
+        "shares": 350,
+        "avg_cost": 99.04,
+        "current_price": 109.44,
+        "value": 38304.0,
+        "gain_pct": 10.5
+      },
+      {
+        "ticker": "COST",
+        "name": "Costco Wholesale",
+        "shares": 160,
+        "avg_cost": 658.84,
+        "current_price": 741.47,
+        "value": 118635.2,
+        "gain_pct": 12.54
+      },
+      {
+        "ticker": "TSLA",
+        "name": "Tesla Inc",
+        "shares": 100,
+        "avg_cost": 220.0,
+        "current_price": 245.05,
+        "value": 24505.0,
+        "gain_pct": 11.39
+      }
+    ],
+    "performance": {
+      "total_return_pct": 12.4,
+      "daily_pnl": 749.0,
+      "weekly_pnl": 210000,
+      "monthly_pnl": 890000
+    }
+  },
+  "flat": {
+    "agent_id": "flat",
+    "cash": 2946614.0,
+    "total_value": 3158542.0,
+    "holdings": [
+      {
+        "ticker": "SPY",
+        "name": "SPDR S&P 500 ETF",
+        "shares": 220,
+        "avg_cost": 504.48,
+        "current_price": 536.5,
+        "value": 118030.0,
+        "gain_pct": 6.35
+      },
+      {
+        "ticker": "QQQ",
+        "name": "Invesco QQQ Trust",
+        "shares": 100,
+        "avg_cost": 400.0,
+        "current_price": 451.12,
+        "value": 45112.0,
+        "gain_pct": 12.78
+      },
+      {
+        "ticker": "VTI",
+        "name": "Vanguard Total Market ETF",
+        "shares": 200,
+        "avg_cost": 220.0,
+        "current_price": 243.93,
+        "value": 48786.0,
+        "gain_pct": 10.88
+      }
+    ],
+    "performance": {
+      "total_return_pct": 11.8,
+      "daily_pnl": -1345.0,
+      "weekly_pnl": 195000,
+      "monthly_pnl": 810000
     }
   }
 }
