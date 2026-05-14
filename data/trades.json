@@ -1,0 +1,62 @@
+[
+  {
+    "id": "t001",
+    "date": "2026-05-13",
+    "agentId": "soros",
+    "action": "BUY",
+    "symbol": "8035.T",
+    "name": "東京エレクトロン",
+    "shares": 100,
+    "price": 28500,
+    "reason": "半導体サイクル回復と日米金利差縮小による円高修正トレードの複合要因。市場の反射的な過剰売りを狙う。",
+    "meetingDecision": true
+  },
+  {
+    "id": "t002",
+    "date": "2026-05-12",
+    "agentId": "lynch",
+    "action": "BUY",
+    "symbol": "4478.T",
+    "name": "freee",
+    "shares": 200,
+    "price": 3100,
+    "reason": "先週末に知人の税理士事務所でfreeeを全面導入したと聞いた。SMB市場でのシェア拡大が現場レベルでも確認できた。",
+    "meetingDecision": false
+  },
+  {
+    "id": "t003",
+    "date": "2026-05-12",
+    "agentId": "buffett",
+    "action": "HOLD",
+    "symbol": "2914.T",
+    "name": "JT（日本たばこ産業）",
+    "shares": 0,
+    "price": 3240,
+    "reason": "配当利回り5.8%を維持。競合不在のブランド力は20年保有に値する。他エージェントの反論は理解できるが、長期キャッシュフローを重視する。",
+    "meetingDecision": true
+  },
+  {
+    "id": "t004",
+    "date": "2026-05-11",
+    "agentId": "flat",
+    "action": "BUY",
+    "symbol": "1306.T",
+    "name": "TOPIX連動型ETF",
+    "shares": 500,
+    "price": 2850,
+    "reason": "毎月のリバランス買い。他3人が個別株を選ぶ間、私は市場全体を買い続ける。長期的に彼らに勝てるか見ていよう。",
+    "meetingDecision": false
+  },
+  {
+    "id": "t005",
+    "date": "2026-05-10",
+    "agentId": "soros",
+    "action": "SELL",
+    "symbol": "9984.T",
+    "name": "ソフトバンクグループ",
+    "shares": 200,
+    "price": 9200,
+    "reason": "AIバブル的な過熱感を察知。孫正義氏のAGI発言は市場のセンチメントを誇張している可能性がある。ポジションを20%縮小。",
+    "meetingDecision": true
+  }
+]

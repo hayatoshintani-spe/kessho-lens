@@ -1,0 +1,295 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ─── Base ──────────────────────────────────────────────────────────────────── */
+
+:root {
+  --bg-primary: #0B0E14;
+  --bg-card: #141922;
+  --bg-sidebar: #0F1219;
+  --bg-elevated: #1A2233;
+  --accent-gold: #C8860A;
+  --text-primary: #E2DDD5;
+  --text-secondary: #7B7F8C;
+  --border: #1E2535;
+  --profit: #1D9E75;
+  --loss: #D85A30;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  scroll-behavior: smooth;
+}
+
+/* ─── Scrollbar ─────────────────────────────────────────────────────────────── */
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-primary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: #2A3345;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #3A4A60;
+}
+
+/* ─── Selection ─────────────────────────────────────────────────────────────── */
+
+::selection {
+  background: rgba(200, 134, 10, 0.3);
+  color: var(--text-primary);
+}
+
+/* ─── Typography ────────────────────────────────────────────────────────────── */
+
+.font-tabular {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum';
+}
+
+/* ─── Layout utilities ──────────────────────────────────────────────────────── */
+
+.sidebar-width {
+  width: 240px;
+  min-width: 240px;
+}
+
+.main-content {
+  margin-left: 240px;
+}
+
+@media (max-width: 768px) {
+  .main-content {
+    margin-left: 0;
+  }
+}
+
+/* ─── Card ──────────────────────────────────────────────────────────────────── */
+
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+.card-elevated {
+  background: var(--bg-elevated);
+  border: 1px solid #2A3345;
+  border-radius: 8px;
+}
+
+/* ─── Glow effects ──────────────────────────────────────────────────────────── */
+
+.glow-gold {
+  box-shadow: 0 0 20px rgba(200, 134, 10, 0.15);
+}
+
+.glow-profit {
+  box-shadow: 0 0 20px rgba(29, 158, 117, 0.15);
+}
+
+.glow-loss {
+  box-shadow: 0 0 20px rgba(216, 90, 48, 0.15);
+}
+
+/* ─── Agent dot indicator ───────────────────────────────────────────────────── */
+
+.agent-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+/* ─── Recharts custom ───────────────────────────────────────────────────────── */
+
+.recharts-tooltip-wrapper {
+  outline: none !important;
+}
+
+.recharts-cartesian-grid-horizontal line,
+.recharts-cartesian-grid-vertical line {
+  stroke: var(--border);
+}
+
+/* ─── Markdown report styles ────────────────────────────────────────────────── */
+
+.markdown-report h1 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 0.5rem;
+  margin-bottom: 1rem;
+  margin-top: 1.5rem;
+}
+
+.markdown-report h2 {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--accent-gold);
+  margin-bottom: 0.75rem;
+  margin-top: 1.5rem;
+}
+
+.markdown-report h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #B0C4DE;
+  margin-bottom: 0.5rem;
+  margin-top: 1.25rem;
+}
+
+.markdown-report p {
+  color: var(--text-primary);
+  line-height: 1.7;
+  margin-bottom: 0.75rem;
+}
+
+.markdown-report ul {
+  list-style: none;
+  padding: 0;
+  margin-bottom: 1rem;
+}
+
+.markdown-report ul li {
+  position: relative;
+  padding-left: 1.25rem;
+  color: var(--text-primary);
+  margin-bottom: 0.4rem;
+  line-height: 1.6;
+}
+
+.markdown-report ul li::before {
+  content: '▸';
+  position: absolute;
+  left: 0;
+  color: var(--accent-gold);
+}
+
+.markdown-report ol {
+  padding-left: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.markdown-report ol li {
+  color: var(--text-primary);
+  margin-bottom: 0.4rem;
+  line-height: 1.6;
+}
+
+.markdown-report strong {
+  color: #E8A020;
+  font-weight: 600;
+}
+
+.markdown-report em {
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+.markdown-report code {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 0.1rem 0.4rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.85em;
+  color: #7EC8E3;
+}
+
+.markdown-report pre {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 1rem;
+  overflow-x: auto;
+  margin-bottom: 1rem;
+}
+
+.markdown-report pre code {
+  background: none;
+  border: none;
+  padding: 0;
+}
+
+.markdown-report blockquote {
+  border-left: 3px solid var(--accent-gold);
+  padding-left: 1rem;
+  margin-left: 0;
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+.markdown-report hr {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 1.5rem 0;
+}
+
+.markdown-report table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 1rem;
+}
+
+.markdown-report table th {
+  text-align: left;
+  padding: 0.5rem 0.75rem;
+  background: var(--bg-elevated);
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid var(--border);
+}
+
+.markdown-report table td {
+  padding: 0.5rem 0.75rem;
+  color: var(--text-primary);
+  border-bottom: 1px solid var(--border);
+}
+
+.markdown-report table tr:last-child td {
+  border-bottom: none;
+}
+
+/* ─── Animations ────────────────────────────────────────────────────────────── */
+
+@keyframes pulse-glow {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+/* ─── Number ticker ─────────────────────────────────────────────────────────── */
+
+.ticker-up {
+  color: var(--profit);
+}
+
+.ticker-down {
+  color: var(--loss);
+}

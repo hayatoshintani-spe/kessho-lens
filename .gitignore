@@ -1,5 +1,57 @@
-node_modules/
+# ── 環境変数 ──────────────────────────────────────────────────────
 .env
-data/
+.env.local
+.env.*.local
+
+# ── Node.js ───────────────────────────────────────────────────────
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# ── Next.js ───────────────────────────────────────────────────────
+frontend/.next/
+frontend/out/
+frontend/.vercel/
+
+# ── Python ────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+backend/.venv/
+backend/venv/
+backend/env/
+backend/.env/
+backend/build/
+backend/dist/
+backend/*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# ── データキャッシュ ─────────────────────────────────────────────
+# data/ は初期データとしてGit管理
+data/companies_cache.json
+data/*.tmp
+
+# ── OS ────────────────────────────────────────────────────────────
 .DS_Store
+Thumbs.db
+
+# ── IDE ───────────────────────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# ── ログ ──────────────────────────────────────────────────────────
 *.log
+logs/
+
+# ── ビルド成果物 ──────────────────────────────────────────────────
+dist/
+build/
+.turbo/

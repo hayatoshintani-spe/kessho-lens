@@ -1,0 +1,61 @@
+[
+  {
+    "date": "2026-05-13",
+    "agentId": "lynch",
+    "discoveries": [
+      {
+        "symbol": "7974.T",
+        "name": "任天堂",
+        "reason": "Switch 2の予約が家電量販店で即完売。ゲームソフトの継続課金モデルへの移行が加速している。PEGレシオ0.8は割安。",
+        "conviction": "HIGH",
+        "action": "ウォッチリスト追加"
+      },
+      {
+        "symbol": "4480.T",
+        "name": "メドレー",
+        "reason": "病院受付での電子問診システムを複数の診療所で目撃。医療DXの浸透が加速している。エムスリーの次はここかもしれない。",
+        "conviction": "MEDIUM",
+        "action": "調査中"
+      }
+    ]
+  },
+  {
+    "date": "2026-05-13",
+    "agentId": "soros",
+    "discoveries": [
+      {
+        "symbol": "USD/JPY",
+        "name": "ドル円",
+        "reason": "FRBの利下げ観測とBOJの利上げシグナルが交差。再帰的な円安修正トレードが近い。為替感応度の高い輸出企業のヘッジポジションを再考。",
+        "conviction": "HIGH",
+        "action": "マクロ注視"
+      }
+    ]
+  },
+  {
+    "date": "2026-05-12",
+    "agentId": "buffett",
+    "discoveries": [
+      {
+        "symbol": "8031.T",
+        "name": "三井物産",
+        "reason": "資源価格の回復と国内インフラ需要。40年以上続く商社の堀は深い。配当性向を引き上げる余地あり。",
+        "conviction": "MEDIUM",
+        "action": "バリュエーション確認中"
+      }
+    ]
+  },
+  {
+    "date": "2026-05-12",
+    "agentId": "flat",
+    "discoveries": [
+      {
+        "symbol": "なし",
+        "name": "個別株発掘は無意味",
+        "reason": "3人が銘柄を探している間、私のETFはTOPIX全体のリターンを確実に獲得し続けている。情報の非対称性が存在しないのに個別株を探すのは時間の無駄だ。",
+        "conviction": "LOW",
+        "action": "インデックス継続保有"
+      }
+    ]
+  }
+]

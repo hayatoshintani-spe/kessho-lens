@@ -1,15 +1,12 @@
 {
-  "version": 2,
-  "builds": [
-    { "src": "server.js", "use": "@vercel/node" }
-  ],
-  "routes": [
-    { "src": "/(.*)", "dest": "/server.js" }
-  ],
+  "buildCommand": "cd frontend && npm install && npm run build",
+  "outputDirectory": "frontend/.next",
+  "framework": "nextjs",
+  "installCommand": "cd frontend && npm install",
   "crons": [
     {
-      "path": "/api/refresh",
-      "schedule": "30 9 * * 1-5"
+      "path": "/api/trigger-daily",
+      "schedule": "0 1 * * *"
     }
   ]
 }
