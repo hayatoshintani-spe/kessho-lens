@@ -552,5 +552,83 @@
     "reason": "ドル安トレンド、地政学リスクプレミアム上昇。ゴールドは割安。",
     "success": true,
     "message": "GLD 50株を$218.18で購入"
+  },
+  {
+    "date": "2026-05-14",
+    "timestamp": "2026-05-14T09:08:23.288399+00:00",
+    "agent_id": "soros",
+    "ticker": "NVDA",
+    "action": "buy",
+    "shares": 50,
+    "price": 864.98,
+    "total": 43249.0,
+    "reason": "AI需要の再帰的成長。市場はまだAIの価値を過少評価している。",
+    "success": true,
+    "message": "NVDA 50株を$864.98で購入"
+  },
+  {
+    "date": "2026-05-14",
+    "timestamp": "2026-05-14T09:08:23.292443+00:00",
+    "agent_id": "soros",
+    "ticker": "GLD",
+    "action": "buy",
+    "shares": 50,
+    "price": 218.43,
+    "total": 10921.5,
+    "reason": "ドル安トレンド、地政学リスクプレミアム上昇。ゴールドは割安。",
+    "success": true,
+    "message": "GLD 50株を$218.43で購入"
+  },
+  {
+    "date": "2026-05-14",
+    "timestamp": "2026-05-14T09:08:23.296094+00:00",
+    "agent_id": "flat",
+    "ticker": "SPY",
+    "action": "buy",
+    "shares": 50,
+    "price": 528.5,
+    "total": 26425.0,
+    "reason": "S&P500インデックス。低コスト・高分散。個別銘柄選択は不要。",
+    "success": true,
+    "message": "SPY 50株を$528.50で購入"
+  },
+  {
+    "date": "2026-05-14",
+    "timestamp": "2026-05-14T09:08:23.299562+00:00",
+    "agent_id": "lynch",
+    "ticker": "COST",
+    "action": "buy",
+    "shares": 50,
+    "price": 734.34,
+    "total": 36717.0,
+    "reason": "会員更新率93.1%（過去最高）。コストコの堀は顧客の習慣そのもの。",
+    "success": true,
+    "message": "COST 50株を$734.34で購入"
+  },
+  {
+    "date": "2026-05-14",
+    "timestamp": "2026-05-14T09:08:23.303052+00:00",
+    "agent_id": "lynch",
+    "ticker": "NKE",
+    "action": "buy",
+    "shares": 50,
+    "price": 109.37,
+    "total": 5468.5,
+    "reason": "スポーツショップで若者のナイキ購入が増えている。ブランド力健在。",
+    "success": true,
+    "message": "NKE 50株を$109.37で購入"
+  },
+  {
+    "date": "2026-05-14",
+    "timestamp": "2026-05-14T09:08:23.306428+00:00",
+    "agent_id": "buffett",
+    "ticker": "KO",
+    "action": "buy",
+    "shares": 50,
+    "price": 62.44,
+    "total": 3122.0,
+    "reason": "下落時こそ配当株の買い増しチャンス。",
+    "success": true,
+    "message": "KO 50株を$62.44で購入"
   }
 ]

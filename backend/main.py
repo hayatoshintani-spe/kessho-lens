@@ -35,20 +35,26 @@ app = FastAPI(
     redoc_url="/redoc",
 )
 
-# CORSミドルウェアを設定（フロントエンドからのアクセスを許可）
+# CORSミドルウェアを設定
+# allow_origin_regex でワイルドカード相当のドメインを許可（FastAPIはallow_originsではワイルドカードを解釈しない）
+_explicit_origins = [
+    "http://localhost:3000",
+    "http://localhost:5173",
+    "http://localhost:8080",
+]
+_frontend_url = os.getenv("FRONTEND_URL", "").rstrip("/")
+if _frontend_url:
+    _explicit_origins.append(_frontend_url)
+
+# ALLOWED_ORIGINS env var (カンマ区切り) で追加可能
+_extra = os.getenv("ALLOWED_ORIGINS", "")
+if _extra:
+    _explicit_origins.extend([o.strip().rstrip("/") for o in _extra.split(",") if o.strip()])
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:3000",
-        "http://localhost:5173",
-        "http://localhost:8080",
-        "https://*.vercel.app",
-        "https://*.netlify.app",
-        "https://*.railway.app",
-        "https://*.onrender.com",
-        # 本番フロントエンドURLをここに追加
-        os.getenv("FRONTEND_URL", ""),
-    ],
+    allow_origins=_explicit_origins,
+    allow_origin_regex=r"^https://([a-zA-Z0-9-]+\.)*(vercel\.app|netlify\.app|railway\.app|onrender\.com)$",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

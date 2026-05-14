@@ -1,3 +1,5 @@
+# Render Blueprint - One-click deploy from this repo
+# https://render.com/docs/blueprint-spec
 services:
   - type: web
     name: kessho-lens-backend

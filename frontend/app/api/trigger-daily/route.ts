@@ -20,8 +20,8 @@ export async function GET(req: NextRequest) {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        Authorization: `Bearer ${CRON_SECRET}`,
       },
-      body: JSON.stringify({ secret: CRON_SECRET }),
     });
 
     const data = await res.json();
