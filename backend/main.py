@@ -64,6 +64,17 @@ app.include_router(discovery_router, prefix="/api", tags=["発見ログ"])
 app.include_router(cron_router, prefix="/api", tags=["クロン"])
 
 
+@app.on_event("startup")
+async def startup_event():
+    """アプリケーション起動時の初期化"""
+    try:
+        from src.simulation.daily_runner import initialize_mock_data
+        initialize_mock_data()
+        print("[起動] モックデータの初期化完了")
+    except Exception as e:
+        print(f"[起動] 初期化エラー（続行します）: {e}")
+
+
 @app.get("/")
 async def root():
     """ルートエンドポイント"""

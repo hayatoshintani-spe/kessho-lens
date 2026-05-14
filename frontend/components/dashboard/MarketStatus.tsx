@@ -1,6 +1,4 @@
-'use client';
-
-import { Activity, TrendingUp, TrendingDown, Minus } from 'lucide-react';
+import { Activity, TrendingUp, TrendingDown } from 'lucide-react';
 import type { FundStats } from '@/lib/types';
 import { formatDate, formatLargeNumber, formatPct, cn } from '@/lib/utils';
 import { AGENT_NAMES } from '@/lib/utils';

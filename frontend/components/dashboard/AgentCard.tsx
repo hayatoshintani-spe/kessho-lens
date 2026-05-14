@@ -16,7 +16,7 @@ export default function AgentCard({ agent }: AgentCardProps) {
   return (
     <Link href={`/agents/${agent.id}`}>
       <div
-        className="card p-5 hover:border-[color:var(--agent-color)] transition-all duration-200 cursor-pointer group"
+        className="card p-5 hover:border-[color:var(--agent-color)] transition-all duration-200 cursor-pointer group relative overflow-hidden"
         style={{ '--agent-color': agent.color + '66' } as React.CSSProperties}
       >
         {/* Header */}
