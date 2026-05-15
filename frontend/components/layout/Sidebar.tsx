@@ -11,6 +11,7 @@ import {
   Settings,
   TrendingUp,
   Clock,
+  Lightbulb,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -20,6 +21,7 @@ const navItems = [
   { href: '/meetings', label: '投資会議ログ', icon: MessageSquare },
   { href: '/reports', label: '日次レポート', icon: FileText },
   { href: '/discovery', label: '銘柄探索', icon: Search },
+  { href: '/advisor', label: '個人アドバイス', icon: Lightbulb },
   { href: '/settings', label: '設定', icon: Settings },
 ];
 

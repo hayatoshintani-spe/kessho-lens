@@ -25,6 +25,7 @@ from api.meetings import router as meetings_router
 from api.reports import router as reports_router
 from api.discovery import router as discovery_router
 from api.cron import router as cron_router
+from api.advisor import router as advisor_router
 
 # FastAPIアプリケーションを初期化
 app = FastAPI(
@@ -68,6 +69,7 @@ app.include_router(meetings_router, prefix="/api", tags=["ミーティング"])
 app.include_router(reports_router, prefix="/api", tags=["レポート"])
 app.include_router(discovery_router, prefix="/api", tags=["発見ログ"])
 app.include_router(cron_router, prefix="/api", tags=["クロン"])
+app.include_router(advisor_router, prefix="/api", tags=["アドバイザー"])
 
 
 @app.on_event("startup")

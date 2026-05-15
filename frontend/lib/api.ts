@@ -411,3 +411,17 @@ export async function runDailyNow(): Promise<{ message: string; date: string }> 
 export async function fetchHealth(): Promise<{ status: string; version: string }> {
   return get('/api/health');
 }
+
+// ─── Advisor ──────────────────────────────────────────────────────────────────
+
+export type AdvisorPeriod = 'short' | 'medium' | 'long';
+export type AdvisorRisk = 'low' | 'medium' | 'high';
+
+export async function fetchAdvisorDebate(
+  amount: number,
+  period: AdvisorPeriod,
+  risk: AdvisorRisk,
+): Promise<MeetingLog> {
+  const raw = await post<Record<string, unknown>>('/api/advisor', { amount, period, risk });
+  return adaptMeeting(raw);
+}

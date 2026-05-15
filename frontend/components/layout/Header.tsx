@@ -13,6 +13,7 @@ const ROUTE_LABELS: Record<string, string> = {
   '/meetings': '投資会議ログ',
   '/reports': '日次レポート',
   '/discovery': '銘柄探索ログ',
+  '/advisor': '個人資産アドバイス',
   '/settings': '設定',
 };
 
@@ -84,6 +85,7 @@ export default function Header() {
               { href: '/meetings', label: '投資会議ログ' },
               { href: '/reports', label: '日次レポート' },
               { href: '/discovery', label: '銘柄探索' },
+              { href: '/advisor', label: '個人アドバイス' },
               { href: '/settings', label: '設定' },
             ].map(({ href, label }) => (
               <Link
