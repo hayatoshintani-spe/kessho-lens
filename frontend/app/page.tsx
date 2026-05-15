@@ -1,5 +1,7 @@
+'use client';
+
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Suspense } from 'react';
 import {
   fetchAgents,
   fetchFundStats,
@@ -10,13 +12,11 @@ import {
 import {
   generateMockPnlData,
   formatDate,
-  formatRelative,
 } from '@/lib/utils';
 import AgentCard from '@/components/dashboard/AgentCard';
 import PnLChart from '@/components/dashboard/PnLChart';
 import RankingTable from '@/components/dashboard/RankingTable';
 import MarketStatus from '@/components/dashboard/MarketStatus';
-import { FullPageSpinner, CardSkeleton } from '@/components/ui/LoadingSpinner';
 import { ArrowRight, BarChart2, MessageSquare, FileText } from 'lucide-react';
 import type { Agent, FundStats, PerformanceDataPoint, MeetingLog, DailyReport } from '@/lib/types';
 
@@ -103,35 +103,31 @@ const MOCK_MEETING: MeetingLog = {
   messages: [],
 };
 
-export const dynamic = 'force-dynamic';
-
 // ─── Dashboard Page ────────────────────────────────────────────────────────────
 
-export default async function DashboardPage() {
-  let agents: Agent[] = MOCK_AGENTS;
-  let stats: FundStats = MOCK_STATS;
-  let performance: PerformanceDataPoint[] = generateMockPnlData(30);
-  let latestMeeting: MeetingLog | null = MOCK_MEETING;
-  let latestReport: DailyReport | null = null;
-  let isLive = false;
+export default function DashboardPage() {
+  const [agents, setAgents] = useState<Agent[]>(MOCK_AGENTS);
+  const [stats, setStats] = useState<FundStats>(MOCK_STATS);
+  const [performance, setPerformance] = useState<PerformanceDataPoint[]>(generateMockPnlData(30));
+  const [latestMeeting, setLatestMeeting] = useState<MeetingLog | null>(MOCK_MEETING);
+  const [latestReport, setLatestReport] = useState<DailyReport | null>(null);
+  const [isLive, setIsLive] = useState(false);
 
-  try {
-    const [agentsData, statsData, perfData, meetingData, reportData] = await Promise.allSettled([
+  useEffect(() => {
+    Promise.allSettled([
       fetchAgents(),
       fetchFundStats(),
       fetchPerformance(30),
       fetchLatestMeeting(),
       fetchLatestReport(),
-    ]);
-
-    if (agentsData.status === 'fulfilled') { agents = agentsData.value; isLive = true; }
-    if (statsData.status === 'fulfilled') { stats = statsData.value; }
-    if (perfData.status === 'fulfilled') { performance = perfData.value; }
-    if (meetingData.status === 'fulfilled') { latestMeeting = meetingData.value; }
-    if (reportData.status === 'fulfilled') { latestReport = reportData.value; }
-  } catch {
-    // Use mock data
-  }
+    ]).then(([agentsData, statsData, perfData, meetingData, reportData]) => {
+      if (agentsData.status === 'fulfilled') { setAgents(agentsData.value); setIsLive(true); }
+      if (statsData.status === 'fulfilled') { setStats(statsData.value); }
+      if (perfData.status === 'fulfilled') { setPerformance(perfData.value); }
+      if (meetingData.status === 'fulfilled') { setLatestMeeting(meetingData.value); }
+      if (reportData.status === 'fulfilled') { setLatestReport(reportData.value); }
+    });
+  }, []);
 
   return (
     <div className="space-y-6 animate-fade-in">
@@ -170,7 +166,6 @@ export default async function DashboardPage() {
 
       {/* Chart + Ranking row */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
-        {/* PnL Chart */}
         <div className="lg:col-span-2 card p-5">
           <div className="flex items-center gap-2 mb-4">
             <BarChart2 className="w-4 h-4 text-accent-gold" />
@@ -178,8 +173,6 @@ export default async function DashboardPage() {
           </div>
           <PnLChart data={performance} />
         </div>
-
-        {/* Ranking */}
         <div className="card p-5">
           <h2 className="text-text-primary text-sm font-semibold mb-4">現在ランキング</h2>
           <RankingTable agents={agents} />
@@ -188,13 +181,11 @@ export default async function DashboardPage() {
 
       {/* Market Status + Latest Meeting */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-        {/* Market Status */}
         <MarketStatus
           stats={stats}
           marketTheme={latestMeeting?.marketTheme}
         />
 
-        {/* Latest Meeting */}
         {latestMeeting && (
           <div className="card p-5">
             <div className="flex items-center justify-between mb-4">
@@ -209,21 +200,17 @@ export default async function DashboardPage() {
                 詳細 <ArrowRight className="w-3 h-3" />
               </Link>
             </div>
-
             <div className="text-text-muted text-xs mb-2">
               {formatDate(latestMeeting.date)}
             </div>
-
             {latestMeeting.marketTheme && (
               <div className="text-accent-gold text-xs font-medium mb-3">
                 {latestMeeting.marketTheme}
               </div>
             )}
-
             <p className="text-text-secondary text-sm leading-relaxed mb-4">
               {latestMeeting.summary}
             </p>
-
             <div className="space-y-2">
               {latestMeeting.keyDecisions.slice(0, 3).map((d, i) => (
                 <div key={i} className="flex items-start gap-2">
