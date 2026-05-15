@@ -1,8 +1,16 @@
 {
-  "framework": "nextjs",
-  "buildCommand": "cd frontend && npm install && npm run build",
-  "outputDirectory": "frontend/.next",
-  "installCommand": "cd frontend && npm install",
+  "version": 2,
+  "builds": [
+    {
+      "src": "frontend/package.json",
+      "use": "@vercel/next"
+    }
+  ],
+  "routes": [
+    { "src": "/_next/(.*)", "dest": "/frontend/_next/$1" },
+    { "src": "/api/(.*)", "dest": "/frontend/api/$1" },
+    { "src": "/(.*)", "dest": "/frontend/$1" }
+  ],
   "crons": [
     {
       "path": "/api/trigger-daily",
