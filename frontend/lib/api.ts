@@ -20,10 +20,7 @@ const API_BASE =
 // ─── HTTP helpers ─────────────────────────────────────────────────────────────
 
 async function get<T>(path: string): Promise<T> {
-  const res = await fetch(`${API_BASE}${path}`, {
-    cache: 'no-store',
-    headers: { 'Content-Type': 'application/json' },
-  });
+  const res = await fetch(`${API_BASE}${path}`, { cache: 'no-store' });
   if (!res.ok) throw new Error(`API error ${res.status}: ${res.statusText}`);
   return res.json() as Promise<T>;
 }
