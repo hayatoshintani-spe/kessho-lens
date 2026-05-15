@@ -21,7 +21,7 @@ const API_BASE =
 
 async function get<T>(path: string): Promise<T> {
   const res = await fetch(`${API_BASE}${path}`, {
-    next: { revalidate: 60 },
+    cache: 'no-store',
     headers: { 'Content-Type': 'application/json' },
   });
   if (!res.ok) throw new Error(`API error ${res.status}: ${res.statusText}`);

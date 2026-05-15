@@ -103,6 +103,8 @@ const MOCK_MEETING: MeetingLog = {
   messages: [],
 };
 
+export const dynamic = 'force-dynamic';
+
 // ─── Dashboard Page ────────────────────────────────────────────────────────────
 
 export default async function DashboardPage() {
