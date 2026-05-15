@@ -4,8 +4,17 @@ import { useState, useEffect } from 'react';
 import { fetchDiscoveries } from '@/lib/api';
 import DiscoveryLog from '@/components/discovery/DiscoveryLog';
 import EmptyState from '@/components/ui/EmptyState';
-import type { DiscoveryEntry } from '@/lib/types';
+import type { DiscoveryEntry, AgentId } from '@/lib/types';
+import { AGENT_COLORS } from '@/lib/utils';
 import { Search } from 'lucide-react';
+
+const AGENT_FILTERS: Array<{ id: AgentId | 'all'; label: string }> = [
+  { id: 'all', label: 'すべて' },
+  { id: 'buffett', label: 'バフェットAI' },
+  { id: 'soros', label: 'ソロスAI' },
+  { id: 'lynch', label: 'リンチAI' },
+  { id: 'flat', label: 'フラットAI' },
+];
 
 const MOCK_DISCOVERIES: DiscoveryEntry[] = [
   {
@@ -90,16 +99,18 @@ const MOCK_DISCOVERIES: DiscoveryEntry[] = [
 
 export default function DiscoveryPage() {
   const [entries, setEntries] = useState<DiscoveryEntry[]>(MOCK_DISCOVERIES);
+  const [agentFilter, setAgentFilter] = useState<AgentId | 'all'>('all');
 
   useEffect(() => {
     fetchDiscoveries(1, 50).then(data => { if (data && data.items.length > 0) setEntries(data.items); }).catch(() => {});
   }, []);
 
+  const filtered = agentFilter === 'all' ? entries : entries.filter((e) => e.agentId === agentFilter);
+
   const statusCounts = {
-    found: entries.filter((e) => e.status === 'found').length,
-    watchlist: entries.filter((e) => e.status === 'watchlist').length,
-    rejected: entries.filter((e) => e.status === 'rejected').length,
-    scanning: entries.filter((e) => e.status === 'scanning').length,
+    found: filtered.filter((e) => e.status === 'found').length,
+    watchlist: filtered.filter((e) => e.status === 'watchlist').length,
+    rejected: filtered.filter((e) => e.status === 'rejected').length,
   };
 
   return (
@@ -121,13 +132,10 @@ export default function DiscoveryPage() {
           { label: '発見', count: statusCounts.found, color: '#1D9E75' },
           { label: 'ウォッチ', count: statusCounts.watchlist, color: '#C8860A' },
           { label: '却下', count: statusCounts.rejected, color: '#D85A30' },
-          { label: '合計', count: entries.length, color: '#7B7F8C' },
+          { label: '合計', count: filtered.length, color: '#7B7F8C' },
         ].map(({ label, count, color }) => (
           <div key={label} className="card p-4 text-center">
-            <div
-              className="text-2xl font-bold font-tabular"
-              style={{ color }}
-            >
+            <div className="text-2xl font-bold font-tabular" style={{ color }}>
               {count}
             </div>
             <div className="text-text-muted text-xs mt-0.5">{label}</div>
@@ -135,15 +143,44 @@ export default function DiscoveryPage() {
         ))}
       </div>
 
+      {/* Agent filter */}
+      <div className="flex gap-2 flex-wrap">
+        {AGENT_FILTERS.map(({ id, label }) => {
+          const isActive = agentFilter === id;
+          const color = id !== 'all' ? AGENT_COLORS[id as AgentId] : undefined;
+          return (
+            <button
+              key={id}
+              onClick={() => setAgentFilter(id)}
+              className="px-3 py-1.5 rounded-full text-xs font-medium transition-all border"
+              style={
+                isActive && color
+                  ? { backgroundColor: color + '22', borderColor: color + '55', color }
+                  : isActive
+                  ? { backgroundColor: 'rgba(200,134,10,0.15)', borderColor: 'rgba(200,134,10,0.4)', color: '#C8860A' }
+                  : { backgroundColor: 'transparent', borderColor: '#1E2535', color: '#7B7F8C' }
+              }
+            >
+              {label}
+              {id !== 'all' && (
+                <span className="ml-1 opacity-70">
+                  {entries.filter((e) => e.agentId === id).length}
+                </span>
+              )}
+            </button>
+          );
+        })}
+      </div>
+
       {/* Discovery log */}
-      {entries.length === 0 ? (
+      {filtered.length === 0 ? (
         <EmptyState
           icon={Search}
           title="銘柄探索ログがありません"
           description="AIエージェントが銘柄を探索すると記録されます"
         />
       ) : (
-        <DiscoveryLog entries={entries} />
+        <DiscoveryLog entries={filtered} />
       )}
     </div>
   );

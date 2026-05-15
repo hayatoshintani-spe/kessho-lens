@@ -9,7 +9,7 @@ import LoadingSpinner from '@/components/ui/LoadingSpinner';
 const SETTINGS_KEY = 'kessho_settings';
 
 const DEFAULT_SETTINGS: AppSettings = {
-  apiBaseUrl: 'http://localhost:8000',
+  apiBaseUrl: 'https://kessho-lens-backend.onrender.com',
   anthropicApiKey: '',
   marketTarget: 'japan',
   autoRunEnabled: true,

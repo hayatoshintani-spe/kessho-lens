@@ -97,13 +97,21 @@ export default function MeetingDetail({ meeting }: MeetingDetailProps) {
       <div className="card p-5">
         <h3 className="text-text-primary font-semibold text-sm mb-5 flex items-center gap-2">
           <BookOpen className="w-4 h-4 text-accent-gold" />
-          会議ログ ({meeting.messages.length}件)
+          会議ログ {meeting.messages.length > 0 && `(${meeting.messages.length}件)`}
         </h3>
-        <div className="space-y-4">
-          {meeting.messages.map((msg, i) => (
-            <ChatBubble key={i} message={msg} />
-          ))}
-        </div>
+        {meeting.messages.length === 0 ? (
+          <div className="py-10 text-center">
+            <BookOpen className="w-8 h-8 text-text-muted mx-auto mb-3 opacity-40" />
+            <p className="text-text-muted text-sm">会議ログはまだ記録されていません</p>
+            <p className="text-text-muted text-xs mt-1">シミュレーション実行後に表示されます</p>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {meeting.messages.map((msg, i) => (
+              <ChatBubble key={i} message={msg} />
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
