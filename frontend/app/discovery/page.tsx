@@ -1,3 +1,6 @@
+'use client';
+
+import { useState, useEffect } from 'react';
 import { fetchDiscoveries } from '@/lib/api';
 import DiscoveryLog from '@/components/discovery/DiscoveryLog';
 import EmptyState from '@/components/ui/EmptyState';
@@ -85,15 +88,12 @@ const MOCK_DISCOVERIES: DiscoveryEntry[] = [
   },
 ];
 
-export default async function DiscoveryPage() {
-  let entries: DiscoveryEntry[] = MOCK_DISCOVERIES;
+export default function DiscoveryPage() {
+  const [entries, setEntries] = useState<DiscoveryEntry[]>(MOCK_DISCOVERIES);
 
-  try {
-    const data = await fetchDiscoveries(1, 50);
-    if (data.items.length > 0) entries = data.items;
-  } catch {
-    // fallback
-  }
+  useEffect(() => {
+    fetchDiscoveries(1, 50).then(data => { if (data && data.items.length > 0) setEntries(data.items); }).catch(() => {});
+  }, []);
 
   const statusCounts = {
     found: entries.filter((e) => e.status === 'found').length,

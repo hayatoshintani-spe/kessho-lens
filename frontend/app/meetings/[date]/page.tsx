@@ -1,4 +1,6 @@
-import { notFound } from 'next/navigation';
+'use client';
+
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { fetchMeeting } from '@/lib/api';
 import MeetingDetail from '@/components/meetings/MeetingDetail';
@@ -75,37 +77,20 @@ const MOCK_MEETING: MeetingLog = {
   ],
 };
 
-export default async function MeetingDetailPage({
+export default function MeetingDetailPage({
   params,
 }: {
   params: { date: string };
 }) {
   const { date } = params;
-
-  // Validate date format
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
-    notFound();
-  }
-
-  let meeting: MeetingLog = {
+  const [meeting, setMeeting] = useState<MeetingLog>({
     ...MOCK_MEETING,
     date,
-  };
+  });
 
-  try {
-    meeting = await fetchMeeting(date);
-  } catch {
-    // Use mock with correct date if this is the demo date
-    if (date !== '2026-05-14') {
-      // For other dates, show a simplified version
-      meeting = {
-        ...MOCK_MEETING,
-        date,
-        summary: `${date}の会議ログです。`,
-        messages: MOCK_MEETING.messages,
-      };
-    }
-  }
+  useEffect(() => {
+    fetchMeeting(date).then(data => { if (data) setMeeting(data); }).catch(() => {});
+  }, [date]);
 
   return (
     <div className="space-y-6 animate-fade-in max-w-3xl">

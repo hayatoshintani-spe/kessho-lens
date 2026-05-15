@@ -1,4 +1,6 @@
-import { notFound } from 'next/navigation';
+'use client';
+
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { fetchAgent, fetchAgentPerformance } from '@/lib/api';
 import AgentProfile from '@/components/agents/AgentProfile';
@@ -129,30 +131,23 @@ const MOCK_AGENTS: Record<AgentId, Agent> = {
   },
 };
 
-export default async function AgentDetailPage({
+export default function AgentDetailPage({
   params,
 }: {
   params: { id: string };
 }) {
   const id = params.id as AgentId;
+  const [agent, setAgent] = useState<Agent>(
+    VALID_IDS.includes(id) ? MOCK_AGENTS[id] : MOCK_AGENTS['buffett'],
+  );
+  const [performance, setPerformance] = useState<PerformanceDataPoint[]>(
+    generateMockPnlData(30),
+  );
 
-  if (!VALID_IDS.includes(id)) {
-    notFound();
-  }
-
-  let agent: Agent = MOCK_AGENTS[id];
-  let performance: PerformanceDataPoint[] = generateMockPnlData(30);
-
-  try {
-    const [agentData, perfData] = await Promise.allSettled([
-      fetchAgent(id),
-      fetchAgentPerformance(id, 30),
-    ]);
-    if (agentData.status === 'fulfilled') agent = agentData.value;
-    if (perfData.status === 'fulfilled') performance = perfData.value;
-  } catch {
-    // use mock
-  }
+  useEffect(() => {
+    fetchAgent(id).then(data => { if (data) setAgent(data); }).catch(() => {});
+    fetchAgentPerformance(id, 30).then(data => { if (data) setPerformance(data); }).catch(() => {});
+  }, [id]);
 
   // Map performance data to single-agent view
   const chartData = performance.map((p) => ({
@@ -189,13 +184,4 @@ export default async function AgentDetailPage({
       <AgentStats agent={agent} />
     </div>
   );
-}
-
-export function generateStaticParams() {
-  return [
-    { id: 'buffett' },
-    { id: 'soros' },
-    { id: 'lynch' },
-    { id: 'flat' },
-  ];
 }

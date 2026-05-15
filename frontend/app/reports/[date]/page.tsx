@@ -1,4 +1,6 @@
-import { notFound } from 'next/navigation';
+'use client';
+
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { fetchReport } from '@/lib/api';
 import MarkdownReport from '@/components/reports/MarkdownReport';
@@ -122,24 +124,17 @@ AI活用クラウドサービス企業を新たに発掘しました。業績の
   marketTheme: '米金利動向と日本株への影響',
 };
 
-export default async function ReportDetailPage({
+export default function ReportDetailPage({
   params,
 }: {
   params: { date: string };
 }) {
   const { date } = params;
+  const [report, setReport] = useState<DailyReport>({ ...MOCK_REPORT, date });
 
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
-    notFound();
-  }
-
-  let report: DailyReport = { ...MOCK_REPORT, date };
-
-  try {
-    report = await fetchReport(date);
-  } catch {
-    // use mock
-  }
+  useEffect(() => {
+    fetchReport(date).then(data => { if (data) setReport(data); }).catch(() => {});
+  }, [date]);
 
   const isFundProfit = report.totalFundReturn >= 0;
 

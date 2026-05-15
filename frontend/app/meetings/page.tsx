@@ -1,3 +1,6 @@
+'use client';
+
+import { useState, useEffect } from 'react';
 import { fetchMeetings } from '@/lib/api';
 import MeetingCard from '@/components/meetings/MeetingCard';
 import EmptyState from '@/components/ui/EmptyState';
@@ -83,15 +86,12 @@ const MOCK_MEETINGS: MeetingLog[] = [
   },
 ];
 
-export default async function MeetingsPage() {
-  let meetings: MeetingLog[] = MOCK_MEETINGS;
+export default function MeetingsPage() {
+  const [meetings, setMeetings] = useState<MeetingLog[]>(MOCK_MEETINGS);
 
-  try {
-    const data = await fetchMeetings(1, 20);
-    if (data.items.length > 0) meetings = data.items;
-  } catch {
-    // fallback to mock
-  }
+  useEffect(() => {
+    fetchMeetings(1, 20).then(data => { if (data && data.items.length > 0) setMeetings(data.items); }).catch(() => {});
+  }, []);
 
   return (
     <div className="space-y-6 animate-fade-in">

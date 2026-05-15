@@ -1,3 +1,6 @@
+'use client';
+
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { fetchAgents } from '@/lib/api';
 import type { Agent } from '@/lib/types';
@@ -89,15 +92,12 @@ const MOCK_AGENTS: Agent[] = [
   },
 ];
 
-export default async function AgentsPage() {
-  let agents: Agent[] = MOCK_AGENTS;
+export default function AgentsPage() {
+  const [agents, setAgents] = useState<Agent[]>(MOCK_AGENTS);
 
-  try {
-    const data = await fetchAgents();
-    if (data.length > 0) agents = data;
-  } catch {
-    // fallback to mock
-  }
+  useEffect(() => {
+    fetchAgents().then(data => { if (data && data.length > 0) setAgents(data); }).catch(() => {});
+  }, []);
 
   const sorted = [...agents].sort((a, b) => a.rank - b.rank);
 

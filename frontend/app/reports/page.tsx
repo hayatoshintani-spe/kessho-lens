@@ -1,3 +1,6 @@
+'use client';
+
+import { useState, useEffect } from 'react';
 import { fetchReports } from '@/lib/api';
 import ReportCard from '@/components/reports/ReportCard';
 import EmptyState from '@/components/ui/EmptyState';
@@ -73,15 +76,12 @@ AI関連中小型株を新規発掘。四半期成長率45%の企業をウォッ
   },
 ];
 
-export default async function ReportsPage() {
-  let reports: DailyReport[] = MOCK_REPORTS;
+export default function ReportsPage() {
+  const [reports, setReports] = useState<DailyReport[]>(MOCK_REPORTS);
 
-  try {
-    const data = await fetchReports(1, 20);
-    if (data.items.length > 0) reports = data.items;
-  } catch {
-    // fallback
-  }
+  useEffect(() => {
+    fetchReports(1, 20).then(data => { if (data && data.items.length > 0) setReports(data.items); }).catch(() => {});
+  }, []);
 
   return (
     <div className="space-y-6 animate-fade-in">
