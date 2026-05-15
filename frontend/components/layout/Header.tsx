@@ -36,43 +36,45 @@ export default function Header() {
           'ページ');
 
   return (
-    <header className="sticky top-0 z-30 bg-bg-primary/80 backdrop-blur border-b border-border px-4 md:px-6 h-14 flex items-center justify-between flex-shrink-0">
-      {/* Left: mobile menu + breadcrumb */}
-      <div className="flex items-center gap-3">
-        {/* Mobile menu toggle */}
-        <button
-          className="md:hidden text-text-secondary hover:text-text-primary"
-          onClick={() => setMenuOpen((v) => !v)}
-          aria-label="メニュー"
-        >
-          {menuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-        </button>
+    <>
+      <header className="sticky top-0 z-30 bg-bg-primary/80 backdrop-blur border-b border-border px-4 md:px-6 h-14 flex items-center justify-between flex-shrink-0">
+        {/* Left: mobile menu + breadcrumb */}
+        <div className="flex items-center gap-3">
+          {/* Mobile menu toggle */}
+          <button
+            className="md:hidden text-text-secondary hover:text-text-primary"
+            onClick={() => setMenuOpen((v) => !v)}
+            aria-label="メニュー"
+          >
+            {menuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+          </button>
 
-        <div className="text-text-secondary text-sm">
-          <span className="text-text-primary font-medium">{routeLabel}</span>
+          <div className="text-text-secondary text-sm">
+            <span className="text-text-primary font-medium">{routeLabel}</span>
+          </div>
         </div>
-      </div>
 
-      {/* Right: time + actions */}
-      <div className="flex items-center gap-3">
-        {now && (
-          <span className="hidden sm:block text-text-muted text-xs font-mono">
-            {now}
-          </span>
-        )}
-        <button
-          className="text-text-muted hover:text-text-secondary transition-colors"
-          title="更新"
-          onClick={() => window.location.reload()}
-        >
-          <RefreshCw className="w-4 h-4" />
-        </button>
-        <button className="text-text-muted hover:text-text-secondary transition-colors">
-          <Bell className="w-4 h-4" />
-        </button>
-      </div>
+        {/* Right: time + actions */}
+        <div className="flex items-center gap-3">
+          {now && (
+            <span className="hidden sm:block text-text-muted text-xs font-mono">
+              {now}
+            </span>
+          )}
+          <button
+            className="text-text-muted hover:text-text-secondary transition-colors"
+            title="更新"
+            onClick={() => window.location.reload()}
+          >
+            <RefreshCw className="w-4 h-4" />
+          </button>
+          <button className="text-text-muted hover:text-text-secondary transition-colors">
+            <Bell className="w-4 h-4" />
+          </button>
+        </div>
+      </header>
 
-      {/* Mobile nav overlay */}
+      {/* Mobile nav overlay — outside <header> to avoid backdrop-filter containing block */}
       {menuOpen && (
         <div className="md:hidden fixed inset-0 top-14 z-50 bg-bg-sidebar border-t border-border">
           <nav className="p-4 space-y-1">
@@ -101,6 +103,6 @@ export default function Header() {
           </nav>
         </div>
       )}
-    </header>
+    </>
   );
 }
