@@ -21,7 +21,15 @@ async def health_check():
         "description": "AIインベストメントファンドシミュレーター",
         "env": os.getenv("ENV", "production"),
         "has_anthropic_key": bool(os.getenv("ANTHROPIC_API_KEY")),
-        "has_market_data_key": bool(
-            os.getenv("ALPHA_VANTAGE_API_KEY") or os.getenv("FINNHUB_API_KEY")
+        "has_finnhub_key": bool(os.getenv("FINNHUB_API_KEY")),
+        "has_alpha_vantage_key": bool(os.getenv("ALPHA_VANTAGE_API_KEY")),
+        "market_data_source": (
+            "yfinance"
+            if True  # yfinance は常に最初に試みる（APIキー不要）
+            else "finnhub"
+            if os.getenv("FINNHUB_API_KEY")
+            else "alpha_vantage"
+            if os.getenv("ALPHA_VANTAGE_API_KEY")
+            else "mock"
         ),
     }
