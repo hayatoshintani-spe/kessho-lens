@@ -147,11 +147,11 @@ export default function DashboardPage() {
         </div>
         {isConnecting ? (
           <div className="bg-blue-500/10 border border-blue-500/30 text-blue-400 text-xs px-3 py-1.5 rounded-md animate-pulse">
-            接続中...
+            バックエンド起動中...（最大60秒）
           </div>
         ) : !isLive ? (
-          <div className="bg-red-500/10 border border-red-500/30 text-red-400 text-xs px-3 py-1.5 rounded-md max-w-[200px] truncate">
-            {debugError ?? 'バックエンド未接続'}
+          <div className="bg-accent-gold/10 border border-accent-gold/30 text-accent-gold text-xs px-3 py-1.5 rounded-md">
+            デモモード（バックエンド未接続）
           </div>
         ) : null}
       </div>

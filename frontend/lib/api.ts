@@ -19,8 +19,13 @@ const API_BASE =
 
 // ─── HTTP helpers ─────────────────────────────────────────────────────────────
 
-async function get<T>(path: string): Promise<T> {
+async function get<T>(path: string, attempt = 0): Promise<T> {
   const res = await fetch(`${API_BASE}${path}`, { cache: 'no-store' });
+  // Render free tier returns 503 while cold-starting (~50s). Retry up to 6 times.
+  if ((res.status === 503 || res.status === 502) && attempt < 6) {
+    await new Promise(r => setTimeout(r, 10_000));
+    return get<T>(path, attempt + 1);
+  }
   if (!res.ok) throw new Error(`API error ${res.status}: ${res.statusText}`);
   return res.json() as Promise<T>;
 }
