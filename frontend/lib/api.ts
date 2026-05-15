@@ -21,13 +21,31 @@ const API_BASE =
 
 async function get<T>(path: string, attempt = 0): Promise<T> {
   const res = await fetch(`${API_BASE}${path}`, { cache: 'no-store' });
-  // Render free tier returns 503 while cold-starting (~50s). Retry up to 6 times.
-  if ((res.status === 503 || res.status === 502) && attempt < 6) {
-    await new Promise(r => setTimeout(r, 10_000));
+  // Render free tier returns 5xx while cold-starting (~50s). Retry up to 4 times with 8s gaps.
+  if (res.status >= 500 && attempt < 4) {
+    await new Promise(r => setTimeout(r, 8_000));
     return get<T>(path, attempt + 1);
   }
   if (!res.ok) throw new Error(`API error ${res.status}: ${res.statusText}`);
   return res.json() as Promise<T>;
+}
+
+// Poll /api/health until it returns 200 or we give up after maxMs milliseconds.
+// This warms up Render's free-tier container before making actual data requests.
+export async function warmupBackend(maxMs = 70_000): Promise<boolean> {
+  const deadline = Date.now() + maxMs;
+  while (Date.now() < deadline) {
+    try {
+      const res = await fetch(`${API_BASE}/api/health`, { cache: 'no-store' });
+      if (res.ok) return true;
+    } catch {
+      // network error — keep waiting
+    }
+    const remaining = deadline - Date.now();
+    if (remaining <= 0) break;
+    await new Promise(r => setTimeout(r, Math.min(5_000, remaining)));
+  }
+  return false;
 }
 
 async function post<T>(path: string, body?: unknown, secret?: string): Promise<T> {

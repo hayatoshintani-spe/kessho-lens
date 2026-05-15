@@ -8,6 +8,7 @@ import {
   fetchPerformance,
   fetchLatestMeeting,
   fetchLatestReport,
+  warmupBackend,
 } from '@/lib/api';
 import {
   generateMockPnlData,
@@ -117,21 +118,30 @@ export default function DashboardPage() {
 
   useEffect(() => {
     const t0 = Date.now();
-    Promise.allSettled([
-      fetchAgents(),
-      fetchFundStats(),
-      fetchPerformance(30),
-      fetchLatestMeeting(),
-      fetchLatestReport(),
-    ]).then(([agentsData, statsData, perfData, meetingData, reportData]) => {
-      const elapsed = Date.now() - t0;
-      if (agentsData.status === 'fulfilled') { setAgents(agentsData.value); setIsLive(true); }
-      else { setDebugError(`[${elapsed}ms] ${(agentsData.reason as Error)?.message ?? 'unknown'}`); }
-      if (statsData.status === 'fulfilled') { setStats(statsData.value); }
-      if (perfData.status === 'fulfilled') { setPerformance(perfData.value); }
-      if (meetingData.status === 'fulfilled') { setLatestMeeting(meetingData.value); }
-      if (reportData.status === 'fulfilled') { setLatestReport(reportData.value); }
-      setIsConnecting(false);
+    // First warm up the Render free-tier container, then fetch data.
+    warmupBackend(70_000).then((alive) => {
+      if (!alive) {
+        const elapsed = Date.now() - t0;
+        setDebugError(`[${elapsed}ms] バックエンドに接続できませんでした`);
+        setIsConnecting(false);
+        return;
+      }
+      Promise.allSettled([
+        fetchAgents(),
+        fetchFundStats(),
+        fetchPerformance(30),
+        fetchLatestMeeting(),
+        fetchLatestReport(),
+      ]).then(([agentsData, statsData, perfData, meetingData, reportData]) => {
+        const elapsed = Date.now() - t0;
+        if (agentsData.status === 'fulfilled') { setAgents(agentsData.value); setIsLive(true); }
+        else { setDebugError(`[${elapsed}ms] ${(agentsData.reason as Error)?.message ?? 'unknown'}`); }
+        if (statsData.status === 'fulfilled') { setStats(statsData.value); }
+        if (perfData.status === 'fulfilled') { setPerformance(perfData.value); }
+        if (meetingData.status === 'fulfilled') { setLatestMeeting(meetingData.value); }
+        if (reportData.status === 'fulfilled') { setLatestReport(reportData.value); }
+        setIsConnecting(false);
+      });
     });
   }, []);
 
@@ -147,11 +157,11 @@ export default function DashboardPage() {
         </div>
         {isConnecting ? (
           <div className="bg-blue-500/10 border border-blue-500/30 text-blue-400 text-xs px-3 py-1.5 rounded-md animate-pulse">
-            バックエンド起動中...（最大60秒）
+            バックエンド起動中...（最大70秒）
           </div>
         ) : !isLive ? (
           <div className="bg-accent-gold/10 border border-accent-gold/30 text-accent-gold text-xs px-3 py-1.5 rounded-md">
-            デモモード（バックエンド未接続）
+            デモモード（バックエンド未接続）{debugError ? ` — ${debugError}` : ''}
           </div>
         ) : null}
       </div>

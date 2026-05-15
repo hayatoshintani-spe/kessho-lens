@@ -160,9 +160,9 @@ async def list_agents():
             "color": details["color"],
             "style_tags": details["style_tags"],
             "bio_short": details["bio_ja"][:100] + "...",
-            "catchphrase": agent.catchphrase,
-            "style": agent.style,
-            "favorite_sectors": agent.favorite_sectors,
+            "catchphrase": agent.catchphrase if agent else details["style_tags"][0] if details["style_tags"] else "",
+            "style": agent.style if agent else details["style_tags"][0] if details["style_tags"] else "",
+            "favorite_sectors": agent.favorite_sectors if agent else [],
             "performance": {
                 "total_return_pct": perf.get("total_return_pct", 0),
                 "daily_pnl": perf.get("daily_pnl", 0),
@@ -199,9 +199,10 @@ async def get_agent_detail(agent_id: str):
     # 直近のミーティングでの発言
     recent_meetings = Storage.get_meetings(limit=5)
     agent_messages = []
+    agent_name = agent.name if agent else details["display_name"]
     for meeting in recent_meetings:
         for msg in meeting.get("messages", []):
-            if msg.get("agent") == agent.name:
+            if msg.get("agent") == agent_name:
                 agent_messages.append({
                     "date": meeting.get("date"),
                     "time": msg.get("time"),
@@ -219,9 +220,9 @@ async def get_agent_detail(agent_id: str):
         "color": details["color"],
         "style_tags": details["style_tags"],
         "bio_ja": details["bio_ja"],
-        "catchphrase": agent.catchphrase,
-        "style": agent.style,
-        "favorite_sectors": agent.favorite_sectors,
+        "catchphrase": agent.catchphrase if agent else details["style_tags"][0] if details["style_tags"] else "",
+        "style": agent.style if agent else details["style_tags"][0] if details["style_tags"] else "",
+        "favorite_sectors": agent.favorite_sectors if agent else [],
         "famous_quotes": details["famous_quotes"],
         "investment_approach": details["investment_approach"],
         "weaknesses": details["weaknesses"],
