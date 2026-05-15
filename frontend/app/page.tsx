@@ -112,6 +112,7 @@ export default function DashboardPage() {
   const [latestMeeting, setLatestMeeting] = useState<MeetingLog | null>(MOCK_MEETING);
   const [latestReport, setLatestReport] = useState<DailyReport | null>(null);
   const [isLive, setIsLive] = useState(false);
+  const [isConnecting, setIsConnecting] = useState(true);
 
   useEffect(() => {
     Promise.allSettled([
@@ -126,6 +127,7 @@ export default function DashboardPage() {
       if (perfData.status === 'fulfilled') { setPerformance(perfData.value); }
       if (meetingData.status === 'fulfilled') { setLatestMeeting(meetingData.value); }
       if (reportData.status === 'fulfilled') { setLatestReport(reportData.value); }
+      setIsConnecting(false);
     });
   }, []);
 
@@ -139,11 +141,15 @@ export default function DashboardPage() {
             4つのAIエージェントによる日次投資シミュレーション
           </p>
         </div>
-        {!isLive && (
+        {isConnecting ? (
+          <div className="bg-blue-500/10 border border-blue-500/30 text-blue-400 text-xs px-3 py-1.5 rounded-md animate-pulse">
+            バックエンド接続中...
+          </div>
+        ) : !isLive ? (
           <div className="bg-accent-gold/10 border border-accent-gold/30 text-accent-gold text-xs px-3 py-1.5 rounded-md">
             デモモード（バックエンド未接続）
           </div>
-        )}
+        ) : null}
       </div>
 
       {/* Agent cards grid */}
