@@ -1,7 +1,8 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { Database, Filter } from 'lucide-react';
+import Link from 'next/link';
+import { Database, Filter, Plus } from 'lucide-react';
 import { fetchIntelCards } from '@/lib/intel-api';
 import { warmupBackend } from '@/lib/api';
 import CardItem from '@/components/intel/CardItem';
@@ -83,6 +84,13 @@ export default function CardsDBPage() {
         <span className="text-text-muted text-sm ml-2">
           全 {cards.length} 件 / 絞り込み後 {filtered.length} 件
         </span>
+        <Link
+          href="/intel/cards/new"
+          className="ml-auto inline-flex items-center gap-1 px-3 py-1.5 rounded bg-accent-gold/10 border border-accent-gold/40 text-accent-gold text-xs font-medium hover:bg-accent-gold/20"
+        >
+          <Plus className="w-3.5 h-3.5" />
+          新規カード
+        </Link>
       </div>
 
       {/* 重要度別カウント */}
