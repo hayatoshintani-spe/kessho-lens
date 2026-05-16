@@ -9,11 +9,5 @@
   "rewrites": [
     { "source": "/", "destination": "/frontend" },
     { "source": "/:path*", "destination": "/frontend/:path*" }
-  ],
-  "crons": [
-    {
-      "path": "/api/trigger-daily",
-      "schedule": "0 1 * * *"
-    }
   ]
 }

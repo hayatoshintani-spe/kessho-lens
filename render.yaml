@@ -2,7 +2,7 @@
 # https://render.com/docs/blueprint-spec
 services:
   - type: web
-    name: kessho-lens-backend
+    name: tsuburaya-intel-backend
     runtime: python
     plan: free
     rootDir: backend
@@ -12,13 +12,11 @@ services:
     envVars:
       - key: ENV
         value: production
-      - key: CRON_SECRET
-        sync: false
       - key: FRONTEND_URL
         sync: false
       - key: ANTHROPIC_API_KEY
         sync: false
-      - key: ALPHA_VANTAGE_API_KEY
+      - key: NOTION_API_KEY
         sync: false
-      - key: FINNHUB_API_KEY
+      - key: NOTION_CARDS_DB_ID
         sync: false
