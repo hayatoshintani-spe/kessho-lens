@@ -9,7 +9,13 @@ export type AgentId = FundAgentId | 'macro' | 'quant' | 'risk';
 export interface Portfolio {
   totalValue: number;
   cash: number;
+  cashRatio?: number;       // 現金比率 %
+  equityRatio?: number;     // 株式比率 %
+  holdingsValue?: number;   // 株式評価額合計
   holdings: Holding[];
+  priceUpdatedAt?: string;  // 株価最終更新時刻 (ISO 8601)
+  priceSource?: string;     // データソース (alpaca | finnhub | yfinance | alpha_vantage | mock)
+  consistencyWarnings?: ConsistencyWarning[];
 }
 
 export interface Holding {
@@ -20,7 +26,18 @@ export interface Holding {
   currentPrice: number;
   unrealizedPnL: number;
   unrealizedPnLPct: number;
-  weight: number; // portfolio weight %
+  weight: number;            // portfolio weight %
+  priceUpdatedAt?: string;   // この銘柄の株価が取得された時刻
+  priceSource?: string;      // どのAPIから取得したか
+  prevPrice?: number;        // 直近の前日比チェック用
+}
+
+export type ConsistencyLevel = 'info' | 'warning' | 'error';
+
+export interface ConsistencyWarning {
+  level: ConsistencyLevel;
+  code: string;
+  message: string;
 }
 
 export interface Agent {

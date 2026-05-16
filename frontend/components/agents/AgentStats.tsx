@@ -1,6 +1,8 @@
 import type { Agent } from '@/lib/types';
 import { formatPct, formatCurrency, cn } from '@/lib/utils';
 import { Package, DollarSign } from 'lucide-react';
+import PriceMetaBadge from '@/components/ui/PriceMetaBadge';
+import ConsistencyBanner from '@/components/ui/ConsistencyBanner';
 
 interface AgentStatsProps {
   agent: Agent;
@@ -12,15 +14,28 @@ export default function AgentStats({ agent }: AgentStatsProps) {
   const topHoldings = [...(portfolio.holdings ?? [])]
     .sort((a, b) => b.weight - a.weight)
     .slice(0, 8);
+  const equityRatio = portfolio.equityRatio ?? (
+    portfolio.totalValue > 0
+      ? ((portfolio.totalValue - portfolio.cash) / portfolio.totalValue) * 100
+      : 0
+  );
 
   return (
     <div className="space-y-5">
+      {/* Consistency warnings — only shown if any */}
+      {portfolio.consistencyWarnings && portfolio.consistencyWarnings.length > 0 && (
+        <ConsistencyBanner warnings={portfolio.consistencyWarnings} />
+      )}
+
       {/* Portfolio summary */}
       <div className="card p-5">
-        <h3 className="text-text-primary font-semibold text-sm mb-4 flex items-center gap-2">
-          <DollarSign className="w-4 h-4 text-accent-gold" />
-          ポートフォリオ概要
-        </h3>
+        <div className="flex items-center justify-between gap-3 mb-4 flex-wrap">
+          <h3 className="text-text-primary font-semibold text-sm flex items-center gap-2">
+            <DollarSign className="w-4 h-4 text-accent-gold" />
+            ポートフォリオ概要
+          </h3>
+          <PriceMetaBadge source={portfolio.priceSource} updatedAt={portfolio.priceUpdatedAt} />
+        </div>
         <div className="grid grid-cols-2 gap-3">
           <div className="bg-bg-elevated rounded-md p-3">
             <div className="text-text-muted text-[10px] uppercase tracking-wider mb-1">
@@ -51,12 +66,7 @@ export default function AgentStats({ agent }: AgentStatsProps) {
               株式比率
             </div>
             <div className="text-text-primary font-bold font-tabular text-base">
-              {portfolio.totalValue > 0
-                ? formatPct(
-                    ((portfolio.totalValue - portfolio.cash) / portfolio.totalValue) * 100,
-                    0,
-                  )
-                : '—'}
+              {portfolio.totalValue > 0 ? formatPct(equityRatio, 0) : '—'}
             </div>
           </div>
         </div>

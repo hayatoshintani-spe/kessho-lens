@@ -116,10 +116,11 @@ function toHolding(h: Record<string, unknown>): Holding {
   const shares = Number(h.shares ?? 0);
   const avgCost = Number(h.avg_cost ?? h.avgCost ?? 0);
   const currentPrice = Number(h.current_price ?? h.currentPrice ?? 0);
-  const value = Number(h.value ?? shares * currentPrice);
+  const value = shares * currentPrice;
   const cost = shares * avgCost;
   const pnl = value - cost;
   const pnlPct = cost > 0 ? (pnl / cost) * 100 : 0;
+  const prevPriceRaw = h.prev_price ?? h.prevPrice;
   return {
     ticker: String(h.ticker ?? h.symbol ?? ''),
     name: String(h.name ?? ''),
@@ -128,22 +129,49 @@ function toHolding(h: Record<string, unknown>): Holding {
     currentPrice,
     unrealizedPnL: pnl,
     unrealizedPnLPct: Number(h.gain_pct ?? pnlPct),
-    weight: 0,
+    weight: Number(h.weight ?? 0),
+    priceUpdatedAt: (h.price_updated_at ?? h.priceUpdatedAt) as string | undefined,
+    priceSource: (h.price_source ?? h.priceSource) as string | undefined,
+    prevPrice: prevPriceRaw !== undefined && prevPriceRaw !== null ? Number(prevPriceRaw) : undefined,
   };
+}
+
+function toConsistencyWarnings(raw: unknown): import('./types').ConsistencyWarning[] {
+  if (!Array.isArray(raw)) return [];
+  return raw
+    .filter((w): w is Record<string, unknown> => typeof w === 'object' && w !== null)
+    .map((w) => ({
+      level: ((w.level as string) === 'error' || w.level === 'warning' ? w.level : 'info') as import('./types').ConsistencyLevel,
+      code: String(w.code ?? ''),
+      message: String(w.message ?? ''),
+    }));
 }
 
 function toPortfolio(p: Record<string, unknown> | undefined | null): Portfolio {
   if (!p) return { totalValue: 0, cash: 0, holdings: [] };
-  const totalValue = Number(p.total_value ?? p.totalValue ?? 0);
   const cash = Number(p.cash ?? 0);
   const rawHoldings = (p.holdings as Record<string, unknown>[] | undefined) ?? [];
   const holdings = rawHoldings.map(toHolding);
+  // バックエンドが再計算済みの値を返すならそれを使い、無ければクライアント側で計算
   const equityValue = holdings.reduce((s, h) => s + h.shares * h.currentPrice, 0);
   const basis = equityValue + cash;
   for (const h of holdings) {
-    h.weight = basis > 0 ? ((h.shares * h.currentPrice) / basis) * 100 : 0;
+    if (!h.weight) {
+      h.weight = basis > 0 ? ((h.shares * h.currentPrice) / basis) * 100 : 0;
+    }
   }
-  return { totalValue, cash, holdings };
+  const totalValue = Number(p.total_value ?? p.totalValue ?? basis);
+  return {
+    totalValue,
+    cash,
+    cashRatio: p.cash_ratio !== undefined ? Number(p.cash_ratio) : undefined,
+    equityRatio: p.equity_ratio !== undefined ? Number(p.equity_ratio) : undefined,
+    holdingsValue: p.holdings_value !== undefined ? Number(p.holdings_value) : equityValue,
+    holdings,
+    priceUpdatedAt: (p.price_updated_at ?? p.priceUpdatedAt) as string | undefined,
+    priceSource: (p.price_source ?? p.priceSource) as string | undefined,
+    consistencyWarnings: toConsistencyWarnings(p.consistency_warnings ?? p.consistencyWarnings),
+  };
 }
 
 function deriveBeliefs(d: Record<string, unknown>): string[] {
@@ -156,10 +184,25 @@ function deriveBeliefs(d: Record<string, unknown>): string[] {
 function adaptAgentListItem(raw: Record<string, unknown>, rankMap?: Map<string, number>): Agent {
   const id = String(raw.id ?? '');
   const agentId: AgentId = isAgentId(id) ? id : 'flat';
-  const portfolio = toPortfolio(raw.portfolio as Record<string, unknown> | undefined);
-  const perf = ((raw.portfolio as Record<string, unknown> | undefined)?.performance as
-    | Record<string, unknown>
-    | undefined) ?? (raw.performance as Record<string, unknown> | undefined);
+  // /api/agents/{id} returns portfolio nested; /api/dashboard returns portfolio fields flat
+  // Detect and pass the right object to toPortfolio.
+  const nested = raw.portfolio as Record<string, unknown> | undefined;
+  const portfolioSrc: Record<string, unknown> = nested
+    ? nested
+    : {
+        cash: raw.cash,
+        total_value: raw.total_value,
+        cash_ratio: raw.cash_ratio,
+        equity_ratio: raw.equity_ratio,
+        holdings_value: raw.holdings_value,
+        holdings: raw.top_holdings ?? raw.holdings,
+        price_updated_at: raw.price_updated_at,
+        price_source: raw.price_source,
+        consistency_warnings: raw.consistency_warnings,
+      };
+  const portfolio = toPortfolio(portfolioSrc);
+  const perf = (nested?.performance as Record<string, unknown> | undefined)
+    ?? (raw.performance as Record<string, unknown> | undefined);
   const totalReturn = Number(perf?.total_return_pct ?? 0);
   const totalReturnAbs = Number(perf?.daily_pnl ?? 0);
   return {

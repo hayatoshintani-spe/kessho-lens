@@ -151,16 +151,24 @@ def _update_portfolio_value(portfolio: Dict, latest_price: float, latest_ticker:
     portfolio["total_value"] = round(total_value, 2)
 
 
-def update_prices(agent_id: str, price_updates: Dict[str, float]) -> Dict:
+def update_prices(
+    agent_id: str,
+    price_updates: Dict[str, float],
+    source: str = "unknown",
+    fetched_at: Optional[str] = None,
+) -> Dict:
     """
     市場価格の更新をポートフォリオに反映する
 
     Args:
         agent_id: エージェントID
         price_updates: {ticker: new_price} の辞書
+        source: 株価データの取得元（"alpaca" | "finnhub" | "yfinance" | "alpha_vantage" | "mock"）
+        fetched_at: 株価取得時刻（ISO 8601）。省略時は現在時刻。
     """
     portfolio = get_or_init_portfolio(agent_id)
     prev_value = portfolio.get("total_value", 0)
+    timestamp = fetched_at or datetime.now(timezone.utc).isoformat()
 
     holdings = portfolio.get("holdings", [])
     total_holdings_value = 0
@@ -169,11 +177,17 @@ def update_prices(agent_id: str, price_updates: Dict[str, float]) -> Dict:
         ticker = holding["ticker"]
         if ticker in price_updates:
             new_price = price_updates[ticker]
+            # 前回値を残して前日比チェックに使う
+            old_price = holding.get("current_price")
+            if old_price is not None:
+                holding["prev_price"] = old_price
             holding["current_price"] = new_price
             holding["value"] = round(holding["shares"] * new_price, 2)
             holding["gain_pct"] = round(
                 (new_price - holding["avg_cost"]) / holding["avg_cost"] * 100, 2
             )
+            holding["price_updated_at"] = timestamp
+            holding["price_source"] = source
         total_holdings_value += holding.get("value", 0)
 
     new_total = portfolio.get("cash", 0) + total_holdings_value
@@ -181,6 +195,8 @@ def update_prices(agent_id: str, price_updates: Dict[str, float]) -> Dict:
 
     portfolio["total_value"] = round(new_total, 2)
     portfolio["holdings"] = holdings
+    portfolio["price_updated_at"] = timestamp
+    portfolio["price_source"] = source
     if "performance" not in portfolio:
         portfolio["performance"] = {}
     portfolio["performance"]["daily_pnl"] = daily_pnl

@@ -364,13 +364,15 @@ async def _update_all_portfolios(market_data: Dict) -> Dict:
     """全エージェントのポートフォリオ価格を更新"""
     tickers = market_data.get("tickers", [])
     price_updates = {t.get("ticker"): t.get("price") for t in tickers if t.get("ticker")}
+    source = market_data.get("source", "unknown")
+    fetched_at = market_data.get("timestamp")
 
     portfolios = {}
     agent_ids = ["buffett", "soros", "lynch", "flat"]
 
     for agent_id in agent_ids:
         try:
-            portfolio = update_prices(agent_id, price_updates)
+            portfolio = update_prices(agent_id, price_updates, source=source, fetched_at=fetched_at)
             portfolios[agent_id] = portfolio
         except Exception as e:
             print(f"ポートフォリオ更新エラー ({agent_id}): {e}")

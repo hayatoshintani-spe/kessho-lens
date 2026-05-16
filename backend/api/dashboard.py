@@ -10,6 +10,7 @@ import random
 
 from src.data.storage import Storage
 from src.data.mock_data import INITIAL_PORTFOLIOS
+from src.simulation.consistency import reconcile_portfolio, check_portfolio_consistency
 
 router = APIRouter()
 
@@ -55,9 +56,13 @@ async def get_dashboard():
     rankings = []
 
     for agent_id, meta in _AGENT_META.items():
-        portfolio = Storage.get_portfolio(agent_id)
-        if not portfolio:
-            portfolio = INITIAL_PORTFOLIOS.get(agent_id, {})
+        portfolio_raw = Storage.get_portfolio(agent_id)
+        if not portfolio_raw:
+            portfolio_raw = INITIAL_PORTFOLIOS.get(agent_id, {})
+
+        # 表示前に必ず再計算する（保存値を信頼しない）
+        portfolio = reconcile_portfolio(portfolio_raw)
+        consistency_warnings = check_portfolio_consistency(portfolio_raw, portfolio)
 
         perf = portfolio.get("performance", {})
         total_value = portfolio.get("total_value", 50_000_000)
@@ -71,7 +76,13 @@ async def get_dashboard():
             "style": meta["style"],
             "total_value": total_value,
             "cash": portfolio.get("cash", 0),
+            "cash_ratio": portfolio.get("cash_ratio", 0),
+            "equity_ratio": portfolio.get("equity_ratio", 0),
+            "holdings_value": portfolio.get("holdings_value", 0),
             "holdings_count": len(holdings),
+            "price_updated_at": portfolio.get("price_updated_at"),
+            "price_source": portfolio.get("price_source"),
+            "consistency_warnings": consistency_warnings,
             "performance": {
                 "total_return_pct": perf.get("total_return_pct", 0),
                 "daily_pnl": perf.get("daily_pnl", 0),
