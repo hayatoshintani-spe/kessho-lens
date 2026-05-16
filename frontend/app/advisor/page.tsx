@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { Lightbulb, Play, CheckCircle2, BookOpen, AlertTriangle } from 'lucide-react';
-import { fetchAdvisorDebate } from '@/lib/api';
+import { fetchAdvisorDebate, warmupBackend } from '@/lib/api';
 import type { AdvisorPeriod, AdvisorRisk } from '@/lib/api';
 import ChatBubble from '@/components/meetings/ChatBubble';
 import { cn, AGENT_COLORS, AGENT_NAMES } from '@/lib/utils';
@@ -36,10 +36,13 @@ export default function AdvisorPage() {
     setError(null);
     setResult(null);
     try {
+      // Wake the backend up first (Render free tier can sleep ~50s)
+      await warmupBackend(70_000);
       const data = await fetchAdvisorDebate(n, period, risk);
       setResult(data);
-    } catch {
-      setError('バックエンドに接続できませんでした。設定ページでAPIを確認してください。');
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      setError(`バックエンドに接続できませんでした。${msg}`);
     } finally {
       setLoading(false);
     }

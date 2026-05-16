@@ -306,7 +306,12 @@ def generate_rule_based_debate(amount: int, period: str, risk: str) -> dict:
 async def generate_claude_debate(amount: int, period: str, risk: str) -> dict | None:
     try:
         import anthropic
-        client = anthropic.Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
+        # 25秒タイムアウト: Renderの30秒制限内に確実にフォールバックできるようにする
+        client = anthropic.Anthropic(
+            api_key=os.getenv("ANTHROPIC_API_KEY"),
+            timeout=25.0,
+            max_retries=0,
+        )
         amount_str = f"{amount:,}万円"
 
         system = (
@@ -369,9 +374,23 @@ async def get_advisor_debate(req: AdvisorRequest):
 
     result = None
     if os.getenv("ANTHROPIC_API_KEY"):
-        result = await generate_claude_debate(amount, period, risk)
+        try:
+            result = await generate_claude_debate(amount, period, risk)
+        except Exception as e:
+            print(f"[advisor] unexpected Claude error, falling back: {e}")
+            result = None
 
     if result is None:
-        result = generate_rule_based_debate(amount, period, risk)
+        try:
+            result = generate_rule_based_debate(amount, period, risk)
+        except Exception as e:
+            print(f"[advisor] rule-based generation failed: {e}")
+            result = {
+                "participants": ["soros", "buffett", "lynch", "flat"],
+                "summary": "議論の生成に失敗しました。再度お試しください。",
+                "market_theme": "エラー",
+                "key_decisions": [],
+                "messages": [],
+            }
 
     return {"date": "advisor", **result}

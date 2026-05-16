@@ -48,15 +48,39 @@ export async function warmupBackend(maxMs = 70_000): Promise<boolean> {
   return false;
 }
 
-async function post<T>(path: string, body?: unknown, secret?: string): Promise<T> {
+async function post<T>(path: string, body?: unknown, secret?: string, attempt = 0): Promise<T> {
   const headers: Record<string, string> = { 'Content-Type': 'application/json' };
   if (secret) headers['Authorization'] = `Bearer ${secret}`;
-  const res = await fetch(`${API_BASE}${path}`, {
-    method: 'POST',
-    headers,
-    body: body ? JSON.stringify(body) : undefined,
-  });
-  if (!res.ok) throw new Error(`API error ${res.status}: ${res.statusText}`);
+  let res: Response;
+  try {
+    res = await fetch(`${API_BASE}${path}`, {
+      method: 'POST',
+      headers,
+      body: body ? JSON.stringify(body) : undefined,
+    });
+  } catch (e) {
+    // Network error (often happens on Render cold start). Retry with backoff.
+    if (attempt < 4) {
+      await new Promise(r => setTimeout(r, 8_000));
+      return post<T>(path, body, secret, attempt + 1);
+    }
+    throw e;
+  }
+  // Render free tier returns 5xx while cold-starting (~50s). Retry up to 4 times with 8s gaps.
+  if (res.status >= 500 && attempt < 4) {
+    await new Promise(r => setTimeout(r, 8_000));
+    return post<T>(path, body, secret, attempt + 1);
+  }
+  if (!res.ok) {
+    let detail = '';
+    try {
+      const errJson = await res.json();
+      detail = typeof errJson === 'object' && errJson ? JSON.stringify(errJson) : '';
+    } catch {
+      // ignore
+    }
+    throw new Error(`API error ${res.status}: ${res.statusText}${detail ? ` — ${detail}` : ''}`);
+  }
   return res.json() as Promise<T>;
 }
 
