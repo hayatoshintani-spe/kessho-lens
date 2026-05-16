@@ -16,6 +16,7 @@ import {
   Newspaper,
   Database,
   GitMerge,
+  Link2,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -34,6 +35,7 @@ const intelNavItems = [
   { href: '/intel/cards', label: 'カードDB', icon: Database },
   { href: '/intel/council', label: 'AI会議', icon: GitMerge },
   { href: '/intel/watchlist', label: 'ウォッチリスト', icon: Radar },
+  { href: '/intel/notion', label: 'Notion連携', icon: Link2 },
 ];
 
 export default function Sidebar() {

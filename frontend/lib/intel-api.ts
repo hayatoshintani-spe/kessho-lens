@@ -134,3 +134,59 @@ export async function fetchWatchlists(): Promise<CategoryWatchlist[]> {
   const res = await get<{ watchlists: CategoryWatchlist[] }>('/api/intel/watchlist');
   return res.watchlists;
 }
+
+// ─── Notion ────────────────────────────────────────────────────────────
+
+export interface NotionStatus {
+  enabled: boolean;
+  has_api_key: boolean;
+  has_db_id: boolean;
+  db_id: string | null;
+  db: {
+    title?: string;
+    url?: string;
+    properties?: string[];
+    error?: string;
+  };
+}
+
+export interface NotionSyncResult {
+  action: 'created' | 'updated' | 'skipped' | 'error';
+  page_id: string | null;
+  url: string | null;
+  error: string | null;
+}
+
+export async function fetchNotionStatus(): Promise<NotionStatus> {
+  return get<NotionStatus>('/api/intel/notion/status');
+}
+
+export async function syncCardToNotion(cardId: string): Promise<{
+  mode: 'single';
+  result: NotionSyncResult;
+}> {
+  return post('/api/intel/notion/sync', { card_id: cardId });
+}
+
+export async function syncAllCardsToNotion(): Promise<{
+  mode: 'all';
+  result: {
+    created: number;
+    updated: number;
+    skipped: number;
+    errors: Array<{ card_id?: string; error?: string } | string>;
+  };
+}> {
+  return post('/api/intel/notion/sync', {});
+}
+
+export async function setupNotionDatabase(
+  parentPageId: string,
+): Promise<{
+  database_id?: string;
+  url?: string;
+  message?: string;
+  error?: string;
+}> {
+  return post('/api/intel/notion/setup', { parent_page_id: parentPageId });
+}

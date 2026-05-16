@@ -6,6 +6,7 @@ Tsuburaya Intelligence Brief API
 - カテゴリ・ウォッチリスト
 """
 
+import os
 from datetime import datetime, timezone
 from typing import List, Optional
 
@@ -18,6 +19,7 @@ from src.intel.experts import EXPERT_META, list_experts, IMPORTANCE_LABELS
 from src.intel.card_generator import build_intel_card
 from src.intel.brief_generator import build_daily_brief, build_weekly_brief
 from src.intel.council import generate_council_session
+from src.intel import notion_sync
 
 router = APIRouter()
 
@@ -57,16 +59,27 @@ class CardCreateRequest(BaseModel):
     category: Optional[str] = None
     importance: Optional[str] = None
     date: Optional[str] = None  # YYYY-MM-DD
+    sync_to_notion: Optional[bool] = True  # デフォルト同期、Notion未設定なら自動skip
 
 
 @router.post("/intel/cards")
 async def create_intel_card(req: CardCreateRequest):
-    """新規カードを生成して保存"""
-    news = req.model_dump(exclude_none=True)
-    date = news.pop("date", None)
-    card = build_intel_card(news, date=date)
+    """新規カードを生成して保存。Notion設定済みなら自動同期"""
+    payload = req.model_dump(exclude_none=True)
+    date = payload.pop("date", None)
+    sync_flag = payload.pop("sync_to_notion", True)
+    card = build_intel_card(payload, date=date)
     Storage.save_intel_card(card)
-    return {"card": card, "message": "カードを生成しました"}
+
+    notion_result = None
+    if sync_flag and notion_sync.is_enabled():
+        notion_result = notion_sync.sync_card(card)
+
+    return {
+        "card": card,
+        "message": "カードを生成しました",
+        "notion": notion_result,
+    }
 
 
 # ─── Briefs ──────────────────────────────────────────────────────────────
@@ -194,6 +207,55 @@ async def get_intel_meta():
 
 
 # ─── Watchlist ──────────────────────────────────────────────────────────
+
+
+# ─── Notion ──────────────────────────────────────────────────────────────
+
+
+@router.get("/intel/notion/status")
+async def notion_status():
+    """Notion接続状況とDB情報を返す"""
+    return notion_sync.get_status()
+
+
+class NotionSyncRequest(BaseModel):
+    card_id: Optional[str] = None  # 指定なしなら全カード
+
+
+@router.post("/intel/notion/sync")
+async def notion_sync_endpoint(req: NotionSyncRequest):
+    """カードをNotionに同期する。card_id指定で個別、なしで全件"""
+    if not notion_sync.is_enabled():
+        raise HTTPException(
+            status_code=400,
+            detail="NOTION_API_KEY または NOTION_CARDS_DB_ID が未設定です",
+        )
+    if req.card_id:
+        card = Storage.get_intel_card(req.card_id)
+        if not card:
+            raise HTTPException(status_code=404, detail="カードが見つかりません")
+        return {"mode": "single", "result": notion_sync.sync_card(card)}
+    else:
+        cards = Storage.get_intel_cards(limit=500)
+        return {"mode": "all", "result": notion_sync.sync_all_cards(cards)}
+
+
+class NotionSetupRequest(BaseModel):
+    parent_page_id: str
+
+
+@router.post("/intel/notion/setup")
+async def notion_setup(req: NotionSetupRequest):
+    """
+    Notion DB を新規作成する。
+    Notion Integration を親ページに招待しておく必要がある。
+    """
+    if not os.getenv("NOTION_API_KEY"):
+        raise HTTPException(status_code=400, detail="NOTION_API_KEY が未設定です")
+    result = notion_sync.create_cards_database(req.parent_page_id)
+    if result.get("error"):
+        raise HTTPException(status_code=400, detail=result["error"])
+    return result
 
 
 @router.get("/intel/watchlist")

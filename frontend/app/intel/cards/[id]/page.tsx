@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, ExternalLink, AlertTriangle } from 'lucide-react';
-import { fetchIntelCard } from '@/lib/intel-api';
+import { ArrowLeft, ExternalLink, AlertTriangle, Upload, CheckCircle2 } from 'lucide-react';
+import { fetchIntelCard, syncCardToNotion, fetchNotionStatus } from '@/lib/intel-api';
 import { warmupBackend } from '@/lib/api';
 import { formatDate } from '@/lib/utils';
 import type { IntelCard } from '@/lib/intel-types';
@@ -24,6 +24,13 @@ export default function CardDetailPage({ params }: PageProps) {
   const [card, setCard] = useState<IntelCard | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [notionEnabled, setNotionEnabled] = useState(false);
+  const [notionSyncMsg, setNotionSyncMsg] = useState<{
+    ok: boolean;
+    text: string;
+    url?: string;
+  } | null>(null);
+  const [isSyncing, setIsSyncing] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -34,8 +41,12 @@ export default function CardDetailPage({ params }: PageProps) {
         return;
       }
       try {
-        const data = await fetchIntelCard(params.id);
+        const [data, status] = await Promise.all([
+          fetchIntelCard(params.id),
+          fetchNotionStatus().catch(() => null),
+        ]);
         setCard(data);
+        setNotionEnabled(Boolean(status?.enabled));
       } catch (e) {
         setErrorMsg((e as Error).message);
       } finally {
@@ -43,6 +54,32 @@ export default function CardDetailPage({ params }: PageProps) {
       }
     })();
   }, [params.id]);
+
+  async function handleSyncToNotion() {
+    if (!card) return;
+    setIsSyncing(true);
+    setNotionSyncMsg(null);
+    try {
+      const res = await syncCardToNotion(card.id);
+      const r = res.result;
+      if (r.action === 'created' || r.action === 'updated') {
+        setNotionSyncMsg({
+          ok: true,
+          text: r.action === 'created' ? 'Notion に作成しました' : 'Notion を更新しました',
+          url: r.url ?? undefined,
+        });
+      } else {
+        setNotionSyncMsg({
+          ok: false,
+          text: r.error || `同期失敗 (${r.action})`,
+        });
+      }
+    } catch (e) {
+      setNotionSyncMsg({ ok: false, text: (e as Error).message });
+    } finally {
+      setIsSyncing(false);
+    }
+  }
 
   return (
     <div className="space-y-5 animate-fade-in max-w-4xl">
@@ -63,6 +100,49 @@ export default function CardDetailPage({ params }: PageProps) {
         <div className="card p-6 text-center text-text-muted">カードが見つかりません</div>
       ) : (
         <>
+          {/* Notion 同期ボタン */}
+          {notionEnabled && (
+            <div className="card p-3 flex items-center justify-between gap-3">
+              <div className="text-xs text-text-secondary">
+                このカードを Notion DB に同期できます
+              </div>
+              <div className="flex items-center gap-2">
+                {notionSyncMsg && (
+                  <span
+                    className={`text-xs flex items-center gap-1 ${
+                      notionSyncMsg.ok ? 'text-profit' : 'text-loss'
+                    }`}
+                  >
+                    {notionSyncMsg.ok ? (
+                      <CheckCircle2 className="w-3 h-3" />
+                    ) : (
+                      <AlertTriangle className="w-3 h-3" />
+                    )}
+                    {notionSyncMsg.text}
+                    {notionSyncMsg.url && (
+                      <a
+                        href={notionSyncMsg.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="ml-1 inline-flex items-center gap-1 text-accent-gold hover:underline"
+                      >
+                        開く <ExternalLink className="w-3 h-3" />
+                      </a>
+                    )}
+                  </span>
+                )}
+                <button
+                  onClick={handleSyncToNotion}
+                  disabled={isSyncing}
+                  className="px-3 py-1.5 rounded bg-accent-gold/10 border border-accent-gold/40 text-accent-gold text-xs font-medium hover:bg-accent-gold/20 disabled:opacity-40 flex items-center gap-1"
+                >
+                  <Upload className="w-3 h-3" />
+                  {isSyncing ? '同期中...' : 'Notion同期'}
+                </button>
+              </div>
+            </div>
+          )}
+
           {/* ヘッダー */}
           <div className="card p-6">
             <div className="flex items-center gap-2 mb-3 flex-wrap">
