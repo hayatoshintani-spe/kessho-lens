@@ -10,7 +10,7 @@ import os
 from datetime import datetime, timezone
 from typing import List, Optional
 
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, HTTPException, Query, Request
 from pydantic import BaseModel
 
 from src.data.storage import Storage
@@ -19,7 +19,7 @@ from src.intel.experts import EXPERT_META, list_experts, IMPORTANCE_LABELS
 from src.intel.card_generator import build_intel_card
 from src.intel.brief_generator import build_daily_brief, build_weekly_brief
 from src.intel.council import generate_council_session
-from src.intel import notion_sync
+from src.intel import notion_sync, email_sender
 
 router = APIRouter()
 
@@ -281,3 +281,126 @@ async def get_watchlist():
                 ],
             })
     return {"watchlists": lists}
+
+
+# ─── Cron & Email Delivery ──────────────────────────────────────────────
+
+
+def _verify_cron_auth(request: Request) -> None:
+    """Authorization ヘッダを CRON_SECRET と照合。失敗時は 401。"""
+    cron_secret = os.getenv("CRON_SECRET", "")
+    if not cron_secret:
+        raise HTTPException(
+            status_code=500,
+            detail="サーバー設定エラー: CRON_SECRET が設定されていません",
+        )
+    auth = request.headers.get("Authorization", "")
+    if auth != f"Bearer {cron_secret}":
+        raise HTTPException(
+            status_code=401,
+            detail="認証に失敗しました。Authorization: Bearer <CRON_SECRET> が必要です。",
+        )
+
+
+def _resolve_today_in_brief_tz() -> str:
+    """BRIEF_TIMEZONE（既定: Asia/Tokyo）における今日の YYYY-MM-DD"""
+    from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
+
+    tz_name = os.getenv("BRIEF_TIMEZONE", "Asia/Tokyo")
+    try:
+        tz = ZoneInfo(tz_name)
+    except ZoneInfoNotFoundError:
+        tz = ZoneInfo("Asia/Tokyo")
+    return datetime.now(tz).strftime("%Y-%m-%d")
+
+
+def _ensure_brief_for_date(date: str) -> tuple[Optional[dict], list]:
+    """指定日の Daily Brief を取得。なければカードから生成して保存する。
+
+    Returns:
+        (brief, top_cards). カードゼロなら (None, [])
+    """
+    brief = Storage.get_intel_brief(date, "daily")
+    if not brief:
+        all_cards = Storage.get_intel_cards(limit=500)
+        cards_today = [c for c in all_cards if c.get("date") == date]
+        if not cards_today:
+            return (None, [])
+        brief = build_daily_brief(date, cards_today)
+        Storage.save_intel_brief(brief)
+    top_topic_ids = brief.get("top_topics", [])
+    top_cards = [Storage.get_intel_card(cid) for cid in top_topic_ids]
+    top_cards = [c for c in top_cards if c]
+    return (brief, top_cards)
+
+
+@router.post("/intel/cron/daily-brief")
+async def cron_daily_brief(request: Request):
+    """
+    日次 Daily Brief 生成 + メール配信を実行するクロンエンドポイント。
+    Vercel Cron / Render Cron / GitHub Actions などから呼び出す。
+    Authorization: Bearer <CRON_SECRET> が必須。
+    """
+    _verify_cron_auth(request)
+    date = _resolve_today_in_brief_tz()
+    brief, top_cards = _ensure_brief_for_date(date)
+    if not brief:
+        return {
+            "status": "skipped",
+            "date": date,
+            "reason": f"{date} 付のカードが登録されていないため Brief 生成を見送りました",
+            "email": None,
+        }
+    delivery = email_sender.send_brief_email(brief, top_cards)
+    return {
+        "status": "ok",
+        "date": date,
+        "brief_built": True,
+        "email": delivery,
+    }
+
+
+@router.get("/intel/email/status")
+async def email_status():
+    """メール配信設定の状況を返す"""
+    return email_sender.get_status()
+
+
+class EmailTestRequest(BaseModel):
+    date: Optional[str] = None  # YYYY-MM-DD; 未指定は今日
+    recipients: Optional[List[str]] = None  # 未指定は環境変数
+    dry_run: bool = False  # True なら実送信せずプレビューだけ返す
+
+
+@router.post("/intel/email/test")
+async def email_test(req: EmailTestRequest):
+    """
+    指定日（既定: 今日）の Brief をテスト送信。
+    dry_run=True なら HTML/text プレビューだけ返し送信はしない。
+    """
+    if not req.dry_run and not email_sender.is_enabled():
+        raise HTTPException(
+            status_code=400,
+            detail="メール配信が無効です。RESEND_API_KEY / BRIEF_EMAIL_FROM / BRIEF_EMAIL_RECIPIENTS を設定してください。",
+        )
+
+    date = req.date or _resolve_today_in_brief_tz()
+    brief, top_cards = _ensure_brief_for_date(date)
+
+    # 当日カードがない場合は直近の Brief で代用してテスト可能にする
+    if not brief:
+        recent = Storage.get_intel_briefs(brief_type="daily", limit=1)
+        if not recent:
+            raise HTTPException(
+                status_code=404,
+                detail="送信可能な Brief が見つかりません。先にカードを登録してください。",
+            )
+        brief = recent[0]
+        top_topic_ids = brief.get("top_topics", [])
+        top_cards = [Storage.get_intel_card(cid) for cid in top_topic_ids]
+        top_cards = [c for c in top_cards if c]
+
+    result = email_sender.send_brief_email(
+        brief, top_cards, recipients=req.recipients, dry_run=req.dry_run
+    )
+    return {"date": brief.get("date"), "result": result}

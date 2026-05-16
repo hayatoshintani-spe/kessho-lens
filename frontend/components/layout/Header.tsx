@@ -14,6 +14,7 @@ const ROUTE_LABELS: Record<string, string> = {
   '/intel/cards/new': '新規カード',
   '/intel/council': 'AI会議',
   '/intel/watchlist': 'ウォッチリスト',
+  '/intel/delivery': 'メール配信',
   '/intel/notion': 'Notion連携',
 };
 
@@ -23,6 +24,7 @@ const MOBILE_NAV_ITEMS = [
   { href: '/intel/cards/new', label: '新規カード' },
   { href: '/intel/council', label: 'AI会議' },
   { href: '/intel/watchlist', label: 'ウォッチリスト' },
+  { href: '/intel/delivery', label: 'メール配信' },
   { href: '/intel/notion', label: 'Notion連携' },
 ];
 

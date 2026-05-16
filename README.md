@@ -35,6 +35,7 @@
 - **AI Council Session** — 6エキスパートによる戦略議論と編集者の結論
 - **Watchlist** — カテゴリ別の監視キーワード・対象企業
 - **Notion 連携** — IntelCard を社内 Notion DB に自動同期
+- **Daily Brief 自動配信** — 毎朝 7:00 JST に Brief を経営層へ自動メール配信 (Resend)
 
 ---
 
@@ -124,9 +125,14 @@ npm run dev
 | `ANTHROPIC_API_KEY` | Claude API キー（カード・ブリーフ・AI会議生成） | 推奨（なしでもテンプレで動作） |
 | `NOTION_API_KEY` | Notion Integration Token | 任意（Notion 連携時） |
 | `NOTION_CARDS_DB_ID` | IntelCards DB の ID | 任意（Notion 連携時） |
+| `RESEND_API_KEY` | Resend API キー（メール配信） | 任意（メール配信時） |
+| `BRIEF_EMAIL_FROM` | メール差出人 (`"Name <addr>"` 形式可) | 任意（メール配信時） |
+| `BRIEF_EMAIL_RECIPIENTS` | カンマ区切り宛先 | 任意（メール配信時） |
+| `BRIEF_TIMEZONE` | Brief 生成タイムゾーン (既定: `Asia/Tokyo`) | 任意 |
+| `CRON_SECRET` | クロンエンドポイント認証用シークレット | 自動配信時必須 |
 | `NEXT_PUBLIC_API_BASE_URL` | バックエンド URL | 本番必須 |
 | `ALLOWED_ORIGINS` | CORS 許可オリジン（カンマ区切り） | 本番推奨 |
-| `FRONTEND_URL` | フロントエンド URL（CORS 自動追加） | 任意 |
+| `FRONTEND_URL` | フロントエンド URL（メール本文リンクに使用） | メール配信時推奨 |
 
 ---
 
@@ -148,6 +154,9 @@ GET  /api/intel/watchlist                # ウォッチリスト
 GET  /api/intel/notion/status            # Notion 接続状況
 POST /api/intel/notion/sync              # カードを Notion に同期
 POST /api/intel/notion/setup             # Notion DB を新規作成
+GET  /api/intel/email/status             # メール配信設定の状況
+POST /api/intel/email/test               # Brief をテスト送信 (dry_run=true でプレビューのみ)
+POST /api/intel/cron/daily-brief         # 日次自動配信 (Bearer CRON_SECRET 認証)
 ```
 
 OpenAPI 仕様: `http://localhost:8000/docs`
@@ -166,6 +175,57 @@ data/
 
 JSON ファイルは原子的書き込み（temp → rename）で同時書き込みを防いでいます。
 将来 Supabase / PostgreSQL に移行する場合は `backend/src/data/storage.py` の `Storage` クラスを差し替えるだけで済む構造です。
+
+---
+
+## Daily Brief 自動メール配信
+
+### 仕組み
+
+```
+┌─────────────┐     ┌─────────────────────┐     ┌───────────────────┐
+│ Vercel Cron │ ──→ │ /api/cron/daily-brief│ ──→ │ Backend /intel/cron│
+│ 22:00 UTC   │     │ (Bearer CRON_SECRET) │     │ /daily-brief       │
+└─────────────┘     └─────────────────────┘     └────────┬──────────┘
+                                                          │
+                          ┌───────────────────────────────┼─────────────────┐
+                          ↓                               ↓                 ↓
+                  Brief 生成 / 取得              Resend API 送信       配信ログ
+                  (intel_briefs.json)         (BRIEF_EMAIL_RECIPIENTS)
+```
+
+毎朝 7:00 JST (=22:00 UTC 前日) に:
+1. その日付の IntelCard を集めて Daily Brief を生成（既存なら再利用）
+2. Brief を HTML/text 整形して Resend で配信
+3. 当日カードが 0 件なら配信スキップ
+
+### セットアップ
+
+1. **Resend** で API キー取得 + 送信ドメイン認証 → https://resend.com/api-keys
+2. バックエンドに環境変数を設定:
+   ```
+   RESEND_API_KEY=re_...
+   BRIEF_EMAIL_FROM="Tsuburaya Intel <intel@yourdomain.com>"
+   BRIEF_EMAIL_RECIPIENTS=ceo@example.com,strategy@example.com
+   CRON_SECRET=$(openssl rand -hex 32)
+   FRONTEND_URL=https://your-frontend.vercel.app
+   ```
+3. **Vercel Cron を使う場合**: Vercel プロジェクトに同じ `CRON_SECRET` を設定。`vercel.json` の crons が自動で `/api/cron/daily-brief` を毎朝呼び出す。
+4. **Render Cron を使う場合**: `render.yaml` の `tsuburaya-intel-daily-brief` サービスに `BACKEND_URL` と `CRON_SECRET` を設定。
+5. アプリの `/intel/delivery` ページでテスト送信して動作確認。
+
+### 手動トリガ
+
+```bash
+# 今日の Brief をテスト送信
+curl -X POST http://localhost:8000/api/intel/email/test \
+  -H "Content-Type: application/json" \
+  -d '{"dry_run": false}'
+
+# クロンを手で叩く
+curl -X POST http://localhost:8000/api/intel/cron/daily-brief \
+  -H "Authorization: Bearer $CRON_SECRET"
+```
 
 ---
 

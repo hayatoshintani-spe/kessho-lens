@@ -20,3 +20,29 @@ services:
         sync: false
       - key: NOTION_CARDS_DB_ID
         sync: false
+      - key: CRON_SECRET
+        sync: false
+      - key: RESEND_API_KEY
+        sync: false
+      - key: BRIEF_EMAIL_FROM
+        sync: false
+      - key: BRIEF_EMAIL_RECIPIENTS
+        sync: false
+      - key: BRIEF_TIMEZONE
+        value: Asia/Tokyo
+
+  # 日次 Daily Brief 生成 + メール配信 (7:00 JST = 22:00 UTC 前日)
+  # Vercel Cron で代替する場合はこの cron サービスは不要
+  - type: cron
+    name: tsuburaya-intel-daily-brief
+    runtime: python
+    plan: free
+    rootDir: backend
+    schedule: "0 22 * * *"
+    buildCommand: pip install httpx
+    startCommand: python scripts/cron_kick.py
+    envVars:
+      - key: BACKEND_URL
+        sync: false  # Web サービスの公開 URL を設定
+      - key: CRON_SECRET
+        sync: false

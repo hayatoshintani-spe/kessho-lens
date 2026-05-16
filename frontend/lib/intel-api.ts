@@ -190,3 +190,40 @@ export async function setupNotionDatabase(
 }> {
   return post('/api/intel/notion/setup', { parent_page_id: parentPageId });
 }
+
+// ─── Email Delivery ──────────────────────────────────────────────────────
+
+export interface EmailDeliveryStatus {
+  enabled: boolean;
+  has_api_key: boolean;
+  from: string | null;
+  recipients: string[];
+  recipient_count: number;
+  frontend_url: string;
+  timezone: string;
+}
+
+export type EmailSendStatus = 'sent' | 'skipped' | 'error' | 'dry_run';
+
+export interface EmailSendResult {
+  status: EmailSendStatus;
+  message_id?: string;
+  recipients?: string[];
+  subject?: string;
+  reason?: string;
+  error?: string;
+  html_preview?: string;
+  text_preview?: string;
+}
+
+export async function fetchEmailStatus(): Promise<EmailDeliveryStatus> {
+  return get<EmailDeliveryStatus>('/api/intel/email/status');
+}
+
+export async function sendTestEmail(input: {
+  date?: string;
+  recipients?: string[];
+  dry_run?: boolean;
+}): Promise<{ date: string; result: EmailSendResult }> {
+  return post('/api/intel/email/test', input);
+}

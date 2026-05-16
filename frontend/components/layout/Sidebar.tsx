@@ -10,6 +10,7 @@ import {
   Link2,
   Plus,
   Clock,
+  Mail,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -19,6 +20,7 @@ const navItems = [
   { href: '/intel/cards/new', label: '新規カード', icon: Plus },
   { href: '/intel/council', label: 'AI会議', icon: GitMerge },
   { href: '/intel/watchlist', label: 'ウォッチリスト', icon: Radar },
+  { href: '/intel/delivery', label: 'メール配信', icon: Mail },
   { href: '/intel/notion', label: 'Notion連携', icon: Link2 },
 ];
 
