@@ -42,6 +42,11 @@ def ensure_data_dir():
         "memories.json": {},
         "daily_reports.json": [],
         "discovery.json": [],
+        # Tsuburaya Intelligence Brief
+        "intel_cards.json": [],
+        "intel_briefs.json": [],
+        "intel_council.json": [],
+        "intel_watchlist.json": [],
     }
 
     for filename, initial_data in initial_files.items():
@@ -232,3 +237,104 @@ class Storage:
         existing = read_json("discovery.json") or []
         existing.extend(discoveries)
         write_json("discovery.json", existing)
+
+    # ─── Intelligence Brief: Cards ──────────────────────────────────────
+
+    @staticmethod
+    def get_intel_cards(
+        category: Optional[str] = None,
+        importance: Optional[str] = None,
+        limit: int = 200,
+    ) -> List[Dict]:
+        cards = read_json("intel_cards.json") or []
+        if category:
+            cards = [c for c in cards if c.get("category") == category]
+        if importance:
+            cards = [c for c in cards if c.get("importance") == importance]
+        cards.sort(key=lambda c: c.get("date", ""), reverse=True)
+        return cards[:limit]
+
+    @staticmethod
+    def get_intel_card(card_id: str) -> Optional[Dict]:
+        cards = read_json("intel_cards.json") or []
+        for c in cards:
+            if c.get("id") == card_id:
+                return c
+        return None
+
+    @staticmethod
+    def save_intel_card(card: Dict) -> None:
+        cards = read_json("intel_cards.json") or []
+        card_id = card.get("id")
+        cards = [c for c in cards if c.get("id") != card_id]
+        cards.append(card)
+        write_json("intel_cards.json", cards)
+
+    @staticmethod
+    def save_intel_cards(cards: List[Dict]) -> None:
+        """カードリストを上書き保存（シード用）"""
+        write_json("intel_cards.json", cards)
+
+    # ─── Intelligence Brief: Briefs ─────────────────────────────────────
+
+    @staticmethod
+    def get_intel_briefs(brief_type: Optional[str] = None, limit: int = 60) -> List[Dict]:
+        briefs = read_json("intel_briefs.json") or []
+        if brief_type:
+            briefs = [b for b in briefs if b.get("brief_type") == brief_type]
+        briefs.sort(key=lambda b: b.get("date", ""), reverse=True)
+        return briefs[:limit]
+
+    @staticmethod
+    def get_intel_brief(date: str, brief_type: str = "daily") -> Optional[Dict]:
+        briefs = read_json("intel_briefs.json") or []
+        for b in briefs:
+            if b.get("date") == date and b.get("brief_type") == brief_type:
+                return b
+        return None
+
+    @staticmethod
+    def save_intel_brief(brief: Dict) -> None:
+        briefs = read_json("intel_briefs.json") or []
+        date = brief.get("date")
+        btype = brief.get("brief_type", "daily")
+        briefs = [
+            b for b in briefs
+            if not (b.get("date") == date and b.get("brief_type") == btype)
+        ]
+        briefs.append(brief)
+        write_json("intel_briefs.json", briefs)
+
+    # ─── Intelligence Brief: Council Sessions ──────────────────────────
+
+    @staticmethod
+    def get_council_sessions(limit: int = 30) -> List[Dict]:
+        sessions = read_json("intel_council.json") or []
+        sessions.sort(key=lambda s: s.get("date", ""), reverse=True)
+        return sessions[:limit]
+
+    @staticmethod
+    def get_council_session(session_id: str) -> Optional[Dict]:
+        sessions = read_json("intel_council.json") or []
+        for s in sessions:
+            if s.get("id") == session_id:
+                return s
+        return None
+
+    @staticmethod
+    def save_council_session(session: Dict) -> None:
+        sessions = read_json("intel_council.json") or []
+        sid = session.get("id")
+        sessions = [s for s in sessions if s.get("id") != sid]
+        sessions.append(session)
+        write_json("intel_council.json", sessions)
+
+    # ─── Intelligence Brief: Watchlist ─────────────────────────────────
+
+    @staticmethod
+    def get_watchlists() -> List[Dict]:
+        return read_json("intel_watchlist.json") or []
+
+    @staticmethod
+    def save_watchlists(watchlists: List[Dict]) -> None:
+        write_json("intel_watchlist.json", watchlists)

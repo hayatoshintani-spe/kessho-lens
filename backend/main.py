@@ -26,6 +26,7 @@ from api.reports import router as reports_router
 from api.discovery import router as discovery_router
 from api.cron import router as cron_router
 from api.advisor import router as advisor_router
+from api.intel import router as intel_router
 
 # FastAPIアプリケーションを初期化
 app = FastAPI(
@@ -70,6 +71,7 @@ app.include_router(reports_router, prefix="/api", tags=["レポート"])
 app.include_router(discovery_router, prefix="/api", tags=["発見ログ"])
 app.include_router(cron_router, prefix="/api", tags=["クロン"])
 app.include_router(advisor_router, prefix="/api", tags=["アドバイザー"])
+app.include_router(intel_router, prefix="/api", tags=["インテリジェンス"])
 
 
 @app.on_event("startup")

@@ -12,6 +12,10 @@ import {
   TrendingUp,
   Clock,
   Lightbulb,
+  Radar,
+  Newspaper,
+  Database,
+  GitMerge,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -23,6 +27,13 @@ const navItems = [
   { href: '/discovery', label: '銘柄探索', icon: Search },
   { href: '/advisor', label: '個人アドバイス', icon: Lightbulb },
   { href: '/settings', label: '設定', icon: Settings },
+];
+
+const intelNavItems = [
+  { href: '/intel', label: 'ブリーフ', icon: Newspaper },
+  { href: '/intel/cards', label: 'カードDB', icon: Database },
+  { href: '/intel/council', label: 'AI会議', icon: GitMerge },
+  { href: '/intel/watchlist', label: 'ウォッチリスト', icon: Radar },
 ];
 
 export default function Sidebar() {
@@ -51,8 +62,13 @@ export default function Sidebar() {
       <div className="flex-1 px-3 py-4 overflow-y-auto">
         <div className="space-y-0.5">
           {navItems.map(({ href, label, icon: Icon }) => {
-            const isActive =
-              href === '/' ? pathname === '/' : pathname.startsWith(href);
+            // /intel 配下では投資ファンド側はアクティブにしない
+            const onIntelRoute = pathname.startsWith('/intel');
+            const isActive = onIntelRoute
+              ? false
+              : href === '/'
+                ? pathname === '/'
+                : pathname === href || pathname.startsWith(`${href}/`);
             return (
               <Link
                 key={href}
@@ -77,6 +93,46 @@ export default function Sidebar() {
               </Link>
             );
           })}
+        </div>
+
+        {/* Tsuburaya Intelligence Brief セクション */}
+        <div className="mt-6 pt-4 border-t border-border">
+          <div className="px-3 mb-2">
+            <div className="text-text-muted text-[10px] font-mono uppercase tracking-wider">
+              Tsuburaya Intelligence
+            </div>
+          </div>
+          <div className="space-y-0.5">
+            {intelNavItems.map(({ href, label, icon: Icon }) => {
+              const isActive =
+                href === '/intel'
+                  ? pathname === '/intel' || pathname.startsWith('/intel/brief')
+                  : pathname === href || pathname.startsWith(`${href}/`);
+              return (
+                <Link
+                  key={href}
+                  href={href}
+                  className={cn(
+                    'flex items-center gap-3 px-3 py-2.5 rounded-md text-sm transition-all duration-150',
+                    isActive
+                      ? 'bg-accent-gold/10 text-accent-gold border border-accent-gold/20'
+                      : 'text-text-secondary hover:text-text-primary hover:bg-bg-elevated',
+                  )}
+                >
+                  <Icon
+                    className={cn(
+                      'w-4 h-4 flex-shrink-0',
+                      isActive ? 'text-accent-gold' : 'text-text-muted',
+                    )}
+                  />
+                  <span>{label}</span>
+                  {isActive && (
+                    <div className="ml-auto w-1.5 h-1.5 rounded-full bg-accent-gold" />
+                  )}
+                </Link>
+              );
+            })}
+          </div>
         </div>
       </div>
 
