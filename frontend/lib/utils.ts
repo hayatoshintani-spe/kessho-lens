@@ -95,18 +95,26 @@ export function formatLargeNumber(value: number): string {
 
 // ─── Agent helpers ────────────────────────────────────────────────────────────
 
-export const AGENT_COLORS: Record<AgentId, string> = {
+export const AGENT_COLORS: Record<string, string> = {
+  // ファンドメンバー（4名）
   buffett: '#4CAF50',
   soros: '#E91E63',
   lynch: '#2196F3',
   flat: '#9E9E9E',
+  // 専門分析AI（3名）
+  macro: '#7C3AED',   // 紫: マクロ経済
+  quant: '#0891B2',   // シアン: 定量分析
+  risk: '#DC2626',    // 赤: リスク管理
 };
 
-export const AGENT_NAMES: Record<AgentId, { en: string; ja: string }> = {
+export const AGENT_NAMES: Record<string, { en: string; ja: string }> = {
   buffett: { en: 'BuffettAI', ja: 'バフェットAI' },
   soros: { en: 'SorosAI', ja: 'ソロスAI' },
   lynch: { en: 'LynchAI', ja: 'リンチAI' },
   flat: { en: 'FlatAI', ja: 'フラットAI' },
+  macro: { en: 'MacroAI', ja: 'マクロAI' },
+  quant: { en: 'QuantAI', ja: 'クオンツAI' },
+  risk: { en: 'RiskAI', ja: 'リスクAI' },
 };
 
 export function agentColor(id: AgentId): string {
@@ -119,7 +127,7 @@ export function agentInitial(id: AgentId): string {
 
 // ─── Message type labels ──────────────────────────────────────────────────────
 
-export const MESSAGE_TYPE_LABELS: Record<MessageType, string> = {
+export const MESSAGE_TYPE_LABELS: Record<string, string> = {
   opening: '開始',
   debate: '議論',
   proposal: '提案',
@@ -127,9 +135,11 @@ export const MESSAGE_TYPE_LABELS: Record<MessageType, string> = {
   decision: '決定',
   analysis: '分析',
   closing: '締め',
+  risk_check: 'リスク確認',
+  scenario: 'シナリオ分析',
 };
 
-export const MESSAGE_TYPE_COLORS: Record<MessageType, string> = {
+export const MESSAGE_TYPE_COLORS: Record<string, string> = {
   opening: '#C8860A',
   debate: '#E91E63',
   proposal: '#2196F3',
@@ -137,6 +147,8 @@ export const MESSAGE_TYPE_COLORS: Record<MessageType, string> = {
   decision: '#1D9E75',
   analysis: '#9C27B0',
   closing: '#607D8B',
+  risk_check: '#DC2626',  // 赤: リスク確認
+  scenario: '#0891B2',    // シアン: シナリオ分析
 };
 
 // ─── P&L helpers ─────────────────────────────────────────────────────────────

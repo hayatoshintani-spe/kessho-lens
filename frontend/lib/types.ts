@@ -1,6 +1,10 @@
 // ─── Agent ────────────────────────────────────────────────────────────────────
 
-export type AgentId = 'buffett' | 'soros' | 'lynch' | 'flat';
+// ファンドメンバー（ポートフォリオ・取引に参加する4エージェント）
+export type FundAgentId = 'buffett' | 'soros' | 'lynch' | 'flat';
+
+// 会議参加者（専門分析AI3名を含む7エージェント）
+export type AgentId = FundAgentId | 'macro' | 'quant' | 'risk';
 
 export interface Portfolio {
   totalValue: number;
@@ -36,13 +40,29 @@ export interface Agent {
 
 // ─── Meeting / Discussion ──────────────────────────────────────────────────────
 
-export type MessageType = 'opening' | 'debate' | 'proposal' | 'rebuttal' | 'decision' | 'analysis' | 'closing';
+export type MessageType =
+  | 'opening'
+  | 'debate'
+  | 'proposal'
+  | 'rebuttal'
+  | 'decision'
+  | 'analysis'
+  | 'closing'
+  | 'risk_check'   // RiskAI の反証・撤退条件
+  | 'scenario';    // シナリオ分析
 
 export interface MeetingMessage {
-  agent: AgentId;
-  time: string; // "HH:MM:SS"
+  agent: string; // AgentId または未知のエージェント名
+  time: string;  // "HH:MM:SS"
   content: string;
   type: MessageType;
+}
+
+export interface MeetingScenario {
+  name: 'ベース' | 'ブル' | 'ベア' | string;
+  probability: number; // 0-100
+  description: string;
+  portfolio_action: string;
 }
 
 export interface MeetingLog {
@@ -52,6 +72,7 @@ export interface MeetingLog {
   keyDecisions: string[];
   marketTheme: string;
   messages: MeetingMessage[];
+  scenarios?: MeetingScenario[];
   duration?: string; // "45分"
 }
 
@@ -68,7 +89,7 @@ export interface DailyReport {
   date: string; // "YYYY-MM-DD"
   title: string;
   content: string; // full markdown report
-  agentSummaries: Record<AgentId, AgentSummary>;
+  agentSummaries: Partial<Record<AgentId, AgentSummary>>;
   totalFundReturn: number;
   marketTheme: string;
 }

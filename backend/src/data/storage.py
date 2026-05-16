@@ -160,6 +160,14 @@ class Storage:
         return None
 
     @staticmethod
+    def get_latest_meeting() -> Optional[Dict]:
+        """直近のミーティングログを取得（前回判断の振り返りに使用）"""
+        meetings = read_json("meetings.json") or []
+        if not meetings:
+            return None
+        return sorted(meetings, key=lambda m: m.get("date", ""), reverse=True)[0]
+
+    @staticmethod
     def save_meeting(meeting: Dict) -> None:
         """ミーティングログを保存（同じ日付は上書き）"""
         meetings = read_json("meetings.json") or []

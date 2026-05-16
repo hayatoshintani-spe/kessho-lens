@@ -8,7 +8,7 @@ import random
 from datetime import datetime, timezone
 from typing import Dict, List, Optional, Tuple
 
-from src.agents import get_all_agents, get_agent
+from src.agents import get_all_agents, get_agent, get_fund_agents
 from src.simulation.market_data import get_market_data
 from src.simulation.portfolio_manager import (
     get_or_init_portfolio,
@@ -67,9 +67,12 @@ async def run_daily_simulation(date: Optional[str] = None) -> Dict:
         print("Step 4: 取引提案生成")
         trade_proposals = await _generate_trade_proposals(discoveries)
 
-        # Step 5: AI投資会議
+        # Step 5: AI投資会議（前回の決定を参照して振り返りを行う）
         print("Step 5: AI投資会議生成")
-        meeting_log = generate_meeting_log(date, market_data, agent_analyses, trade_proposals)
+        previous_meeting = Storage.get_latest_meeting()
+        meeting_log = generate_meeting_log(
+            date, market_data, agent_analyses, trade_proposals, previous_meeting
+        )
 
         # Step 6: 取引実行
         print("Step 6: 取引実行")
@@ -122,9 +125,9 @@ async def run_daily_simulation(date: Optional[str] = None) -> Dict:
 
 
 async def _run_market_analyses(market_data: Dict) -> Dict:
-    """全エージェントが市場を分析する"""
+    """全エージェント（7名）が市場を分析する"""
     analyses = {}
-    agents = get_all_agents()
+    agents = get_all_agents()  # MacroAI・QuantAI・RiskAI を含む全7エージェント
 
     # 非同期で全エージェントを分析（実際は同期なのでスレッドで実行）
     loop = asyncio.get_event_loop()

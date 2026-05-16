@@ -12,7 +12,7 @@ import { generateMockPnlData } from '@/lib/utils';
 
 const VALID_IDS: AgentId[] = ['buffett', 'soros', 'lynch', 'flat'];
 
-const MOCK_AGENTS: Record<AgentId, Agent> = {
+const MOCK_AGENTS: Partial<Record<AgentId, Agent>> = {
   buffett: {
     id: 'buffett',
     name: 'BuffettAI',
@@ -138,7 +138,7 @@ export default function AgentDetailPage({
 }) {
   const id = params.id as AgentId;
   const [agent, setAgent] = useState<Agent>(
-    VALID_IDS.includes(id) ? MOCK_AGENTS[id] : MOCK_AGENTS['buffett'],
+    (VALID_IDS.includes(id) ? MOCK_AGENTS[id] : MOCK_AGENTS['buffett']) as Agent,
   );
   const [performance, setPerformance] = useState<PerformanceDataPoint[]>(
     generateMockPnlData(30),

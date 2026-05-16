@@ -62,20 +62,26 @@ async function post<T>(path: string, body?: unknown, secret?: string): Promise<T
 
 // ─── Adapters: backend snake_case → frontend camelCase ────────────────────────
 
-const KNOWN_AGENT_IDS: AgentId[] = ['buffett', 'soros', 'lynch', 'flat'];
+const KNOWN_AGENT_IDS: AgentId[] = ['buffett', 'soros', 'lynch', 'flat', 'macro', 'quant', 'risk'];
 
-const AGENT_COLOR_MAP: Record<AgentId, string> = {
+const AGENT_COLOR_MAP: Partial<Record<AgentId, string>> = {
   buffett: '#4CAF50',
   soros: '#E91E63',
   lynch: '#2196F3',
   flat: '#9E9E9E',
+  macro: '#7C3AED',
+  quant: '#0891B2',
+  risk: '#DC2626',
 };
 
-const AGENT_NAME_JA: Record<AgentId, string> = {
+const AGENT_NAME_JA: Partial<Record<AgentId, string>> = {
   buffett: 'バフェットAI',
   soros: 'ソロスAI',
   lynch: 'リンチAI',
   flat: 'フラットAI',
+  macro: 'マクロAI',
+  quant: 'クオンツAI',
+  risk: 'リスクAI',
 };
 
 function isAgentId(v: string): v is AgentId {
@@ -135,7 +141,7 @@ function adaptAgentListItem(raw: Record<string, unknown>, rankMap?: Map<string, 
   return {
     id: agentId,
     name: String(raw.display_name ?? raw.full_name ?? agentId),
-    nameJa: AGENT_NAME_JA[agentId],
+    nameJa: AGENT_NAME_JA[agentId] ?? String(agentId),
     personality: String(raw.bio_ja ?? raw.catchphrase ?? ''),
     style: String(raw.style ?? ''),
     color: String(raw.color ?? AGENT_COLOR_MAP[agentId]),
@@ -154,12 +160,13 @@ function adaptAgentListItem(raw: Record<string, unknown>, rankMap?: Map<string, 
 function adaptMeeting(raw: Record<string, unknown>): MeetingLog {
   const participants = ((raw.participants as string[] | undefined) ?? []).map((p) => {
     const lower = p.toLowerCase().replace(/ai$/, '');
-    return isAgentId(lower) ? lower : (p as AgentId);
+    return (isAgentId(lower) ? lower : p) as AgentId;
   });
   const messagesRaw = (raw.messages as Array<Record<string, unknown>> | undefined) ?? [];
   const messages = messagesRaw.map((m) => {
+    // エージェント名を正規化（末尾のAIを除去して小文字に）
     const rawAgent = String(m.agent ?? '').toLowerCase().replace(/ai$/, '');
-    const agent: AgentId = isAgentId(rawAgent) ? rawAgent : 'flat';
+    const agent = isAgentId(rawAgent) ? rawAgent : String(m.agent ?? 'flat');
     return {
       agent,
       time: String(m.time ?? ''),
@@ -167,6 +174,13 @@ function adaptMeeting(raw: Record<string, unknown>): MeetingLog {
       type: (m.type as MessageType) ?? 'debate',
     };
   });
+  const scenariosRaw = (raw.scenarios as Array<Record<string, unknown>> | undefined) ?? [];
+  const scenarios = scenariosRaw.map((s) => ({
+    name: String(s.name ?? ''),
+    probability: Number(s.probability ?? 0),
+    description: String(s.description ?? ''),
+    portfolio_action: String(s.portfolio_action ?? ''),
+  }));
   return {
     date: String(raw.date ?? ''),
     participants: participants as AgentId[],
@@ -174,6 +188,7 @@ function adaptMeeting(raw: Record<string, unknown>): MeetingLog {
     keyDecisions: (raw.key_decisions as string[] | undefined) ?? (raw.keyDecisions as string[] | undefined) ?? [],
     marketTheme: String(raw.market_theme ?? raw.marketTheme ?? ''),
     messages,
+    ...(scenarios.length > 0 ? { scenarios } : {}),
   };
 }
 
