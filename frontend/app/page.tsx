@@ -8,6 +8,7 @@ import {
   fetchPerformance,
   fetchLatestMeeting,
   fetchLatestReport,
+  fetchBenchmarks,
   warmupBackend,
 } from '@/lib/api';
 import {
@@ -18,8 +19,9 @@ import AgentCard from '@/components/dashboard/AgentCard';
 import PnLChart from '@/components/dashboard/PnLChart';
 import RankingTable from '@/components/dashboard/RankingTable';
 import MarketStatus from '@/components/dashboard/MarketStatus';
-import { ArrowRight, BarChart2, MessageSquare, FileText } from 'lucide-react';
-import type { Agent, FundStats, PerformanceDataPoint, MeetingLog, DailyReport } from '@/lib/types';
+import BenchmarkChart from '@/components/dashboard/BenchmarkChart';
+import { ArrowRight, BarChart2, MessageSquare, FileText, Scale } from 'lucide-react';
+import type { Agent, FundStats, PerformanceDataPoint, MeetingLog, DailyReport, BenchmarkComparison } from '@/lib/types';
 
 // ─── Mock fallback data ────────────────────────────────────────────────────────
 
@@ -112,9 +114,21 @@ export default function DashboardPage() {
   const [performance, setPerformance] = useState<PerformanceDataPoint[]>(generateMockPnlData(30));
   const [latestMeeting, setLatestMeeting] = useState<MeetingLog | null>(MOCK_MEETING);
   const [latestReport, setLatestReport] = useState<DailyReport | null>(null);
+  const [benchmark, setBenchmark] = useState<BenchmarkComparison | null>(null);
+  const [benchmarkDays, setBenchmarkDays] = useState<number>(90);
   const [isLive, setIsLive] = useState(false);
   const [isConnecting, setIsConnecting] = useState(true);
   const [debugError, setDebugError] = useState<string | null>(null);
+
+  // Re-fetch benchmark series when user changes the time window (skip first run; initial load handles 90d)
+  useEffect(() => {
+    if (!isLive) return;
+    let cancelled = false;
+    fetchBenchmarks(benchmarkDays)
+      .then((d) => { if (!cancelled) setBenchmark(d); })
+      .catch(() => {});
+    return () => { cancelled = true; };
+  }, [benchmarkDays, isLive]);
 
   useEffect(() => {
     const t0 = Date.now();
@@ -132,7 +146,8 @@ export default function DashboardPage() {
         fetchPerformance(30),
         fetchLatestMeeting(),
         fetchLatestReport(),
-      ]).then(([agentsData, statsData, perfData, meetingData, reportData]) => {
+        fetchBenchmarks(benchmarkDays),
+      ]).then(([agentsData, statsData, perfData, meetingData, reportData, benchmarkData]) => {
         const elapsed = Date.now() - t0;
         if (agentsData.status === 'fulfilled') { setAgents(agentsData.value); setIsLive(true); }
         else { setDebugError(`[${elapsed}ms] ${(agentsData.reason as Error)?.message ?? 'unknown'}`); }
@@ -140,6 +155,7 @@ export default function DashboardPage() {
         if (perfData.status === 'fulfilled') { setPerformance(perfData.value); }
         if (meetingData.status === 'fulfilled') { setLatestMeeting(meetingData.value); }
         if (reportData.status === 'fulfilled') { setLatestReport(reportData.value); }
+        if (benchmarkData.status === 'fulfilled') { setBenchmark(benchmarkData.value); }
         setIsConnecting(false);
       });
     });
@@ -198,6 +214,42 @@ export default function DashboardPage() {
           <RankingTable agents={agents} />
         </div>
       </div>
+
+      {/* Benchmark comparison */}
+      <section className="card p-5">
+        <div className="flex items-center justify-between gap-3 flex-wrap mb-4">
+          <div className="flex items-center gap-2">
+            <Scale className="w-4 h-4 text-accent-gold" />
+            <h2 className="text-text-primary text-sm font-semibold">
+              ベンチマーク比較
+            </h2>
+            <span className="text-text-muted text-[11px]">日経225 / TOPIX / S&amp;P 500</span>
+          </div>
+          <div className="flex gap-1">
+            {[30, 90, 365].map((d) => (
+              <button
+                key={d}
+                onClick={() => setBenchmarkDays(d)}
+                className="px-2.5 py-1 rounded-md border text-[11px] font-medium transition-all"
+                style={{
+                  borderColor: benchmarkDays === d ? '#C8860A' : '#1E2535',
+                  backgroundColor: benchmarkDays === d ? '#C8860A18' : 'transparent',
+                  color: benchmarkDays === d ? '#C8860A' : '#7B7F8C',
+                }}
+              >
+                {d === 30 ? '30日' : d === 90 ? '90日' : '1年'}
+              </button>
+            ))}
+          </div>
+        </div>
+        {benchmark ? (
+          <BenchmarkChart data={benchmark} />
+        ) : (
+          <div className="flex items-center justify-center h-32 text-text-muted text-xs">
+            ベンチマーク取得中...
+          </div>
+        )}
+      </section>
 
       {/* Market Status + Latest Meeting */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">

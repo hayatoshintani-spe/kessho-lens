@@ -42,6 +42,7 @@ def ensure_data_dir():
         "memories.json": {},
         "daily_reports.json": [],
         "discovery.json": [],
+        "nav_history.json": {},
     }
 
     for filename, initial_data in initial_files.items():
@@ -217,6 +218,40 @@ class Storage:
         reports = [r for r in reports if r.get("date") != date]
         reports.append(report)
         write_json("daily_reports.json", reports)
+
+    # NAV履歴操作（ベンチマーク比較用の日次スナップショット）
+    @staticmethod
+    def get_nav_history(agent_id: Optional[str] = None) -> Any:
+        """
+        NAV履歴を取得する。
+        agent_id 指定なし → 全エージェントの辞書 {agent_id: [...]}
+        agent_id 指定あり → そのエージェントの [{date, total_value, ...}] 配列
+        """
+        data = read_json("nav_history.json") or {}
+        if agent_id is None:
+            return data
+        return data.get(agent_id, [])
+
+    @staticmethod
+    def append_nav_snapshot(agent_id: str, snapshot: Dict) -> None:
+        """
+        NAVスナップショットを追加する。
+        同日付のエントリは置き換える（1日複数回呼ばれても重複しない）。
+
+        snapshot: {date, total_value, holdings_value, cash, return_pct}
+        """
+        data = read_json("nav_history.json") or {}
+        series = data.get(agent_id, [])
+        date = snapshot.get("date")
+        # 同日付エントリを除去してから追加
+        series = [s for s in series if s.get("date") != date]
+        series.append(snapshot)
+        series.sort(key=lambda s: s.get("date", ""))
+        # 直近2年分のみ保持（容量制御）
+        if len(series) > 730:
+            series = series[-730:]
+        data[agent_id] = series
+        write_json("nav_history.json", data)
 
     # 発見ログ操作
     @staticmethod

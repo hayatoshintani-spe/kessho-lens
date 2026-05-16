@@ -361,11 +361,12 @@ async def _execute_approved_trades(
 
 
 async def _update_all_portfolios(market_data: Dict) -> Dict:
-    """全エージェントのポートフォリオ価格を更新"""
+    """全エージェントのポートフォリオ価格を更新し、NAVスナップショットを保存"""
     tickers = market_data.get("tickers", [])
     price_updates = {t.get("ticker"): t.get("price") for t in tickers if t.get("ticker")}
     source = market_data.get("source", "unknown")
     fetched_at = market_data.get("timestamp")
+    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
 
     portfolios = {}
     agent_ids = ["buffett", "soros", "lynch", "flat"]
@@ -374,6 +375,25 @@ async def _update_all_portfolios(market_data: Dict) -> Dict:
         try:
             portfolio = update_prices(agent_id, price_updates, source=source, fetched_at=fetched_at)
             portfolios[agent_id] = portfolio
+
+            # NAVスナップショット保存（ベンチマーク比較用）
+            try:
+                from src.data.storage import Storage
+                total_value = float(portfolio.get("total_value", 0) or 0)
+                cash = float(portfolio.get("cash", 0) or 0)
+                holdings_value = round(total_value - cash, 2)
+                return_pct = float(
+                    portfolio.get("performance", {}).get("total_return_pct", 0) or 0
+                )
+                Storage.append_nav_snapshot(agent_id, {
+                    "date": today,
+                    "total_value": total_value,
+                    "cash": cash,
+                    "holdings_value": holdings_value,
+                    "return_pct": return_pct,
+                })
+            except Exception as e:
+                print(f"NAVスナップショット保存エラー ({agent_id}): {e}")
         except Exception as e:
             print(f"ポートフォリオ更新エラー ({agent_id}): {e}")
             portfolios[agent_id] = get_or_init_portfolio(agent_id)

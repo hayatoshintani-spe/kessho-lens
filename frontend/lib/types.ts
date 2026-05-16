@@ -40,6 +40,54 @@ export interface ConsistencyWarning {
   message: string;
 }
 
+// ─── Benchmark comparison ─────────────────────────────────────────────────────
+
+export type BenchmarkName = 'n225' | 'topix' | 'sp500';
+
+export interface BenchmarkSummary {
+  agentId: FundAgentId;
+  fundReturnPct: number;
+  vsN225Pct: number;
+  vsTopixPct: number;
+  vsSp500Pct: number;
+}
+
+export interface BenchmarkComparison {
+  days: number;
+  fetchedAt: string;
+  dates: string[];
+  agents: Partial<Record<FundAgentId, number[]>>;       // 累積リターン %
+  benchmarks: Partial<Record<BenchmarkName, number[]>>; // 累積リターン %
+  benchmarkMeta: Partial<Record<BenchmarkName, { displayName: string; currency: string }>>;
+  summary: BenchmarkSummary[];
+}
+
+export interface AttributionContribution {
+  ticker: string;
+  name: string;
+  weightPct: number;
+  returnPct: number;
+  vsBenchmarkPct: number;
+  contributionPct: number;
+}
+
+export interface AttributionAnalysis {
+  agentId: FundAgentId;
+  benchmark: BenchmarkName;
+  benchmarkDisplay: string;
+  days: number;
+  fundReturnPct: number;
+  benchmarkReturnPct: number;
+  excessReturnPct: number;
+  cashDragPct: number;
+  cashRatioPct: number;
+  selectionEffectPct: number;
+  residualPct: number;
+  topContributors: AttributionContribution[];
+  topDetractors: AttributionContribution[];
+  narrative: string;
+}
+
 export interface Agent {
   id: AgentId;
   name: string;        // e.g. "BuffettAI"

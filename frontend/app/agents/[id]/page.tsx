@@ -5,9 +5,10 @@ import Link from 'next/link';
 import { fetchAgent, fetchAgentPerformance } from '@/lib/api';
 import AgentProfile from '@/components/agents/AgentProfile';
 import AgentStats from '@/components/agents/AgentStats';
+import AttributionCard from '@/components/agents/AttributionCard';
 import PnLChart from '@/components/dashboard/PnLChart';
 import { ChevronLeft, BarChart2 } from 'lucide-react';
-import type { Agent, AgentId, PerformanceDataPoint } from '@/lib/types';
+import type { Agent, AgentId, FundAgentId, PerformanceDataPoint } from '@/lib/types';
 import { generateMockPnlData } from '@/lib/utils';
 
 const VALID_IDS: AgentId[] = ['buffett', 'soros', 'lynch', 'flat'];
@@ -179,6 +180,11 @@ export default function AgentDetailPage({
         </div>
         <PnLChart data={chartData} />
       </div>
+
+      {/* Benchmark comparison & attribution — only for fund agents that hold positions */}
+      {(['buffett', 'soros', 'lynch', 'flat'] as FundAgentId[]).includes(id as FundAgentId) && (
+        <AttributionCard agentId={id as FundAgentId} />
+      )}
 
       {/* Stats / Holdings */}
       <AgentStats agent={agent} />

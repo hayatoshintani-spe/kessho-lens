@@ -1,6 +1,7 @@
 import type {
   Agent,
   AgentId,
+  FundAgentId,
   MeetingLog,
   MessageType,
   DailyReport,
@@ -12,6 +13,10 @@ import type {
   Portfolio,
   Holding,
   AgentSummary,
+  BenchmarkComparison,
+  BenchmarkName,
+  AttributionAnalysis,
+  AttributionContribution,
 } from './types';
 
 const API_BASE =
@@ -506,4 +511,91 @@ export async function fetchAdvisorDebate(
 ): Promise<MeetingLog> {
   const raw = await post<Record<string, unknown>>('/api/advisor', { amount, period, risk });
   return adaptMeeting(raw);
+}
+
+// ─── Benchmark comparison ─────────────────────────────────────────────────────
+
+const FUND_IDS: FundAgentId[] = ['buffett', 'soros', 'lynch', 'flat'];
+const BENCH_KEYS: BenchmarkName[] = ['n225', 'topix', 'sp500'];
+
+function asNumberArray(v: unknown): number[] {
+  if (!Array.isArray(v)) return [];
+  return v.map((x) => Number(x ?? 0));
+}
+
+export async function fetchBenchmarks(days = 90): Promise<BenchmarkComparison> {
+  const raw = await get<Record<string, unknown>>(`/api/benchmarks?days=${days}`);
+  const rawAgents = (raw.agents as Record<string, unknown>) ?? {};
+  const rawBench = (raw.benchmarks as Record<string, unknown>) ?? {};
+  const rawMeta = (raw.benchmark_meta as Record<string, unknown>) ?? {};
+  const rawSummary = (raw.summary as Array<Record<string, unknown>>) ?? [];
+
+  const agents: Partial<Record<FundAgentId, number[]>> = {};
+  for (const id of FUND_IDS) agents[id] = asNumberArray(rawAgents[id]);
+
+  const benchmarks: Partial<Record<BenchmarkName, number[]>> = {};
+  const benchmarkMeta: Partial<Record<BenchmarkName, { displayName: string; currency: string }>> = {};
+  for (const k of BENCH_KEYS) {
+    benchmarks[k] = asNumberArray(rawBench[k]);
+    const m = rawMeta[k] as Record<string, unknown> | undefined;
+    if (m) {
+      benchmarkMeta[k] = {
+        displayName: String(m.display_name ?? k),
+        currency: String(m.currency ?? ''),
+      };
+    }
+  }
+
+  return {
+    days: Number(raw.days ?? days),
+    fetchedAt: String(raw.fetched_at ?? ''),
+    dates: ((raw.dates as string[]) ?? []).map(String),
+    agents,
+    benchmarks,
+    benchmarkMeta,
+    summary: rawSummary.map((s) => ({
+      agentId: String(s.agent_id ?? 'flat') as FundAgentId,
+      fundReturnPct: Number(s.fund_return_pct ?? 0),
+      vsN225Pct: Number(s.vs_n225_pct ?? 0),
+      vsTopixPct: Number(s.vs_topix_pct ?? 0),
+      vsSp500Pct: Number(s.vs_sp500_pct ?? 0),
+    })),
+  };
+}
+
+function adaptContribution(c: Record<string, unknown>): AttributionContribution {
+  return {
+    ticker: String(c.ticker ?? ''),
+    name: String(c.name ?? c.ticker ?? ''),
+    weightPct: Number(c.weight_pct ?? 0),
+    returnPct: Number(c.return_pct ?? 0),
+    vsBenchmarkPct: Number(c.vs_benchmark_pct ?? 0),
+    contributionPct: Number(c.contribution_pct ?? 0),
+  };
+}
+
+export async function fetchAttribution(
+  agentId: FundAgentId,
+  benchmark: BenchmarkName = 'topix',
+  days = 90,
+): Promise<AttributionAnalysis> {
+  const raw = await get<Record<string, unknown>>(
+    `/api/attribution/${agentId}?benchmark=${benchmark}&days=${days}`,
+  );
+  return {
+    agentId: String(raw.agent_id ?? agentId) as FundAgentId,
+    benchmark: String(raw.benchmark ?? benchmark) as BenchmarkName,
+    benchmarkDisplay: String(raw.benchmark_display ?? benchmark),
+    days: Number(raw.days ?? days),
+    fundReturnPct: Number(raw.fund_return_pct ?? 0),
+    benchmarkReturnPct: Number(raw.benchmark_return_pct ?? 0),
+    excessReturnPct: Number(raw.excess_return_pct ?? 0),
+    cashDragPct: Number(raw.cash_drag_pct ?? 0),
+    cashRatioPct: Number(raw.cash_ratio_pct ?? 0),
+    selectionEffectPct: Number(raw.selection_effect_pct ?? 0),
+    residualPct: Number(raw.residual_pct ?? 0),
+    topContributors: ((raw.top_contributors as Record<string, unknown>[]) ?? []).map(adaptContribution),
+    topDetractors: ((raw.top_detractors as Record<string, unknown>[]) ?? []).map(adaptContribution),
+    narrative: String(raw.narrative ?? ''),
+  };
 }
