@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Settings, Save, Play, Info, Eye, EyeOff } from 'lucide-react';
+import { Settings, Save, Play, Info, Eye, EyeOff, FastForward } from 'lucide-react';
 import type { AppSettings, MarketTarget } from '@/lib/types';
 import { cn } from '@/lib/utils';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
@@ -28,6 +28,10 @@ export default function SettingsPage() {
   const [showKey, setShowKey] = useState(false);
   const [running, setRunning] = useState(false);
   const [runResult, setRunResult] = useState<string | null>(null);
+  const [backfillFrom, setBackfillFrom] = useState('2026-05-15');
+  const [backfillTo, setBackfillTo] = useState(new Date().toISOString().slice(0, 10));
+  const [backfilling, setBackfilling] = useState(false);
+  const [backfillResult, setBackfillResult] = useState<string | null>(null);
 
   // Load from localStorage on mount
   useEffect(() => {
@@ -49,6 +53,25 @@ export default function SettingsPage() {
       setTimeout(() => setSaved(false), 2000);
     } catch {
       // ignore
+    }
+  };
+
+  const handleBackfill = async () => {
+    setBackfilling(true);
+    setBackfillResult(null);
+    try {
+      const params = new URLSearchParams({ from_date: backfillFrom, to_date: backfillTo });
+      const res = await fetch(`${settings.apiBaseUrl}/api/backfill?${params}`, { method: 'POST' });
+      const data = await res.json();
+      setBackfillResult(
+        res.ok
+          ? `バックフィル開始: ${data.total_days}日分 (${data.from_date} 〜 ${data.to_date})`
+          : `エラー: ${data.detail ?? res.statusText}`,
+      );
+    } catch (e) {
+      setBackfillResult(`接続エラー: バックエンドに接続できません`);
+    } finally {
+      setBackfilling(false);
     }
   };
 
@@ -276,6 +299,64 @@ export default function SettingsPage() {
             <Play className="w-4 h-4" />
           )}
           {running ? '実行中...' : '日次シミュレーションを実行'}
+        </button>
+      </div>
+
+      {/* Backfill */}
+      <div className="card p-6 space-y-4">
+        <h2 className="text-text-primary font-semibold text-base border-b border-border pb-3">
+          過去データのバックフィル
+        </h2>
+        <p className="text-text-secondary text-sm">
+          指定した期間のシミュレーションをまとめて実行します。Claude APIを使わない高速モードで動作します（土日を除く営業日のみ）。バックエンドのバックグラウンドで実行されます。
+        </p>
+
+        <div className="flex flex-wrap gap-4 items-end">
+          <div>
+            <label className="block text-text-secondary text-xs font-medium mb-1.5">開始日</label>
+            <input
+              type="date"
+              value={backfillFrom}
+              onChange={(e) => setBackfillFrom(e.target.value)}
+              className="bg-bg-elevated border border-border rounded-md px-3 py-2 text-text-primary text-sm font-mono focus:outline-none focus:border-accent-gold/60 transition-colors"
+            />
+          </div>
+          <div>
+            <label className="block text-text-secondary text-xs font-medium mb-1.5">終了日</label>
+            <input
+              type="date"
+              value={backfillTo}
+              onChange={(e) => setBackfillTo(e.target.value)}
+              className="bg-bg-elevated border border-border rounded-md px-3 py-2 text-text-primary text-sm font-mono focus:outline-none focus:border-accent-gold/60 transition-colors"
+            />
+          </div>
+        </div>
+
+        {backfillResult && (
+          <div
+            className={cn(
+              'rounded-md p-3 text-sm',
+              backfillResult.startsWith('エラー') || backfillResult.startsWith('接続')
+                ? 'bg-loss/10 border border-loss/30 text-loss'
+                : 'bg-profit/10 border border-profit/30 text-profit',
+            )}
+          >
+            {backfillResult}
+          </div>
+        )}
+
+        <button
+          type="button"
+          onClick={handleBackfill}
+          disabled={backfilling}
+          className="flex items-center gap-2 bg-accent-gold/20 hover:bg-accent-gold/30 border border-accent-gold/40 text-accent-gold px-4 py-2.5 rounded-md text-sm font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {backfilling ? (
+            <LoadingSpinner size="sm" />
+          ) : (
+            <FastForward className="w-4 h-4" />
+          )}
+          {backfilling ? '開始中...' : 'バックフィル実行'}
         </button>
       </div>
 

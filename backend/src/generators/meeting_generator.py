@@ -93,9 +93,10 @@ def generate_meeting_log(
     agent_analyses: Dict,
     trade_proposals: Dict,
     previous_meeting: Optional[Dict] = None,
+    use_ai: bool = True,
 ) -> Dict:
     """ミーティングログを生成する（Claude API優先・ルールベースフォールバック）"""
-    if os.getenv("ANTHROPIC_API_KEY"):
+    if use_ai and os.getenv("ANTHROPIC_API_KEY"):
         try:
             return _generate_with_ai(
                 date, market_data, agent_analyses, trade_proposals, previous_meeting

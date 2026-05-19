@@ -17,6 +17,7 @@ def generate_daily_report(
     trade_results: List[Dict],
     discoveries: List[Dict],
     meeting_log: Dict,
+    use_ai: bool = True,
 ) -> Dict:
     """
     日次レポートを生成する
@@ -29,11 +30,12 @@ def generate_daily_report(
         trade_results: 本日の取引結果
         discoveries: 本日の発見ログ
         meeting_log: ミーティングログ
+        use_ai: Claude APIを使用するか（Falseの場合はルールベースフォールバック）
 
     Returns:
         レポート辞書 (date, title, content, agent_summaries)
     """
-    if os.getenv("ANTHROPIC_API_KEY"):
+    if use_ai and os.getenv("ANTHROPIC_API_KEY"):
         try:
             return _generate_with_ai(
                 date, market_data, agent_analyses, portfolios,

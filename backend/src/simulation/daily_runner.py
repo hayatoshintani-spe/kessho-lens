@@ -27,7 +27,7 @@ from src.data.mock_data import (
 )
 
 
-async def run_daily_simulation(date: Optional[str] = None) -> Dict:
+async def run_daily_simulation(date: Optional[str] = None, fast: bool = False) -> Dict:
     """
     デイリーシミュレーションを実行するメインパイプライン
 
@@ -42,13 +42,18 @@ async def run_daily_simulation(date: Optional[str] = None) -> Dict:
     8. 日次レポート生成
     9. 全データを保存
 
+    Args:
+        date: 実行日付 (YYYY-MM-DD)。Noneの場合は今日。
+        fast: Trueの場合はClaude APIを使わずルールベース生成（バックフィル用）
+
     Returns:
         シミュレーション結果のサマリー
     """
     if date is None:
         date = datetime.now(timezone.utc).strftime("%Y-%m-%d")
 
-    print(f"[デイリーシミュレーション] {date} 開始...")
+    use_ai = not fast
+    print(f"[デイリーシミュレーション] {date} 開始... (fast={fast})")
 
     try:
         # Step 1: 市場データ取得
@@ -71,7 +76,8 @@ async def run_daily_simulation(date: Optional[str] = None) -> Dict:
         print("Step 5: AI投資会議生成")
         previous_meeting = Storage.get_latest_meeting()
         meeting_log = generate_meeting_log(
-            date, market_data, agent_analyses, trade_proposals, previous_meeting
+            date, market_data, agent_analyses, trade_proposals, previous_meeting,
+            use_ai=use_ai,
         )
 
         # Step 6: 取引実行
@@ -80,7 +86,7 @@ async def run_daily_simulation(date: Optional[str] = None) -> Dict:
 
         # Step 7: ポートフォリオ価格更新
         print("Step 7: ポートフォリオ更新")
-        portfolios = await _update_all_portfolios(market_data)
+        portfolios = await _update_all_portfolios(market_data, date=date)
 
         # Step 8: 日次レポート生成
         print("Step 8: 日次レポート生成")
@@ -92,6 +98,7 @@ async def run_daily_simulation(date: Optional[str] = None) -> Dict:
             trade_results=trade_results,
             discoveries=discoveries,
             meeting_log=meeting_log,
+            use_ai=use_ai,
         )
 
         # Step 9: データ保存
@@ -360,13 +367,13 @@ async def _execute_approved_trades(
     return results
 
 
-async def _update_all_portfolios(market_data: Dict) -> Dict:
+async def _update_all_portfolios(market_data: Dict, date: Optional[str] = None) -> Dict:
     """全エージェントのポートフォリオ価格を更新し、NAVスナップショットを保存"""
     tickers = market_data.get("tickers", [])
     price_updates = {t.get("ticker"): t.get("price") for t in tickers if t.get("ticker")}
     source = market_data.get("source", "unknown")
     fetched_at = market_data.get("timestamp")
-    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    snapshot_date = date or datetime.now(timezone.utc).strftime("%Y-%m-%d")
 
     portfolios = {}
     agent_ids = ["buffett", "soros", "lynch", "flat"]
@@ -386,7 +393,7 @@ async def _update_all_portfolios(market_data: Dict) -> Dict:
                     portfolio.get("performance", {}).get("total_return_pct", 0) or 0
                 )
                 Storage.append_nav_snapshot(agent_id, {
-                    "date": today,
+                    "date": snapshot_date,
                     "total_value": total_value,
                     "cash": cash,
                     "holdings_value": holdings_value,
