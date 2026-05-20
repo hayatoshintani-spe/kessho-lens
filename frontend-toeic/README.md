@@ -100,6 +100,17 @@ RLS は全テーブルで有効化済み。**ユーザーは自分のデータ�
 - 苦手分野 (`user_profiles.weak_areas`) は +5% され、他から自動で按分
 - 5分単位に丸め、最小 5分
 
+## テスト
+
+純粋ロジック (タスク配分 / 復習スケジューラ / フォーマッタ) は vitest で検証されています。
+
+```bash
+npm test          # 1回実行
+npm run test:watch # 監視モード
+```
+
+CI (GitHub Actions) でも push / PR 時に自動実行されます。
+
 ## 動作確認の流れ
 
 1. `/` → 「はじめる」 → `/login` → 新規登録（メール＋パスワード）。
@@ -117,9 +128,10 @@ RLS は全テーブルで有効化済み。**ユーザーは自分のデータ�
 - [ ] 録音の AI 採点 (発音 / 流暢さ)
 - [ ] スコア予測モデル (学習履歴 → 推定 TOEIC)
 - [ ] 復習キューを `/study/vocabulary` だけでなく他スキルにも拡張
-- [ ] テスト (`vitest` + `@testing-library/react`)
+- [x] テスト (`vitest`) — タスク配分 / 復習スケジューラ / フォーマッタ
+- [ ] コンポーネントテスト (`@testing-library/react`)
 - [ ] E2E (`Playwright`)
-- [ ] CI (GitHub Actions: type-check / lint)
+- [x] CI (GitHub Actions: type-check / test / build)
 
 ## デプロイ (Vercel)
 
