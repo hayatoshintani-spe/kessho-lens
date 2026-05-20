@@ -1,5 +1,7 @@
 # Kessho Lens English — TOEIC 学習管理アプリ (MVP)
 
+[![TOEIC App CI](https://github.com/hayatoshintani-spe/kessho-lens/actions/workflows/toeic-ci.yml/badge.svg)](https://github.com/hayatoshintani-spe/kessho-lens/actions/workflows/toeic-ci.yml)
+
 TOEIC 500 → 900 を目指す学習者向けの、毎日の学習を可視化する学習管理 Web アプリ。
 
 - Next.js 14 (App Router) + TypeScript
