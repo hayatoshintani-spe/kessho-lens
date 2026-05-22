@@ -1,0 +1,54 @@
+{
+  "name": "Kessho Lens English",
+  "short_name": "TOEIC学習",
+  "description": "TOEIC 500 → 900 を目指す毎日の学習を可視化する学習管理アプリ",
+  "lang": "ja",
+  "start_url": "/dashboard",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f8fafc",
+  "theme_color": "#0f172a",
+  "categories": ["education", "productivity"],
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-maskable.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/apple-touch-icon.svg",
+      "sizes": "180x180",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "今日のタスク",
+      "short_name": "今日",
+      "description": "ダッシュボードを開く",
+      "url": "/dashboard",
+      "icons": [{ "src": "/icon.svg", "sizes": "any" }]
+    },
+    {
+      "name": "単語学習",
+      "short_name": "単語",
+      "url": "/study/vocabulary",
+      "icons": [{ "src": "/icon.svg", "sizes": "any" }]
+    },
+    {
+      "name": "シャドーイング",
+      "short_name": "シャドー",
+      "url": "/study/shadowing",
+      "icons": [{ "src": "/icon.svg", "sizes": "any" }]
+    }
+  ]
+}

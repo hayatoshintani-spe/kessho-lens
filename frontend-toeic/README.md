@@ -7,6 +7,7 @@ TOEIC 500 → 900 を目指す学習者向けの、毎日の学習を可視化�
 - Next.js 14 (App Router) + TypeScript
 - Tailwind CSS + 自前 shadcn/ui プリミティブ
 - Supabase (Auth / PostgreSQL / Storage)
+- PWA 対応 (manifest + Service Worker + オフラインフォールバック)
 - Vercel デプロイ想定
 
 このディレクトリは既存の `kessho-lens` リポジトリの中に独立した形で配置されています（既存の `frontend/` / `backend/` には触れません）。
@@ -100,6 +101,20 @@ RLS は全テーブルで有効化済み。**ユーザーは自分のデータ�
 - 苦手分野 (`user_profiles.weak_areas`) は +5% され、他から自動で按分
 - 5分単位に丸め、最小 5分
 
+## PWA
+
+毎日使う学習アプリのため、スマホのホーム画面から起動できる PWA として動作します。
+
+- `public/manifest.webmanifest` — Web App Manifest (start_url = `/dashboard`)
+- `public/sw.js` — Service Worker。HTML ナビゲーションはネットワーク優先、静的アセットはキャッシュ優先
+- `public/icon.svg` / `icon-maskable.svg` / `apple-touch-icon.svg` — SVG アイコン
+- `/offline` — オフライン時のフォールバックページ
+- `components/PWARegister.tsx` — 本番ビルドのみ SW を登録 (dev で SW がキャッシュを汚さないように)
+
+**動作確認**: `npm run build && npm run start` でビルド版を起動し、Chrome の DevTools → Application タブで Manifest と Service Workers を確認できます。
+
+> モバイル Safari/Chrome でホーム画面に追加すると、`/dashboard` が起動 URL になります。
+
 ## テスト
 
 純粋ロジック (タスク配分 / 復習スケジューラ / フォーマッタ) は vitest で検証されています。
@@ -123,7 +138,7 @@ CI (GitHub Actions) でも push / PR 時に自動実行されます。
 
 ## 次にやるべきこと（MVP 後）
 
-- [ ] PWA 化 (オフライン対応 + ホーム画面追加)
+- [x] PWA 化 (manifest + Service Worker + オフラインページ)
 - [ ] リスニング/シャドーイング教材に **音声ファイル** を Supabase Storage 経由で配信
 - [ ] 録音の AI 採点 (発音 / 流暢さ)
 - [ ] スコア予測モデル (学習履歴 → 推定 TOEIC)
