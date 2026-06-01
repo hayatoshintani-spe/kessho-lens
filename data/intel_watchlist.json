@@ -1,0 +1,94 @@
+[
+  {
+    "category": "ip_content",
+    "label": "IP・キャラクター・コンテンツ市場",
+    "description": "どのIPがどの国で伸びているか / 映像・ゲーム・MD・イベント・ライセンスのどこで稼いでいるか",
+    "targets": ["Disney", "Pokémon", "Sanrio", "Nintendo", "Netflix", "YouTube", "Roblox", "TikTok", "Marvel/DC", "Godzilla", "Anime/Manga/VTuber"],
+    "items": [
+      {"keyword": "Disney IP戦略", "category": "ip_content", "rationale": "IPの長期収益化のベンチマーク", "priority": "high"},
+      {"keyword": "Pokémon海外決算", "category": "ip_content", "rationale": "日本発IPで最大級の成功事例", "priority": "high"},
+      {"keyword": "Sanrio海外展開", "category": "ip_content", "rationale": "海外比率引き上げ構造の最も近い参照", "priority": "high"},
+      {"keyword": "Netflix anime", "category": "ip_content", "rationale": "配信契約構造に直接影響", "priority": "high"},
+      {"keyword": "Roblox IP収益", "category": "ip_content", "rationale": "若年層接点の重要プラットフォーム", "priority": "medium"},
+      {"keyword": "Godzilla franchise", "category": "ip_content", "rationale": "怪獣IPの直接競合・参考事例", "priority": "high"}
+    ]
+  },
+  {
+    "category": "ai_agent",
+    "label": "AI・生成AI・エージェント",
+    "description": "IPキャラクターをAI化できるか / 制作工程をどこまで効率化できるか",
+    "targets": ["OpenAI", "Google", "Anthropic", "Meta", "Character.AI", "Midjourney", "Runway", "Suno", "ElevenLabs"],
+    "items": [
+      {"keyword": "OpenAI 音声 API", "category": "ai_agent", "rationale": "IP音声活用の業界標準を作る動き", "priority": "high"},
+      {"keyword": "Runway / Suno 映像生成", "category": "ai_agent", "rationale": "制作コスト構造を変える可能性", "priority": "high"},
+      {"keyword": "Character.AI", "category": "ai_agent", "rationale": "AIファンチャットの参照事例", "priority": "medium"},
+      {"keyword": "Apple Intelligence", "category": "ai_agent", "rationale": "デバイス側のAI接点", "priority": "medium"},
+      {"keyword": "Anthropic Claude", "category": "ai_agent", "rationale": "業務効率化基盤の有力候補", "priority": "medium"}
+    ]
+  },
+  {
+    "category": "device_telecom",
+    "label": "スマホ・通信・デバイス",
+    "description": "ユーザー接点はどのデバイスに移るか / IP体験はどこで起きるか",
+    "targets": ["Apple Vision", "Meta Quest", "ARグラス", "RCS", "スマートTV", "ゲーム機"],
+    "items": [
+      {"keyword": "Apple Vision Pro", "category": "device_telecom", "rationale": "空間体験プラットフォームの先導役", "priority": "medium"},
+      {"keyword": "Meta Quest", "category": "device_telecom", "rationale": "若年層・ゲーマーへの接点", "priority": "medium"},
+      {"keyword": "ARグラス各社", "category": "device_telecom", "rationale": "次世代IP体験の媒体", "priority": "low"},
+      {"keyword": "5G/RCS", "category": "device_telecom", "rationale": "ファンCRM・通知体験への影響", "priority": "low"}
+    ]
+  },
+  {
+    "category": "global_region",
+    "label": "グローバル市場・地域別トレンド",
+    "description": "ウルトラマンが伸びる国はどこか / 現地パートナー候補はどこか",
+    "targets": ["中国", "東南アジア", "北米", "インド", "中東", "欧州", "韓国", "台湾"],
+    "items": [
+      {"keyword": "中国コンテンツ規制", "category": "global_region", "rationale": "ウルトラマンが既に強い市場の制度動向", "priority": "high"},
+      {"keyword": "東南アジア IP市場", "category": "global_region", "rationale": "熱量が高く成長余地大", "priority": "high"},
+      {"keyword": "インド アニメ", "category": "global_region", "rationale": "次の大型市場、政府支援動向", "priority": "high"},
+      {"keyword": "中東 ファミリーエンタメ", "category": "global_region", "rationale": "新興投資先、ライセンス案件", "priority": "medium"},
+      {"keyword": "韓国 配信", "category": "global_region", "rationale": "アジアコンテンツ流通ハブ", "priority": "medium"}
+    ]
+  },
+  {
+    "category": "retail_md_license",
+    "label": "小売・MD・ライセンス・コマース",
+    "description": "どの価格帯が伸びているか / D2Cで取れる余地はあるか",
+    "targets": ["Bandai", "TOMY", "LEGO", "Funko", "Pop Mart", "Miniso", "ユニクロ", "Amazon", "Shopify", "TikTok Shop"],
+    "items": [
+      {"keyword": "Pop Mart 決算", "category": "retail_md_license", "rationale": "キダルト市場の先導事例", "priority": "high"},
+      {"keyword": "Funko 北米市場", "category": "retail_md_license", "rationale": "コレクター市場の構造把握", "priority": "high"},
+      {"keyword": "Bandai ライセンス", "category": "retail_md_license", "rationale": "最大ライセンシー、関係性設計", "priority": "high"},
+      {"keyword": "TikTok Shop", "category": "retail_md_license", "rationale": "D2C × ソーシャルの新チャネル", "priority": "medium"},
+      {"keyword": "Miniso 海外", "category": "retail_md_license", "rationale": "中国系コラボMDの広がり", "priority": "medium"}
+    ]
+  },
+  {
+    "category": "regulation_ip_law",
+    "label": "規制・著作権・プラットフォーム政策",
+    "description": "子ども向けIPの展開に影響はあるか / AIキャラクター展開の法的リスクは何か",
+    "targets": ["AI著作権", "子どもSNS規制", "EU AI Act", "中国コンテンツ規制", "景表法", "ガチャ規制"],
+    "items": [
+      {"keyword": "EU AI Act", "category": "regulation_ip_law", "rationale": "AI活用の全社方針に直結", "priority": "high"},
+      {"keyword": "中国子ども向け規制", "category": "regulation_ip_law", "rationale": "重要市場の制度変動", "priority": "high"},
+      {"keyword": "AI著作権 米国", "category": "regulation_ip_law", "rationale": "AI生成物の権利帰属", "priority": "high"},
+      {"keyword": "ブラインドボックス規制", "category": "regulation_ip_law", "rationale": "新MD形態の法的位置づけ", "priority": "medium"},
+      {"keyword": "景表法", "category": "regulation_ip_law", "rationale": "国内プロモ素材", "priority": "low"}
+    ]
+  },
+  {
+    "category": "competitor_capital",
+    "label": "競合・決算・資本市場",
+    "description": "どの会社がIP収益を伸ばしているか / 市場はどの事業モデルを評価しているか",
+    "targets": ["円谷フィールズ", "東映アニメーション", "サンリオ", "バンダイナムコ", "東宝", "任天堂", "ソニー", "Netflix", "Disney", "Tencent", "Bilibili"],
+    "items": [
+      {"keyword": "サンリオ 決算", "category": "competitor_capital", "rationale": "海外展開構造の最重要参照", "priority": "high"},
+      {"keyword": "バンダイナムコ IP戦略", "category": "competitor_capital", "rationale": "最重要ライセンシー兼参照企業", "priority": "high"},
+      {"keyword": "東映アニメーション", "category": "competitor_capital", "rationale": "アニメIP事業構造の参照", "priority": "high"},
+      {"keyword": "円谷フィールズ 開示", "category": "competitor_capital", "rationale": "親会社の戦略動向", "priority": "high"},
+      {"keyword": "Tencent / Bilibili", "category": "competitor_capital", "rationale": "中国IPプラットフォームの動き", "priority": "medium"},
+      {"keyword": "Disney 決算", "category": "competitor_capital", "rationale": "IP収益化のグローバル参照", "priority": "medium"}
+    ]
+  }
+]

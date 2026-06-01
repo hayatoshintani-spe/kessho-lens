@@ -1,0 +1,387 @@
+[
+  {
+    "id": "intel_2026-05-16_a1b2c3d4e5",
+    "date": "2026-05-16",
+    "title": "Pop Mart、北米でLabubu収益が前年比4倍超に拡大",
+    "one_liner": "キダルト市場が急拡大、IP収益モデルの転換点",
+    "category": "retail_md_license",
+    "importance": "A",
+    "fact": "Pop Mart の北米四半期売上が前年同期比+312%、Labubu単独で全社売上の約3割を占めると報道。1万〜3万円の中高価格帯コレクター商品が主力。",
+    "interpretation": "(解釈) キャラクターIPの『大人向け × ブラインドボックス × 限定性』の組み合わせが、海外市場でも明確に成立することを示している。従来の玩具市場の枠組みではなく、コレクター/アート市場として捉えるべき段階。円谷の海外MD戦略は『子ども向け』前提を見直す必要がある。",
+    "insight": {
+      "what_it_means": "ウルトラマンも大人向けコレクター市場（フィギュア、ソフビ、アクスタ等）で同様の単価×回転を狙える可能性。特に既存ファン層が30-40代まで成長しており、可処分所得と購買意欲の両面で適合する。一方、Pop Mart型は商品設計・サプライ・ブランド整合性のすべてに専門ノウハウが必要で、自社で全て抱える形は現実的でない。",
+      "business_opportunity": [
+        "Pop Mart的なブラインドボックス × ウルトラマンのコラボ商品（限定地域投入で検証）",
+        "1万円超の大人向けハイエンド造形ライン（既存ライセンシーとの再交渉）",
+        "北米・東南アジアのコレクター向けD2Cチャネル構築"
+      ],
+      "risk": [
+        "ガチャ的販売形態は子ども向けIPブランドとの整合性に疑義（炎上リスク）",
+        "Pop Martと直接競合する形でのIP切り出しは関係を損なう可能性",
+        "在庫リスクを誰が取るかで利益率が大きく変動"
+      ]
+    },
+    "actions": [
+      {
+        "who": "MD / ライセンス + 海外事業部",
+        "what": "Pop Mart型のキダルト商品スキームをウルトラマンで再現する場合の収益試算・パートナー候補リスト化",
+        "priority": "this_week"
+      },
+      {
+        "who": "経営企画",
+        "what": "次回経営会議のアジェンダに『キダルト市場戦略』を上程",
+        "priority": "urgent"
+      },
+      {
+        "who": "法務 / 知財",
+        "what": "ブラインドボックス販売形態の各国規制（特に中国・米国）整理",
+        "priority": "this_month"
+      }
+    ],
+    "tags": ["Pop Mart", "Labubu", "キダルト", "コレクター市場", "ブラインドボックス"],
+    "sources": [
+      {
+        "title": "Pop Mart Q1 2026 earnings: Labubu drives 4x growth in North America",
+        "url": "https://example.com/popmart-q1-2026",
+        "publisher": "Industry Report",
+        "published_at": "2026-05-15",
+        "access_status": "estimated"
+      }
+    ],
+    "confidence": "high",
+    "speculation_notes": "Pop Martの具体的な内訳数値は公表決算ベースであれば検証可能。本カードでは『前年比4倍、Labubu単独で全社売上3割』を仮定として扱っている。1次情報の確認が必要。",
+    "related_card_ids": [],
+    "related_agents": ["md_licensing", "global_expansion", "cfo"]
+  },
+  {
+    "id": "intel_2026-05-16_b2c3d4e5f6",
+    "date": "2026-05-16",
+    "title": "OpenAI、キャラクター音声複製APIを公式公開へ",
+    "one_liner": "IP音声のAI複製が事実上の標準化、許諾フローが論点",
+    "category": "ai_agent",
+    "importance": "A",
+    "fact": "OpenAIが声優の同意ベースで音声を複製する公式APIを開発者向けに提供開始と報道。本人/権利者の事前許諾署名と利用ログがプラットフォームに保存される仕組み。",
+    "interpretation": "(解釈) 音声複製AIが『闇市場』から『公式合意ベース』へ移行する転換点。IPホルダーは『自社IP音声の公式ライセンス化』を能動的に設計しないと、第三者が無許諾モデルを流通させた際に対抗できなくなる。逆に積極設計すれば、海外展開・ファンチャット・新コンテンツ制作で大幅なコスト削減と速度向上が可能。",
+    "insight": {
+      "what_it_means": "ウルトラマンシリーズの過去音声・声優陣の声を『円谷公式 × OpenAI公式』のラインで二重許諾管理し、ファンチャット・海外吹替・新作プロモへ展開できる素地が整う。同時に、無許諾モデルが氾濫する前に『公式音源とは何か』の境界を引いておかないと、ブランド毀損リスクが急上昇する。",
+      "business_opportunity": [
+        "公式ファンチャット（ウルトラマンと会話）を低コストで多言語展開",
+        "AI翻訳吹替による海外配信の地域同時公開",
+        "声優・出演者の二次利用許諾フレームを業界先行で設計"
+      ],
+      "risk": [
+        "声優・遺族との許諾・対価設計を間違えると業界全体の信頼を損なう",
+        "未許諾AI音声を使ったファン制作物の取り扱いが新たな炎上源に",
+        "EU AI Act / 米国SAG-AFTRA基準との整合"
+      ]
+    },
+    "actions": [
+      {
+        "who": "技術企画 + 法務 + 制作",
+        "what": "音声複製APIの内部評価と、声優陣との許諾フレーム叩き台作成",
+        "priority": "urgent"
+      },
+      {
+        "who": "経営企画",
+        "what": "IP音声のAI利用に関する全社ガイドライン草案を6月経営会議に上程",
+        "priority": "this_month"
+      },
+      {
+        "who": "ファンエンゲージメント",
+        "what": "公式ファンチャットのPoC企画立案（ジードAI / メビウスAI 等）",
+        "priority": "this_month"
+      }
+    ],
+    "tags": ["OpenAI", "AI音声", "声優", "ライセンス", "ファンチャット"],
+    "sources": [
+      {
+        "title": "OpenAI Voice Cloning API — official release notes",
+        "url": "https://example.com/openai-voice-2026",
+        "publisher": "Tech press",
+        "published_at": "2026-05-14",
+        "access_status": "estimated"
+      }
+    ],
+    "confidence": "medium",
+    "speculation_notes": "本記事はリリース概要ベースのため、ライセンス条項・取り分・利用ログの詳細は要1次情報確認。",
+    "related_card_ids": [],
+    "related_agents": ["ai_trend", "risk_manager", "ip_strategist"]
+  },
+  {
+    "id": "intel_2026-05-16_c3d4e5f6g7",
+    "date": "2026-05-16",
+    "title": "Netflix、アニメ部門の自社制作比率を2027年までに50%へ",
+    "one_liner": "配信プラットフォームのIP内製化が加速、ライセンス交渉力に影響",
+    "category": "ip_content",
+    "importance": "B",
+    "fact": "Netflixが2027年までにアニメ部門の自社制作（オリジナル）比率を約50%まで引き上げる方針と報道。既存IPライセンス取得から自社IP内製・出資への比重シフトが鮮明。",
+    "interpretation": "(解釈) Netflixは『買う』から『作る/出資する』へ。IPホルダーから見ると、配信契約での取り分が縮小する可能性と、共同出資による上流からの関与で経済性を取り戻す機会の両面が生じる。短期はライセンスフィー減、中期はIP共創/共同出資が現実的な選択肢。",
+    "insight": {
+      "what_it_means": "円谷がウルトラマンを純粋なライセンサーとして配信契約だけ結ぶ姿勢では、Netflix側に主導権を取られ続ける。共同企画・出資型のディール構造を提示できると、収益と発言力の両方を確保しやすい。同時に、Netflix以外（Disney+/Prime Video/中国系プラットフォーム）との関係でも同様の戦略構造化が必要。",
+      "business_opportunity": [
+        "Netflix共同出資型の海外向けウルトラマン新作シリーズの提案",
+        "他配信プラットフォームへのマルチホーミング戦略の見直し",
+        "アニメスタジオ買収/出資による制作キャパシティ確保"
+      ],
+      "risk": [
+        "ライセンスフィー単独モデルへの依存は中期で収益機会を逸する",
+        "プラットフォーム独占契約の長期化はIP戦略の自由度を下げる"
+      ]
+    },
+    "actions": [
+      {
+        "who": "海外事業 + 制作",
+        "what": "Netflix・Disney+との次期契約交渉で『共同出資オプション』を含める準備",
+        "priority": "this_month"
+      },
+      {
+        "who": "経営企画",
+        "what": "配信プラットフォーム別の取引構造マッピングを作成",
+        "priority": "this_week"
+      }
+    ],
+    "tags": ["Netflix", "アニメ", "配信", "共同出資", "プラットフォーム"],
+    "sources": [
+      {
+        "title": "Netflix's anime strategy shift toward originals by 2027",
+        "url": "https://example.com/netflix-anime-2026",
+        "publisher": "Trade press",
+        "published_at": "2026-05-13",
+        "access_status": "paywalled"
+      }
+    ],
+    "confidence": "medium",
+    "speculation_notes": "Netflixの公式声明は確認できておらず、業界レポートの引用ベース。50%という数字は概算と捉える。",
+    "related_card_ids": [],
+    "related_agents": ["ip_strategist", "global_expansion", "cfo"]
+  },
+  {
+    "id": "intel_2026-05-16_d4e5f6g7h8",
+    "date": "2026-05-16",
+    "title": "中国当局、子ども向けライブコマースに新たな広告規制",
+    "one_liner": "中国の若年層向けキャラクター展開に制約、再設計が必要",
+    "category": "regulation_ip_law",
+    "importance": "B",
+    "fact": "中国国家市場監督管理総局が、14歳未満をターゲットとするライブコマース・短尺動画広告に対し、購買誘導表現・キャラクター誘引表現の制限を強化する新ガイドラインを発表。施行は2026年7月予定。",
+    "interpretation": "(解釈) 中国市場でのキャラクターIPは『子ども向け × ライブコマース × 短尺動画』のトライアングルで急成長していたが、トライアングルの一辺が制約される。Tencent/Bilibili等プラットフォーム側の運用変更を踏まえ、表現・販売チャネル設計の再点検が必要。",
+    "insight": {
+      "what_it_means": "中国向けウルトラマンMD・コンテンツのプロモーション設計が直接影響を受ける可能性。子ども向け表現の制限は具体的に何が引っかかるのか、ライセンシー（バンダイ・現地パートナー）との実務確認が急務。一方、規制対応の早い企業ほど現地パートナーから選ばれやすくなる。",
+      "business_opportunity": [
+        "規制対応の知見をパッケージ化し、現地ライセンシーへの付加価値とする",
+        "大人向け・コレクター向け展開比率を中国市場でも増やす"
+      ],
+      "risk": [
+        "現行プロモ素材の差し替え対応コスト",
+        "短期的に中国市場の若年層接点が縮小",
+        "規制違反の場合の罰金・配信停止リスク"
+      ]
+    },
+    "actions": [
+      {
+        "who": "海外事業（中国） + 法務",
+        "what": "ガイドライン全文の翻訳・分析、現地ライセンシー向け影響度マップ作成",
+        "priority": "urgent"
+      },
+      {
+        "who": "マーケティング",
+        "what": "中国向けプロモ素材の規制適合チェック",
+        "priority": "this_month"
+      }
+    ],
+    "tags": ["中国", "規制", "ライブコマース", "子ども向け", "広告規制"],
+    "sources": [
+      {
+        "title": "China new advertising rules for children's live commerce",
+        "url": "https://example.com/china-regulation-2026",
+        "publisher": "Regulatory news",
+        "published_at": "2026-05-12",
+        "access_status": "title_only"
+      }
+    ],
+    "confidence": "low",
+    "speculation_notes": "本記事は本文未確認、タイトルベースの推定。ガイドライン本文の入手と法務翻訳が必要。",
+    "related_card_ids": [],
+    "related_agents": ["risk_manager", "global_expansion", "md_licensing"]
+  },
+  {
+    "id": "intel_2026-05-16_e5f6g7h8i9",
+    "date": "2026-05-16",
+    "title": "Roblox、IPライセンサー向け収益分配を改定",
+    "one_liner": "UGCプラットフォームでのIP収益化条件が好転、要再評価",
+    "category": "ip_content",
+    "importance": "C",
+    "fact": "Robloxが公認IPコンテンツに対するクリエイター/ライセンサーの収益分配率を引き上げる新プログラムを発表（推定: 既存20%台→30%台）。",
+    "interpretation": "(解釈) UGCプラットフォームでのIP出店は、これまでブランド露出メインでマネタイズが弱かったが、収益分配率の改善で『マーケティング兼収益事業』として再評価する余地がある。特に北米・東南アジアの10代接点獲得という意味で、ウルトラマンの認知層拡大に効く可能性。",
+    "insight": {
+      "what_it_means": "Roblox上での公式ウルトラマン体験（ワールド・アバター・ミニゲーム）の本格設計が経済的に成立しやすくなる。ただしブランドガードレールの設計と、UGCクリエイターとの共創モデルの構築は必須。",
+      "business_opportunity": [
+        "Roblox公式ウルトラマンワールドのPoC（限定期間・コラボイベント）",
+        "Roblox/Fortnite/Minecraftを横断する若年層接点戦略の整備"
+      ],
+      "risk": [
+        "UGCでの二次創作・改変IPの取り扱いガイドライン整備が追いつかない",
+        "ブランドにそぐわない使われ方が拡散するリスク"
+      ]
+    },
+    "actions": [
+      {
+        "who": "デジタル / 新規事業",
+        "what": "新プログラムの詳細確認と、PoC企画の叩き台作成",
+        "priority": "this_month"
+      },
+      {
+        "who": "法務 / 知財",
+        "what": "UGC上でのIP利用ガイドライン策定",
+        "priority": "this_month"
+      }
+    ],
+    "tags": ["Roblox", "UGC", "10代接点", "プラットフォーム", "IP分配"],
+    "sources": [
+      {
+        "title": "Roblox revamps revenue share for IP licensors",
+        "url": "https://example.com/roblox-2026",
+        "publisher": "Gaming press",
+        "published_at": "2026-05-14",
+        "access_status": "estimated"
+      }
+    ],
+    "confidence": "medium",
+    "speculation_notes": "分配率の具体数字は業界レポートからの推定。Roblox公式発表の確認が必要。",
+    "related_card_ids": [],
+    "related_agents": ["ip_strategist", "ai_trend"]
+  },
+  {
+    "id": "intel_2026-05-16_f6g7h8i9j0",
+    "date": "2026-05-16",
+    "title": "サンリオ、海外売上比率が国内を逆転（前期決算）",
+    "one_liner": "日本発キャラクターIPの海外シフトが収益ドライバ化",
+    "category": "competitor_capital",
+    "importance": "B",
+    "fact": "サンリオが前期決算で海外売上比率を約52%まで引き上げ、国内（48%）を上回ったと開示。営業利益率も改善。",
+    "interpretation": "(解釈) 日本発キャラクターIPがグローバルでマネタイズに成功した代表事例。鍵は (1) 現地パートナーの選定、(2) 大人向け再ポジショニング、(3) 海外向けライセンス比率の意図的な拡大。円谷の海外展開戦略の参照点として極めて有効。",
+    "insight": {
+      "what_it_means": "ウルトラマンは特撮ヒーローという特性上サンリオと同型ではないが、『海外売上比率を意図的に引き上げる構造』『大人向け再ポジショニング』の方法論は応用可能。中期計画の海外比率KPIを再設定する材料になる。",
+      "business_opportunity": [
+        "海外売上比率の中期KPI再設定（現状→3年で+X%）",
+        "サンリオ型のキャラクターブック / ブランドコラボ手法の研究"
+      ],
+      "risk": [
+        "成功事例の表面模倣に終わると、特撮IPの強みを活かせない"
+      ]
+    },
+    "actions": [
+      {
+        "who": "経営企画 + 海外事業",
+        "what": "サンリオの海外展開構造を分解した詳細レポート作成（中期計画見直しの参考）",
+        "priority": "this_month"
+      },
+      {
+        "who": "経営企画",
+        "what": "競合・参照企業のベンチマーク表に追加（円谷フィールズ、東映アニメ、サンリオ、バンダイナムコ）",
+        "priority": "this_week"
+      }
+    ],
+    "tags": ["サンリオ", "海外比率", "キャラクターIP", "ベンチマーク"],
+    "sources": [
+      {
+        "title": "Sanrio FY2025 earnings: overseas surpasses domestic",
+        "url": "https://example.com/sanrio-2026",
+        "publisher": "決算開示",
+        "published_at": "2026-05-12",
+        "access_status": "full"
+      }
+    ],
+    "confidence": "high",
+    "speculation_notes": null,
+    "related_card_ids": [],
+    "related_agents": ["cfo", "global_expansion", "ip_strategist"]
+  },
+  {
+    "id": "intel_2026-05-16_g7h8i9j0k1",
+    "date": "2026-05-16",
+    "title": "Apple Vision、エンタメ向け空間コンテンツ価格を引き下げ",
+    "one_liner": "空間コンテンツ市場のしきい値が下がり、PoC機会が拡大",
+    "category": "device_telecom",
+    "importance": "C",
+    "fact": "Appleが Vision Pro 系デバイス向けエンタメ空間コンテンツの卸売価格・配信手数料の引き下げを発表。空間映像・空間ライブの単発価格帯を引き下げ普及を後押し。",
+    "interpretation": "(解釈) ARグラス/空間デバイスでのIPコンテンツは普及前夜から本格化フェーズへ移行中。価格しきい値が下がることで『どのIPがARで体験設計を作るか』の競争が始まる。先行事例づくりは比較的安価で可能になりつつある。",
+    "insight": {
+      "what_it_means": "ウルトラマンの『等身大ヒーロー × 都市スケール』の世界観はAR/空間体験との親和性が高い。初期投資を抑えながら、ファンイベントや短尺PoCで実証する価値は十分ある。一方、本格量産はデバイス普及率が決定要因。",
+      "business_opportunity": [
+        "Vision Pro / Quest / ARグラス向けの短尺空間体験コンテンツPoC",
+        "イベント会場での空間体験 → 後日デバイス販売型の連携"
+      ],
+      "risk": [
+        "デバイス普及が遅延した場合の投資コストの埋没"
+      ]
+    },
+    "actions": [
+      {
+        "who": "デジタル / 新規事業",
+        "what": "空間コンテンツPoCの予算枠と制作パートナー選定",
+        "priority": "watch"
+      }
+    ],
+    "tags": ["Apple Vision", "AR", "空間コンテンツ", "Quest", "デバイス"],
+    "sources": [
+      {
+        "title": "Apple lowers spatial entertainment pricing tier",
+        "url": "https://example.com/apple-vision-2026",
+        "publisher": "Tech press",
+        "published_at": "2026-05-13",
+        "access_status": "estimated"
+      }
+    ],
+    "confidence": "medium",
+    "speculation_notes": "具体的な価格幅は業界推定。Apple公式の正確な数値確認が必要。",
+    "related_card_ids": [],
+    "related_agents": ["ai_trend", "ip_strategist"]
+  },
+  {
+    "id": "intel_2026-05-16_h8i9j0k1l2",
+    "date": "2026-05-16",
+    "title": "インド政府、アニメ・キャラクター産業の支援パッケージを発表",
+    "one_liner": "インド市場の入口が制度的に開く、参入タイミング論点化",
+    "category": "global_region",
+    "importance": "B",
+    "fact": "インド政府が国産アニメ・キャラクター産業育成のための支援パッケージ（補助金・優遇税制・国際共同制作枠）を発表。海外IPとの共同制作枠が含まれる。",
+    "interpretation": "(解釈) インドは長年『大きな市場 / 入りにくい市場』だったが、共同制作枠の整備で入りやすくなる可能性。すでに日本アニメに対するインドの若年層需要は高く、ウルトラマンにとっても重要な中長期市場。タイミング設計が論点化する。",
+    "insight": {
+      "what_it_means": "インド市場への参入は『単独進出』ではなく『共同制作』の選択肢が現実味を帯びた。3-5年での中長期投資として、現地スタジオとのアライアンス検討は経営アジェンダ候補。即時収益ではなく、IP認知形成期の投資としての位置づけ。",
+      "business_opportunity": [
+        "インド現地スタジオとの共同制作枠の活用（補助金活用前提）",
+        "ヒンディー語・テルグ語版コンテンツのAI翻訳パイロット"
+      ],
+      "risk": [
+        "現地パートナー選定を誤ると数年単位の機会損失",
+        "補助金条件・知財権利分配の細部要確認"
+      ]
+    },
+    "actions": [
+      {
+        "who": "海外事業（新興市場）",
+        "what": "インド支援パッケージの詳細分析と現地パートナー候補リスト作成",
+        "priority": "this_month"
+      },
+      {
+        "who": "経営企画",
+        "what": "中期計画の中でインドを正式な投資対象市場として位置づけるかを検討",
+        "priority": "this_month"
+      }
+    ],
+    "tags": ["インド", "共同制作", "補助金", "新興市場"],
+    "sources": [
+      {
+        "title": "India unveils support package for animation industry",
+        "url": "https://example.com/india-anime-2026",
+        "publisher": "Government release",
+        "published_at": "2026-05-14",
+        "access_status": "estimated"
+      }
+    ],
+    "confidence": "medium",
+    "speculation_notes": "パッケージの正式条件は政府文書の精読が必要。本カードは概要レベル。",
+    "related_card_ids": [],
+    "related_agents": ["global_expansion", "cfo", "ip_strategist"]
+  }
+]

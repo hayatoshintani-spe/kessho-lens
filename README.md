@@ -1,41 +1,53 @@
-# AI投資ファンド — kessho-lens
+# Tsuburaya Intelligence Brief
 
-**4体のAI投資家が毎日議論し、思考し、学習する投資シミュレーションプラットフォーム**
+**外部ニュース・規制動向・技術トレンドを、円谷の事業機会・リスク・経営論点に翻訳する情報基盤**
 
-> 「投資成績よりも、AIの思考・葛藤・反論・判断変更・学習が見えることを重視する」
-
----
-
-## AIエージェント
-
-| エージェント | 投資スタイル | 個性 |
-|------|------|------|
-| **BuffettAI** | 長期バリュー投資 | 配当・堀・割安を重視。「20年持てる株か？」が口癖 |
-| **SorosAI** | マクロ投資・再帰性理論 | 政策・為替・市場の反射性を重視。「市場は常に間違っている」 |
-| **LynchAI** | テンバガーハンター | 日常観察・PEGレシオ重視。「自分が理解できる株を買え」 |
-| **FlatAI** | インデックス運用 | 効率的市場仮説信者。他3人を批判する役回り |
+> 「読むためのニュース」ではなく「動くためのインテリジェンス」
 
 ---
 
-## 機能
+## 何をするアプリか
 
-- **AIダッシュボード** — 4エージェントのリアルタイム成績・損益・ランキング
-- **AI投資会議ログ** — チャット形式で4人の議論・反論・決定を可視化
-- **日次レポート** — AIが生成するMarkdownレポート（市場概況・判断根拠）
-- **銘柄探索ログ** — 各AIがどのテーマ・銘柄を発見・検討したか
-- **エージェント詳細** — 各AIの哲学・ポートフォリオ・過去の学びと失敗
+毎日大量に流れる業界ニュース・規制動向・技術トレンドは、そのままではただの情報でしかありません。
+このアプリは AI が以下の7カテゴリで監視・要約・解釈し、円谷の経営層・事業部長・経営企画に
+「Daily Intelligence Brief」として届けます。
+
+| カテゴリ | 監視対象 |
+|---|---|
+| IP・コンテンツ | 競合IP動向、配信プラットフォーム、コンテンツ消費トレンド |
+| AI・エージェント | 生成AI、AIエージェント技術、コンテンツ生成への影響 |
+| デバイス・通信 | XR/AR、5G/6G、新型デバイス |
+| グローバル・地域 | 海外市場動向、地域別IP戦略 |
+| 小売・MD・ライセンス | グッズ市場、ライセンス契約、リテール動向 |
+| 規制・著作権 | 著作権法改正、AI生成物の法的扱い、肖像権 |
+| 競合・資本市場 | エンタメ業界M&A、競合資金調達、評価額 |
+
+各情報は **IntelCard**（事実 + 解釈 + 円谷への示唆 + 次アクション）として保存され、
+6 種類の AI エキスパート（IP戦略家・グローバル展開・MD/ライセンス・AI技術トレンド・CFO・リスク管理）が
+**AI Council Session** で論点を議論し、採用・保留・要調査の結論を出します。
+
+---
+
+## 主要機能
+
+- **Daily Brief** — 経営層向け要約 + 重要トピックス + 次アクション + 識別リスク
+- **IntelCard DB** — 重要度A〜D（経営アジェンダ / 事業部検討 / 共有 / 参考）で分類された記事カード
+- **AI Council Session** — 6エキスパートによる戦略議論と編集者の結論
+- **Watchlist** — カテゴリ別の監視キーワード・対象企業
+- **Notion 連携** — IntelCard を社内 Notion DB に自動同期
+- **Daily Brief 自動配信** — 毎朝 7:00 JST に Brief を経営層へ自動メール配信 (Resend)
 
 ---
 
 ## 技術構成
 
 ```
-ai-investment-fund/
-├── frontend/          # Next.js 14 (Vercel)
-├── backend/           # FastAPI (Railway / Render)
+tsuburaya-intelligence-brief/
+├── frontend/          # Next.js 14 (App Router)
+├── backend/           # FastAPI (Python 3.11)
 ├── shared/            # 共通型定義 (TypeScript / Python)
-├── data/              # JSONデータ保存
-├── vercel.json        # Vercel Cron設定
+├── data/              # JSON データ保存（intel_cards / briefs / council / watchlist）
+├── render.yaml        # Render 用 Blueprint
 └── .env.example       # 環境変数テンプレート
 ```
 
@@ -47,21 +59,14 @@ ai-investment-fund/
 - Node.js 18+
 - Python 3.11+
 
-### 1. リポジトリのクローン
-
-```bash
-git clone https://github.com/your-username/kessho-lens.git
-cd kessho-lens
-```
-
-### 2. 環境変数の設定
+### 1. 環境変数
 
 ```bash
 cp .env.example .env
-# .env を編集して ANTHROPIC_API_KEY などを設定
+# .env を編集して ANTHROPIC_API_KEY、Notion 連携を使うなら NOTION_API_KEY を設定
 ```
 
-### 3. バックエンド起動
+### 2. バックエンド
 
 ```bash
 cd backend
@@ -71,10 +76,10 @@ pip install -r requirements.txt
 uvicorn main:app --reload --port 8000
 ```
 
-バックエンドAPI: `http://localhost:8000`  
-APIドキュメント: `http://localhost:8000/docs`
+- API: `http://localhost:8000`
+- ドキュメント: `http://localhost:8000/docs`
 
-### 4. フロントエンド起動
+### 3. フロントエンド
 
 ```bash
 cd frontend
@@ -82,18 +87,7 @@ npm install
 npm run dev
 ```
 
-フロントエンド: `http://localhost:3000`
-
-### 5. 日次シミュレーション手動実行
-
-```bash
-# APIエンドポイント経由
-curl -X POST http://localhost:8000/api/run-daily
-
-# または直接実行
-cd backend
-python src/simulation/daily_runner.py --mode daily
-```
+- 画面: `http://localhost:3000` → `/intel` に自動リダイレクト
 
 ---
 
@@ -101,66 +95,26 @@ python src/simulation/daily_runner.py --mode daily
 
 ### Frontend: Vercel
 
-1. [vercel.com](https://vercel.com) でアカウント作成
-2. GitHubリポジトリを接続
-3. 設定:
-   - **Framework Preset**: Next.js
-   - **Root Directory**: `frontend`
-   - **Build Command**: `npm run build`
-   - **Output Directory**: `.next`（自動検出）
-4. 環境変数を設定:
-   ```
-   NEXT_PUBLIC_API_BASE_URL=https://your-backend.railway.app
-   CRON_SECRET=your-secret-here
-   ```
-5. デプロイ → URLを取得
+1. GitHub リポジトリを接続
+2. 設定:
+   - Framework Preset: **Next.js**
+   - Root Directory: **`frontend`**
+3. 環境変数: `NEXT_PUBLIC_API_BASE_URL=https://your-backend.onrender.com`
 
-**Vercel Cron Jobs**（`vercel.json` で設定済み）:
-- 毎日 01:00 UTC に `/api/trigger-daily` を呼び出し
-- `CRON_SECRET` でバックエンドを保護
+### Backend: Render
 
-### Backend: Railway
-
-1. [railway.app](https://railway.app) でアカウント作成
-2. 「New Project」→「Deploy from GitHub repo」
-3. 設定:
-   - **Root Directory**: `backend`
-   - **Start Command**: `uvicorn main:app --host 0.0.0.0 --port $PORT`
-4. 環境変数を設定:
+1. New Web Service → GitHub リポジトリを接続
+2. 設定（または同梱の `render.yaml` で自動設定）:
+   - Root Directory: `backend`
+   - Build: `pip install -r requirements.txt`
+   - Start: `uvicorn main:app --host 0.0.0.0 --port $PORT`
+3. 環境変数:
    ```
    ANTHROPIC_API_KEY=sk-ant-...
-   CRON_SECRET=your-secret-here
+   NOTION_API_KEY=secret_...        # 任意
+   NOTION_CARDS_DB_ID=...           # 任意
    ALLOWED_ORIGINS=https://your-frontend.vercel.app
    ```
-5. デプロイ → バックエンドURLを取得
-6. VercelのNEXT_PUBLIC_API_BASE_URLに設定
-
-### Backend: Render (代替)
-
-1. [render.com](https://render.com) でアカウント作成
-2. 「New Web Service」→ GitHubリポジトリを接続
-3. 設定:
-   - **Root Directory**: `backend`
-   - **Build Command**: `pip install -r requirements.txt`
-   - **Start Command**: `uvicorn main:app --host 0.0.0.0 --port $PORT`
-   - `render.yaml` で自動設定可能
-4. 環境変数を設定（同上）
-
----
-
-## GitHub連携と自動デプロイ
-
-1. GitHubリポジトリを作成:
-   ```bash
-   git remote add origin https://github.com/your-username/kessho-lens.git
-   git push -u origin main
-   ```
-
-2. Vercelにfrontendを接続（上記参照）
-
-3. RailwayまたはRenderにbackendを接続（上記参照）
-
-4. **自動デプロイ**: `main` ブランチにpushすると両サービスが自動でデプロイ
 
 ---
 
@@ -168,57 +122,44 @@ python src/simulation/daily_runner.py --mode daily
 
 | 変数名 | 説明 | 必須 |
 |--------|------|------|
-| `ANTHROPIC_API_KEY` | Claude API キー | 推奨（なしでもモックで動作） |
-| `CRON_SECRET` | Cronエンドポイント保護 | 本番必須 |
-| `NEXT_PUBLIC_API_BASE_URL` | バックエンドURL | 本番必須 |
-| `ALPHA_VANTAGE_API_KEY` | 株価データAPI | オプション |
-| `FINNHUB_API_KEY` | 追加市場データ | オプション |
-| `DATABASE_URL` | Supabase接続URL | オプション（拡張時） |
+| `ANTHROPIC_API_KEY` | Claude API キー（カード・ブリーフ・AI会議生成） | 推奨（なしでもテンプレで動作） |
+| `NOTION_API_KEY` | Notion Integration Token | 任意（Notion 連携時） |
+| `NOTION_CARDS_DB_ID` | IntelCards DB の ID | 任意（Notion 連携時） |
+| `RESEND_API_KEY` | Resend API キー（メール配信） | 任意（メール配信時） |
+| `BRIEF_EMAIL_FROM` | メール差出人 (`"Name <addr>"` 形式可) | 任意（メール配信時） |
+| `BRIEF_EMAIL_RECIPIENTS` | カンマ区切り宛先 | 任意（メール配信時） |
+| `BRIEF_TIMEZONE` | Brief 生成タイムゾーン (既定: `Asia/Tokyo`) | 任意 |
+| `CRON_SECRET` | クロンエンドポイント認証用シークレット | 自動配信時必須 |
+| `NEXT_PUBLIC_API_BASE_URL` | バックエンド URL | 本番必須 |
+| `ALLOWED_ORIGINS` | CORS 許可オリジン（カンマ区切り） | 本番推奨 |
+| `FRONTEND_URL` | フロントエンド URL（メール本文リンクに使用） | メール配信時推奨 |
 
 ---
 
-## APIリファレンス
+## API リファレンス
 
 ```
-GET  /api/health              # ヘルスチェック
-GET  /api/dashboard           # ダッシュボードデータ（全エージェント成績）
-GET  /api/agents              # エージェント一覧
-GET  /api/agents/{id}         # エージェント詳細 (buffett/soros/lynch/flat)
-GET  /api/meetings            # 会議ログ一覧
-GET  /api/meetings/{date}     # 指定日の会議ログ (YYYY-MM-DD)
-GET  /api/reports             # 日次レポート一覧
-GET  /api/reports/{date}      # 指定日のレポート (YYYY-MM-DD)
-GET  /api/discovery           # 銘柄探索ログ
-POST /api/run-daily           # 日次シミュレーション手動実行
-POST /api/cron/run-daily      # Cron実行（CRON_SECRETで保護）
+GET  /api/health                         # ヘルスチェック
+GET  /api/intel/cards                    # IntelCard 一覧 (?category, ?importance, ?limit)
+GET  /api/intel/cards/{card_id}          # 詳細
+POST /api/intel/cards                    # 新規カード生成（記事タイトル/URL から）
+GET  /api/intel/briefs                   # ブリーフ一覧（軽量サマリ）
+GET  /api/intel/briefs/daily/{date}      # Daily Brief 詳細 + トップカード + 関連 Council
+POST /api/intel/briefs/daily/build       # 指定日のカードから Daily Brief 生成
+GET  /api/intel/council                  # AI 会議セッション一覧
+GET  /api/intel/council/{session_id}     # 会議詳細
+POST /api/intel/council                  # 新規 AI 会議生成
+GET  /api/intel/meta                     # カテゴリ・エキスパート・重要度メタ
+GET  /api/intel/watchlist                # ウォッチリスト
+GET  /api/intel/notion/status            # Notion 接続状況
+POST /api/intel/notion/sync              # カードを Notion に同期
+POST /api/intel/notion/setup             # Notion DB を新規作成
+GET  /api/intel/email/status             # メール配信設定の状況
+POST /api/intel/email/test               # Brief をテスト送信 (dry_run=true でプレビューのみ)
+POST /api/intel/cron/daily-brief         # 日次自動配信 (Bearer CRON_SECRET 認証)
 ```
 
-APIドキュメント（Swagger UI）: `http://localhost:8000/docs`
-
----
-
-## 日次シミュレーション仕様
-
-毎日1回（デフォルト: 01:00 UTC）以下を自動実行:
-
-1. **市場環境取得** — Alpha Vantage / Finnhub からデータ取得（なければモックデータ）
-2. **各AIの銘柄探索** — 4エージェントが独立して市場を分析
-3. **AI投資会議** — Claude APIで4人の議論を生成（個性・反論・意見変更あり）
-4. **最終売買判断** — 会議の結論に基づきトレード決定
-5. **ポートフォリオ更新** — `data/portfolios.json` を更新
-6. **会議ログ保存** — `data/meetings.json` に追加
-7. **日次レポート生成** — Markdown形式で `data/daily_reports.json` に保存
-8. **ダッシュボードデータ更新** — フロントエンドに反映
-
----
-
-## APIキーなしでのデモ動作
-
-`ANTHROPIC_API_KEY` がない場合、システムは自動的に以下にフォールバック:
-
-- **会議生成**: 各エージェントの個性に基づくルールベース応答（日本語）
-- **レポート生成**: テンプレートベースのMarkdownレポート
-- **市場データ**: モックデータ（`data/` ディレクトリの初期データ）
+OpenAPI 仕様: `http://localhost:8000/docs`
 
 ---
 
@@ -226,38 +167,80 @@ APIドキュメント（Swagger UI）: `http://localhost:8000/docs`
 
 ```
 data/
-├── portfolios.json    # 4エージェントの現在ポートフォリオ
-├── trades.json        # 売買履歴
-├── meetings.json      # 会議ログ（チャット形式）
-├── daily_reports.json # 日次レポート（Markdown）
-├── discovery.json     # 銘柄探索ログ
-└── memories.json      # エージェントの学習・記憶
+├── intel_cards.json     # IntelCard（記事カード）
+├── intel_briefs.json    # Daily / Weekly Brief
+├── intel_council.json   # AI 会議セッション
+└── intel_watchlist.json # カテゴリ別ウォッチリスト
+```
+
+JSON ファイルは原子的書き込み（temp → rename）で同時書き込みを防いでいます。
+将来 Supabase / PostgreSQL に移行する場合は `backend/src/data/storage.py` の `Storage` クラスを差し替えるだけで済む構造です。
+
+---
+
+## Daily Brief 自動メール配信
+
+### 仕組み
+
+```
+┌─────────────┐     ┌─────────────────────┐     ┌───────────────────┐
+│ Vercel Cron │ ──→ │ /api/cron/daily-brief│ ──→ │ Backend /intel/cron│
+│ 22:00 UTC   │     │ (Bearer CRON_SECRET) │     │ /daily-brief       │
+└─────────────┘     └─────────────────────┘     └────────┬──────────┘
+                                                          │
+                          ┌───────────────────────────────┼─────────────────┐
+                          ↓                               ↓                 ↓
+                  Brief 生成 / 取得              Resend API 送信       配信ログ
+                  (intel_briefs.json)         (BRIEF_EMAIL_RECIPIENTS)
+```
+
+毎朝 7:00 JST (=22:00 UTC 前日) に:
+1. その日付の IntelCard を集めて Daily Brief を生成（既存なら再利用）
+2. Brief を HTML/text 整形して Resend で配信
+3. 当日カードが 0 件なら配信スキップ
+
+### セットアップ
+
+1. **Resend** で API キー取得 + 送信ドメイン認証 → https://resend.com/api-keys
+2. バックエンドに環境変数を設定:
+   ```
+   RESEND_API_KEY=re_...
+   BRIEF_EMAIL_FROM="Tsuburaya Intel <intel@yourdomain.com>"
+   BRIEF_EMAIL_RECIPIENTS=ceo@example.com,strategy@example.com
+   CRON_SECRET=$(openssl rand -hex 32)
+   FRONTEND_URL=https://your-frontend.vercel.app
+   ```
+3. **Vercel Cron を使う場合**: Vercel プロジェクトに同じ `CRON_SECRET` を設定。`vercel.json` の crons が自動で `/api/cron/daily-brief` を毎朝呼び出す。
+4. **Render Cron を使う場合**: `render.yaml` の `tsuburaya-intel-daily-brief` サービスに `BACKEND_URL` と `CRON_SECRET` を設定。
+5. アプリの `/intel/delivery` ページでテスト送信して動作確認。
+
+### 手動トリガ
+
+```bash
+# 今日の Brief をテスト送信
+curl -X POST http://localhost:8000/api/intel/email/test \
+  -H "Content-Type: application/json" \
+  -d '{"dry_run": false}'
+
+# クロンを手で叩く
+curl -X POST http://localhost:8000/api/intel/cron/daily-brief \
+  -H "Authorization: Bearer $CRON_SECRET"
 ```
 
 ---
 
-## 開発
+## API キーなしのフォールバック動作
 
-```bash
-# バックエンドのテスト
-cd backend
-pytest
+`ANTHROPIC_API_KEY` がない場合:
 
-# フロントエンドのLint
-cd frontend
-npm run lint
+- **カード生成**: テンプレートベースで `fact` / `interpretation` / `insight` を構造化
+- **ブリーフ生成**: その日のカード重要度を集計してテンプレ要約を出力
+- **AI 会議**: 各エキスパートのキー質問に基づくルールベース発言
 
-# 型チェック
-cd frontend
-npx tsc --noEmit
-```
+UI とデータ構造は同じなので、まず API キーなしで全機能を試せます。
 
 ---
 
 ## ライセンス
 
 MIT License
-
----
-
-*本プロダクトはAI投資シミュレーション用のフィクションです。実際の投資判断には使用しないでください。*

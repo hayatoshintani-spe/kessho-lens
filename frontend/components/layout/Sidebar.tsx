@@ -3,27 +3,42 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
-  LayoutDashboard,
-  Users,
-  MessageSquare,
-  FileText,
-  Search,
-  Settings,
-  TrendingUp,
+  Newspaper,
+  Database,
+  GitMerge,
+  Radar,
+  Link2,
+  Plus,
   Clock,
-  Lightbulb,
+  Mail,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const navItems = [
-  { href: '/', label: 'ダッシュボード', icon: LayoutDashboard },
-  { href: '/agents', label: 'AIエージェント', icon: Users },
-  { href: '/meetings', label: '投資会議ログ', icon: MessageSquare },
-  { href: '/reports', label: '日次レポート', icon: FileText },
-  { href: '/discovery', label: '銘柄探索', icon: Search },
-  { href: '/advisor', label: '個人アドバイス', icon: Lightbulb },
-  { href: '/settings', label: '設定', icon: Settings },
+  { href: '/intel', label: 'ブリーフ', icon: Newspaper },
+  { href: '/intel/cards', label: 'カードDB', icon: Database },
+  { href: '/intel/cards/new', label: '新規カード', icon: Plus },
+  { href: '/intel/council', label: 'AI会議', icon: GitMerge },
+  { href: '/intel/watchlist', label: 'ウォッチリスト', icon: Radar },
+  { href: '/intel/delivery', label: 'メール配信', icon: Mail },
+  { href: '/intel/notion', label: 'Notion連携', icon: Link2 },
 ];
+
+function isItemActive(href: string, pathname: string): boolean {
+  if (href === '/intel') {
+    // 「ブリーフ」は /intel と /intel/brief 配下のみアクティブ。
+    // /intel/cards などの兄弟ルートではアクティブにしない。
+    return pathname === '/intel' || pathname.startsWith('/intel/brief');
+  }
+  if (href === '/intel/cards') {
+    // /intel/cards/new は別ナビ項目があるので除外
+    return (
+      (pathname === '/intel/cards' || pathname.startsWith('/intel/cards/')) &&
+      pathname !== '/intel/cards/new'
+    );
+  }
+  return pathname === href || pathname.startsWith(`${href}/`);
+}
 
 export default function Sidebar() {
   const pathname = usePathname();
@@ -34,14 +49,14 @@ export default function Sidebar() {
       <div className="px-5 py-5 border-b border-border">
         <div className="flex items-center gap-2.5">
           <div className="w-8 h-8 rounded-lg bg-accent-gold/20 border border-accent-gold/40 flex items-center justify-center flex-shrink-0">
-            <TrendingUp className="w-4 h-4 text-accent-gold" />
+            <Newspaper className="w-4 h-4 text-accent-gold" />
           </div>
           <div>
             <div className="text-text-primary font-bold text-sm leading-tight">
-              AI投資ファンド
+              Tsuburaya Intel
             </div>
             <div className="text-text-muted text-[10px] leading-tight mt-0.5 font-mono uppercase tracking-wider">
-              kessho-lens
+              Intelligence Brief
             </div>
           </div>
         </div>
@@ -51,8 +66,7 @@ export default function Sidebar() {
       <div className="flex-1 px-3 py-4 overflow-y-auto">
         <div className="space-y-0.5">
           {navItems.map(({ href, label, icon: Icon }) => {
-            const isActive =
-              href === '/' ? pathname === '/' : pathname.startsWith(href);
+            const isActive = isItemActive(href, pathname);
             return (
               <Link
                 key={href}
@@ -84,7 +98,7 @@ export default function Sidebar() {
       <div className="px-4 py-4 border-t border-border">
         <div className="flex items-center gap-2 text-text-muted text-[11px]">
           <Clock className="w-3 h-3 flex-shrink-0" />
-          <span>自動実行: 毎日 10:00</span>
+          <span>日次ブリーフ自動生成</span>
         </div>
         <div className="mt-1.5 flex items-center gap-2">
           <div className="w-1.5 h-1.5 rounded-full bg-profit animate-pulse-slow" />

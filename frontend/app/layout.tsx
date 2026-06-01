@@ -4,9 +4,16 @@ import Sidebar from '@/components/layout/Sidebar';
 import Header from '@/components/layout/Header';
 
 export const metadata: Metadata = {
-  title: 'AI投資ファンド | Kessho Lens',
-  description: '4つのAIエージェントによる日次投資シミュレーション — バフェット、ソロス、リンチ、フラット',
-  keywords: ['AI投資', 'AIファンド', '投資シミュレーション', 'kessho-lens'],
+  title: 'Tsuburaya Intelligence Brief',
+  description:
+    '外部ニュース・規制動向・技術トレンドを、円谷の事業機会・リスク・経営論点に翻訳して経営層に届けるインテリジェンス基盤',
+  keywords: [
+    'Tsuburaya Intelligence Brief',
+    'インテリジェンス・ブリーフ',
+    'IP戦略',
+    'AI会議',
+    '円谷',
+  ],
 };
 
 export const viewport: Viewport = {

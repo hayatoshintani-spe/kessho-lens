@@ -1,4 +1,1 @@
-"""
-kessho-lens バックエンド srcパッケージ
-AIインベストメントファンドシミュレーターのコアロジック
-"""
+"""Tsuburaya Intelligence Brief — バックエンドコアロジック"""

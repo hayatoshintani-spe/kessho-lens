@@ -120,17 +120,6 @@ body {
   flex-shrink: 0;
 }
 
-/* ─── Recharts custom ───────────────────────────────────────────────────────── */
-
-.recharts-tooltip-wrapper {
-  outline: none !important;
-}
-
-.recharts-cartesian-grid-horizontal line,
-.recharts-cartesian-grid-vertical line {
-  stroke: var(--border);
-}
-
 /* ─── Markdown report styles ────────────────────────────────────────────────── */
 
 .markdown-report h1 {

@@ -1,21 +1,40 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { RefreshCw, Bell, Menu, X, TrendingUp } from 'lucide-react';
+import { RefreshCw, Bell, Menu, X } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { formatDatetime } from '@/lib/utils';
 
 const ROUTE_LABELS: Record<string, string> = {
-  '/': 'ダッシュボード',
-  '/agents': 'AIエージェント一覧',
-  '/meetings': '投資会議ログ',
-  '/reports': '日次レポート',
-  '/discovery': '銘柄探索ログ',
-  '/advisor': '個人資産アドバイス',
-  '/settings': '設定',
+  '/': 'ブリーフ',
+  '/intel': 'ブリーフ',
+  '/intel/cards': 'カードDB',
+  '/intel/cards/new': '新規カード',
+  '/intel/council': 'AI会議',
+  '/intel/watchlist': 'ウォッチリスト',
+  '/intel/delivery': 'メール配信',
+  '/intel/notion': 'Notion連携',
 };
+
+const MOBILE_NAV_ITEMS = [
+  { href: '/intel', label: 'ブリーフ' },
+  { href: '/intel/cards', label: 'カードDB' },
+  { href: '/intel/cards/new', label: '新規カード' },
+  { href: '/intel/council', label: 'AI会議' },
+  { href: '/intel/watchlist', label: 'ウォッチリスト' },
+  { href: '/intel/delivery', label: 'メール配信' },
+  { href: '/intel/notion', label: 'Notion連携' },
+];
+
+function deriveLabel(pathname: string): string {
+  if (ROUTE_LABELS[pathname]) return ROUTE_LABELS[pathname];
+  if (pathname.startsWith('/intel/brief/')) return 'ブリーフ詳細';
+  if (pathname.startsWith('/intel/cards/')) return 'カード詳細';
+  if (pathname.startsWith('/intel/council/')) return 'AI会議詳細';
+  return 'ページ';
+}
 
 export default function Header() {
   const pathname = usePathname();
@@ -29,19 +48,13 @@ export default function Header() {
     return () => clearInterval(t);
   }, []);
 
-  const routeLabel =
-    ROUTE_LABELS[pathname] ??
-    (pathname.startsWith('/agents/') ? 'エージェント詳細' :
-      pathname.startsWith('/meetings/') ? '会議詳細' :
-        pathname.startsWith('/reports/') ? 'レポート詳細' :
-          'ページ');
+  const routeLabel = deriveLabel(pathname);
 
   return (
     <>
       <header className="sticky top-0 z-30 bg-bg-primary/80 backdrop-blur border-b border-border px-4 md:px-6 h-14 flex items-center justify-between flex-shrink-0">
         {/* Left: mobile menu + breadcrumb */}
         <div className="flex items-center gap-3">
-          {/* Mobile menu toggle */}
           <button
             className="md:hidden text-text-secondary hover:text-text-primary"
             onClick={() => setMenuOpen((v) => !v)}
@@ -75,19 +88,10 @@ export default function Header() {
         </div>
       </header>
 
-      {/* Mobile nav overlay — outside <header> to avoid backdrop-filter containing block */}
       {menuOpen && (
         <div className="md:hidden fixed inset-0 top-14 z-50 bg-bg-sidebar border-t border-border">
           <nav className="p-4 space-y-1">
-            {[
-              { href: '/', label: 'ダッシュボード' },
-              { href: '/agents', label: 'AIエージェント' },
-              { href: '/meetings', label: '投資会議ログ' },
-              { href: '/reports', label: '日次レポート' },
-              { href: '/discovery', label: '銘柄探索' },
-              { href: '/advisor', label: '個人アドバイス' },
-              { href: '/settings', label: '設定' },
-            ].map(({ href, label }) => (
+            {MOBILE_NAV_ITEMS.map(({ href, label }) => (
               <Link
                 key={href}
                 href={href}

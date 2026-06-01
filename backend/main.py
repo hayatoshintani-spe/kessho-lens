@@ -1,6 +1,8 @@
 """
-kessho-lens バックエンド
-AIが投資判断を下し、その思考プロセスを可視化するシミュレーター
+Tsuburaya Intelligence Brief — Backend
+
+外部ニュース・規制動向・技術トレンドを、円谷の事業機会・リスク・
+経営論点に翻訳して経営層に届ける情報基盤。
 """
 
 import sys
@@ -19,25 +21,18 @@ load_dotenv()
 
 # APIルーターをインポート
 from api.health import router as health_router
-from api.dashboard import router as dashboard_router
-from api.agents import router as agents_router
-from api.meetings import router as meetings_router
-from api.reports import router as reports_router
-from api.discovery import router as discovery_router
-from api.cron import router as cron_router
-from api.advisor import router as advisor_router
+from api.intel import router as intel_router
 
 # FastAPIアプリケーションを初期化
 app = FastAPI(
-    title="kessho-lens API",
-    description="AIインベストメントファンドシミュレーター - AIの思考プロセスを可視化",
+    title="Tsuburaya Intelligence Brief API",
+    description="円谷向けインテリジェンス・ブリーフ生成と AI 会議の API",
     version="1.0.0",
     docs_url="/docs",
     redoc_url="/redoc",
 )
 
 # CORSミドルウェアを設定
-# allow_origin_regex でワイルドカード相当のドメインを許可（FastAPIはallow_originsではワイルドカードを解釈しない）
 _explicit_origins = [
     "http://localhost:3000",
     "http://localhost:5173",
@@ -47,7 +42,6 @@ _frontend_url = os.getenv("FRONTEND_URL", "").rstrip("/")
 if _frontend_url:
     _explicit_origins.append(_frontend_url)
 
-# ALLOWED_ORIGINS env var (カンマ区切り) で追加可能
 _extra = os.getenv("ALLOWED_ORIGINS", "")
 if _extra:
     _explicit_origins.extend([o.strip().rstrip("/") for o in _extra.split(",") if o.strip()])
@@ -63,32 +57,15 @@ app.add_middleware(
 
 # ルーターを登録
 app.include_router(health_router, prefix="/api", tags=["ヘルスチェック"])
-app.include_router(dashboard_router, prefix="/api", tags=["ダッシュボード"])
-app.include_router(agents_router, prefix="/api", tags=["エージェント"])
-app.include_router(meetings_router, prefix="/api", tags=["ミーティング"])
-app.include_router(reports_router, prefix="/api", tags=["レポート"])
-app.include_router(discovery_router, prefix="/api", tags=["発見ログ"])
-app.include_router(cron_router, prefix="/api", tags=["クロン"])
-app.include_router(advisor_router, prefix="/api", tags=["アドバイザー"])
-
-
-@app.on_event("startup")
-async def startup_event():
-    """アプリケーション起動時の初期化"""
-    try:
-        from src.simulation.daily_runner import initialize_mock_data
-        initialize_mock_data()
-        print("[起動] モックデータの初期化完了")
-    except Exception as e:
-        print(f"[起動] 初期化エラー（続行します）: {e}")
+app.include_router(intel_router, prefix="/api", tags=["インテリジェンス"])
 
 
 @app.get("/")
 async def root():
     """ルートエンドポイント"""
     return {
-        "name": "kessho-lens",
-        "description": "AIインベストメントファンドシミュレーター",
+        "name": "Tsuburaya Intelligence Brief",
+        "description": "円谷向けインテリジェンス・ブリーフ API",
         "version": "1.0.0",
         "docs": "/docs",
     }
