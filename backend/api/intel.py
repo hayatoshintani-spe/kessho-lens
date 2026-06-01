@@ -7,6 +7,7 @@ Tsuburaya Intelligence Brief API
 """
 
 import os
+import asyncio
 from datetime import datetime, timezone
 from typing import List, Optional
 
@@ -19,7 +20,7 @@ from src.intel.experts import EXPERT_META, list_experts, IMPORTANCE_LABELS
 from src.intel.card_generator import build_intel_card
 from src.intel.brief_generator import build_daily_brief, build_weekly_brief
 from src.intel.council import generate_council_session
-from src.intel import notion_sync, email_sender
+from src.intel import notion_sync, email_sender, news_ingest
 
 router = APIRouter()
 
@@ -334,21 +335,43 @@ def _ensure_brief_for_date(date: str) -> tuple[Optional[dict], list]:
     return (brief, top_cards)
 
 
+def _auto_ingest_enabled() -> bool:
+    """INTEL_AUTO_INGEST=0/false で自動取得を無効化できる（既定: 有効）"""
+    val = os.getenv("INTEL_AUTO_INGEST", "1").strip().lower()
+    return val not in ("0", "false", "no", "off")
+
+
 @router.post("/intel/cron/daily-brief")
 async def cron_daily_brief(request: Request):
     """
     日次 Daily Brief 生成 + メール配信を実行するクロンエンドポイント。
     Vercel Cron / Render Cron / GitHub Actions などから呼び出す。
     Authorization: Bearer <CRON_SECRET> が必須。
+
+    フロー: (当日 Brief が未生成なら) ニュース自動取得 → カード生成
+            → Daily Brief 生成 → メール配信
     """
     _verify_cron_auth(request)
     date = _resolve_today_in_brief_tz()
+
+    ingest_summary = None
+    # 当日の Brief がまだ無ければニュースを自動取得してカード化する
+    if _auto_ingest_enabled() and not Storage.get_intel_brief(date, "daily"):
+        try:
+            ingest_summary = await asyncio.to_thread(
+                news_ingest.ingest_cards_for_date, date
+            )
+        except Exception as e:  # 取得失敗は致命的にしない（既存カードで継続）
+            print(f"[intel] 自動ニュース取得エラー: {e}")
+            ingest_summary = {"error": str(e)}
+
     brief, top_cards = _ensure_brief_for_date(date)
     if not brief:
         return {
             "status": "skipped",
             "date": date,
-            "reason": f"{date} 付のカードが登録されていないため Brief 生成を見送りました",
+            "reason": f"{date} 付のカードが無いため Brief 生成を見送りました",
+            "ingest": ingest_summary,
             "email": None,
         }
     delivery = email_sender.send_brief_email(brief, top_cards)
@@ -356,8 +379,20 @@ async def cron_daily_brief(request: Request):
         "status": "ok",
         "date": date,
         "brief_built": True,
+        "ingest": ingest_summary,
         "email": delivery,
     }
+
+
+@router.post("/intel/cron/ingest")
+async def cron_ingest(request: Request):
+    """ニュース自動取得 → カード生成のみを実行（テスト/手動キック用）。
+    Brief 生成・メール配信は行わない。Authorization: Bearer <CRON_SECRET> が必須。
+    """
+    _verify_cron_auth(request)
+    date = _resolve_today_in_brief_tz()
+    summary = await asyncio.to_thread(news_ingest.ingest_cards_for_date, date)
+    return {"status": "ok", **summary}
 
 
 @router.get("/intel/email/status")
