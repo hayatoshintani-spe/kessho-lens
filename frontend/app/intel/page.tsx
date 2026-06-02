@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { ArrowRight, Newspaper, Sparkles, AlertTriangle } from 'lucide-react';
+import { ArrowRight, Newspaper, Sparkles, AlertTriangle, RefreshCw } from 'lucide-react';
 import {
   fetchIntelCards,
   fetchBriefs,
@@ -26,6 +26,34 @@ export default function IntelIndexPage() {
   const [recentCards, setRecentCards] = useState<IntelCard[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [refreshMsg, setRefreshMsg] = useState<string | null>(null);
+
+  async function handleRefreshNow() {
+    if (isRefreshing) return;
+    setIsRefreshing(true);
+    setRefreshMsg('最新ニュースを取得中… (最大2分かかります)');
+    try {
+      const res = await fetch('/api/intel/refresh-today', { method: 'POST' });
+      const data = await res.json();
+      if (!res.ok) {
+        setRefreshMsg(`更新に失敗: ${data.error ?? res.statusText}`);
+        return;
+      }
+      if (data.status === 'skipped') {
+        setRefreshMsg(`取得できる新規ニュースがありませんでした (${data.date})`);
+      } else {
+        const ingested = data.ingest?.created ?? 0;
+        const sent = data.email?.status === 'sent' ? '配信済み' : '配信スキップ';
+        setRefreshMsg(`✅ 完了: ${ingested}件取得、${sent}。3秒後に再読み込みします`);
+        setTimeout(() => window.location.reload(), 3000);
+      }
+    } catch (e) {
+      setRefreshMsg(`更新に失敗: ${e instanceof Error ? e.message : String(e)}`);
+    } finally {
+      setIsRefreshing(false);
+    }
+  }
 
   useEffect(() => {
     (async () => {
@@ -65,15 +93,30 @@ export default function IntelIndexPage() {
     <div className="space-y-6 animate-fade-in max-w-6xl">
       {/* Page header */}
       <div>
-        <div className="flex items-center gap-2 mb-1">
-          <Newspaper className="w-5 h-5 text-accent-gold" />
-          <h1 className="text-text-primary text-xl font-bold">
-            Tsuburaya Intelligence Brief
-          </h1>
+        <div className="flex items-center justify-between gap-2 mb-1">
+          <div className="flex items-center gap-2">
+            <Newspaper className="w-5 h-5 text-accent-gold" />
+            <h1 className="text-text-primary text-xl font-bold">
+              Tsuburaya Intelligence Brief
+            </h1>
+          </div>
+          <button
+            type="button"
+            onClick={handleRefreshNow}
+            disabled={isRefreshing}
+            className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded border border-accent-gold/40 text-accent-gold hover:bg-accent-gold/10 disabled:opacity-50 disabled:cursor-not-allowed transition"
+            title="最新ニュースを取得してブリーフ生成・配信・Notion保存まで実行"
+          >
+            <RefreshCw className={`w-3.5 h-3.5 ${isRefreshing ? 'animate-spin' : ''}`} />
+            {isRefreshing ? '更新中…' : '今すぐ更新'}
+          </button>
         </div>
         <p className="text-text-muted text-sm">
           外部ニュース・規制動向・技術トレンドを、円谷の事業機会・リスク・経営論点に翻訳
         </p>
+        {refreshMsg && (
+          <div className="mt-2 text-xs text-text-muted">{refreshMsg}</div>
+        )}
       </div>
 
       {errorMsg && (
