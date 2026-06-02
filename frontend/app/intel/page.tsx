@@ -33,11 +33,30 @@ export default function IntelIndexPage() {
     if (isRefreshing) return;
     setIsRefreshing(true);
     setRefreshMsg('最新ニュースを取得中… (最大2分かかります)');
+    // バックエンドを直接叩く。Vercel serverless の 10秒タイムアウト回避のため
+    // Next.js プロキシを経由しない。CRON_SECRET はブラウザに露出するが
+    // 本アプリは単一運用者向けで影響範囲は限定的（メール送信/コスト消費のみ）。
+    const apiBase = process.env.NEXT_PUBLIC_API_BASE_URL ?? '';
+    const secret = process.env.NEXT_PUBLIC_CRON_SECRET ?? '';
+    if (!apiBase || !secret) {
+      setRefreshMsg(
+        '更新に失敗: NEXT_PUBLIC_API_BASE_URL / NEXT_PUBLIC_CRON_SECRET が未設定です',
+      );
+      setIsRefreshing(false);
+      return;
+    }
     try {
-      const res = await fetch('/api/intel/refresh-today', { method: 'POST' });
+      const res = await fetch(`${apiBase}/api/intel/cron/daily-brief`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${secret}`,
+        },
+        signal: AbortSignal.timeout(150_000),
+      });
       const data = await res.json();
       if (!res.ok) {
-        setRefreshMsg(`更新に失敗: ${data.error ?? res.statusText}`);
+        setRefreshMsg(`更新に失敗: ${data.detail ?? data.error ?? res.statusText}`);
         return;
       }
       if (data.status === 'skipped') {
