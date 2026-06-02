@@ -375,12 +375,28 @@ async def cron_daily_brief(request: Request):
             "email": None,
         }
     delivery = email_sender.send_brief_email(brief, top_cards)
+
+    # Notion 連携が有効なら、当日のカードを Notion へ永続化（best-effort）
+    notion_result = None
+    if notion_sync.is_enabled():
+        try:
+            cards_today = [
+                c for c in Storage.get_intel_cards(limit=500) if c.get("date") == date
+            ]
+            notion_result = await asyncio.to_thread(
+                notion_sync.sync_all_cards, cards_today
+            )
+        except Exception as e:
+            print(f"[intel] Notion 同期エラー: {e}")
+            notion_result = {"error": str(e)}
+
     return {
         "status": "ok",
         "date": date,
         "brief_built": True,
         "ingest": ingest_summary,
         "email": delivery,
+        "notion": notion_result,
     }
 
 

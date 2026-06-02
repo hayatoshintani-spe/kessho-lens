@@ -5,11 +5,14 @@ IntelCard を Notion DB に同期する（idempotent upsert）
 設計:
 - NOTION_API_KEY と NOTION_CARDS_DB_ID 環境変数で動作
 - card.id を Notion ページの "Card ID" プロパティに保存し、再同期時は upsert
-- カードのメタはプロパティ、本文はページ children として書き込む
+- カードの完全な JSON は "Card JSON" プロパティに格納（round-trip 用）。
+  これにより Notion から元のカード構造を完全復元できる（fetch_all_cards）。
+- カードのメタはプロパティ、本文はページ children として書き込む（人間可読用）
 - 未設定時は is_enabled() が False を返し、API 呼び出し側で安全にスキップ
 """
 
 import os
+import json
 from typing import Dict, List, Optional, Tuple
 
 import httpx
@@ -19,6 +22,9 @@ from .experts import IMPORTANCE_LABELS, EXPERT_META
 
 NOTION_API_BASE = "https://api.notion.com/v1"
 NOTION_VERSION = "2022-06-28"
+
+# Notion rich_text の1要素あたり最大2000文字。複数要素配列にすれば総計は数万文字まで可。
+_CARD_JSON_CHUNK = 1900
 
 
 def is_enabled() -> bool:
@@ -82,6 +88,34 @@ def _divider() -> Dict:
 # ─── Card → Notion 変換 ────────────────────────────────────────────────
 
 
+def _card_to_json_rich_text(card: Dict) -> List[Dict]:
+    """カード全体を JSON 化し、Notion rich_text のチャンク配列に分割する。
+    各 text item は 2000 文字制限のため _CARD_JSON_CHUNK=1900 で安全に分割。
+    """
+    blob = json.dumps(card, ensure_ascii=False, separators=(",", ":"))
+    chunks: List[Dict] = []
+    for i in range(0, len(blob), _CARD_JSON_CHUNK):
+        part = blob[i : i + _CARD_JSON_CHUNK]
+        chunks.append({"type": "text", "text": {"content": part}})
+    return chunks
+
+
+def _read_card_json_property(page: Dict) -> Optional[Dict]:
+    """Notion ページの Card JSON プロパティを連結してカード dict にデコードする"""
+    props = page.get("properties", {})
+    field = props.get("Card JSON") or {}
+    items = field.get("rich_text") or []
+    if not items:
+        return None
+    blob = "".join((it.get("plain_text") or it.get("text", {}).get("content", "")) for it in items)
+    if not blob:
+        return None
+    try:
+        return json.loads(blob)
+    except (ValueError, TypeError):
+        return None
+
+
 def _card_to_properties(card: Dict) -> Dict:
     """IntelCard を Notion DB プロパティへ変換"""
     cat_meta = CATEGORY_META.get(card.get("category"), {})
@@ -99,6 +133,7 @@ def _card_to_properties(card: Dict) -> Dict:
     props: Dict = {
         "Title": {"title": _rich_text(card.get("title", "(無題)"))},
         "Card ID": {"rich_text": _rich_text(card.get("id", ""))},
+        "Card JSON": {"rich_text": _card_to_json_rich_text(card)},
         "Date": {"date": {"start": card.get("date")}} if card.get("date") else {"date": None},
         "Importance": {
             "select": {"name": f"{card.get('importance', 'D')} - {imp_meta.get('label', '')}"}
@@ -362,6 +397,7 @@ def create_cards_database(parent_page_id: str) -> Dict:
         "properties": {
             "Title": {"title": {}},
             "Card ID": {"rich_text": {}},
+            "Card JSON": {"rich_text": {}},
             "Date": {"date": {}},
             "Importance": {
                 "select": {
@@ -463,3 +499,71 @@ def get_status() -> Dict:
         "db_id": db_id,
         "db": db_info,
     }
+
+
+# ─── Restore: Notion → ローカル ──────────────────────────────────────────
+
+
+def fetch_all_cards(db_id: Optional[str] = None) -> List[Dict]:
+    """Notion DB から全カードを取得して dict のリストとして返す。
+    Card JSON プロパティを優先、欠落しているページはスキップする。
+    """
+    if not is_enabled():
+        return []
+    db_id = db_id or os.getenv("NOTION_CARDS_DB_ID")
+    if not db_id:
+        return []
+
+    cards: List[Dict] = []
+    next_cursor: Optional[str] = None
+    try:
+        with httpx.Client(headers=_headers(), timeout=30.0) as client:
+            while True:
+                payload: Dict = {"page_size": 100}
+                if next_cursor:
+                    payload["start_cursor"] = next_cursor
+                resp = client.post(
+                    f"{NOTION_API_BASE}/databases/{db_id}/query",
+                    json=payload,
+                )
+                if resp.status_code != 200:
+                    print(
+                        f"[notion] fetch_all_cards: query failed "
+                        f"{resp.status_code} {resp.text[:200]}"
+                    )
+                    break
+                data = resp.json()
+                for page in data.get("results", []):
+                    card = _read_card_json_property(page)
+                    if card and card.get("id"):
+                        cards.append(card)
+                if not data.get("has_more"):
+                    break
+                next_cursor = data.get("next_cursor")
+    except httpx.HTTPError as e:
+        print(f"[notion] fetch_all_cards error: {e}")
+        return cards
+    return cards
+
+
+def restore_local_from_notion() -> Dict:
+    """Notion のカードをローカル JSON ストアへ反映する（起動時の復元用）。
+    Notion 未設定なら何もしない。Returns: {restored, skipped, error}
+    """
+    if not is_enabled():
+        return {"restored": 0, "skipped": 0, "error": "notion_not_configured"}
+
+    # 循環インポート回避のためここで遅延 import
+    from ..data.storage import Storage
+
+    try:
+        cards = fetch_all_cards()
+    except Exception as e:
+        return {"restored": 0, "skipped": 0, "error": f"fetch_failed: {e}"}
+
+    if not cards:
+        return {"restored": 0, "skipped": 0, "error": None}
+
+    # Notion を source of truth とし、ローカルを上書き
+    Storage.save_intel_cards(cards)
+    return {"restored": len(cards), "skipped": 0, "error": None}
