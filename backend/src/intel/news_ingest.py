@@ -44,11 +44,26 @@ GOOGLE_NEWS_RSS = (
 )
 
 
+def _recency() -> str:
+    """Google News の `when:` 演算子で使う直近期間。既定: 2d（直近2日）。
+    空文字なら時間フィルタ無効。例: '1d', '3d', '12h'
+    """
+    return os.getenv("INTEL_NEWS_RECENCY", "2d").strip()
+
+
 def _get_queries() -> List[str]:
     raw = os.getenv("INTEL_NEWS_QUERIES", "").strip()
     if raw:
         return [q.strip() for q in raw.split(",") if q.strip()]
     return DEFAULT_QUERIES
+
+
+def _apply_recency(query: str) -> str:
+    """クエリに直近期間フィルタ（when:Nd）を付与。既に when: があれば触らない。"""
+    window = _recency()
+    if not window or "when:" in query:
+        return query
+    return f"{query} when:{window}"
 
 
 def _max_items() -> int:
@@ -98,7 +113,7 @@ def fetch_news_items(
     headers = {"User-Agent": "Mozilla/5.0 (compatible; TsuburayaIntel/1.0)"}
     with httpx.Client(timeout=timeout, headers=headers, follow_redirects=True) as client:
         for query in queries:
-            url = GOOGLE_NEWS_RSS.format(query=quote_plus(query))
+            url = GOOGLE_NEWS_RSS.format(query=quote_plus(_apply_recency(query)))
             try:
                 resp = client.get(url)
                 resp.raise_for_status()
