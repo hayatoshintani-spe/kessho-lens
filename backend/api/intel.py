@@ -89,26 +89,53 @@ async def create_intel_card(req: CardCreateRequest):
 @router.get("/intel/briefs")
 async def list_briefs(brief_type: Optional[str] = Query(None)):
     briefs = Storage.get_intel_briefs(brief_type=brief_type)
-    # 軽量化: sections は最初の100文字だけ返す
-    summary_list = []
+    summary_by_date: dict[str, dict] = {}
     for b in briefs:
-        summary_list.append({
-            "date": b.get("date"),
+        d = b.get("date")
+        if not d:
+            continue
+        summary_by_date[d] = {
+            "date": d,
             "brief_type": b.get("brief_type", "daily"),
             "title": b.get("title"),
             "executive_summary": b.get("executive_summary", ""),
             "card_count": len(b.get("top_topics", [])),
-        })
+        }
+    # Render free tier は揮発性なので、起動後にカードだけ Notion から復元される。
+    # ブリーフが消えていても、カードのある日付は「再生成可能」として一覧に出す。
+    if brief_type in (None, "daily"):
+        card_dates: dict[str, int] = {}
+        for c in Storage.get_intel_cards(limit=500):
+            d = c.get("date")
+            if d:
+                card_dates[d] = card_dates.get(d, 0) + 1
+        for d, count in card_dates.items():
+            if d in summary_by_date:
+                continue
+            summary_by_date[d] = {
+                "date": d,
+                "brief_type": "daily",
+                "title": f"{d} Daily Brief",
+                "executive_summary": "",
+                "card_count": count,
+            }
+    summary_list = sorted(
+        summary_by_date.values(),
+        key=lambda x: x.get("date") or "",
+        reverse=True,
+    )
     return {"briefs": summary_list, "count": len(summary_list)}
 
 
 @router.get("/intel/briefs/daily/{date}")
 async def get_daily_brief(date: str):
-    brief = Storage.get_intel_brief(date, "daily")
+    # Render free tier ではブリーフが揮発する。カードが残っていれば
+    # その場で再生成して 200 で返す（メール内リンクが死なないように）。
+    brief, top_cards = _ensure_brief_for_date(date)
     if not brief:
         raise HTTPException(
             status_code=404,
-            detail=f"{date}のDaily Briefが見つかりません",
+            detail=f"{date}のDaily Briefが見つかりません（カードもありません）",
         )
     # トップカードの詳細を埋める
     top_topic_ids = brief.get("top_topics", [])
