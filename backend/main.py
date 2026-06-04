@@ -61,17 +61,21 @@ app.include_router(intel_router, prefix="/api", tags=["インテリジェンス"
 
 
 @app.on_event("startup")
-async def restore_cards_from_notion_on_startup():
+async def restore_from_notion_on_startup():
     """Render 無料プランは揮発性ディスクのため、起動時に Notion DB から
-    カードを復元してローカル JSON にロードする。Notion 未設定なら no-op。
+    カード/ブリーフを復元してローカル JSON にロードする。未設定なら no-op。
     """
+    import asyncio
     try:
         from src.intel import notion_sync
-        if not notion_sync.is_enabled():
-            return
-        import asyncio
-        result = await asyncio.to_thread(notion_sync.restore_local_from_notion)
-        print(f"[startup] Notion restore: {result}")
+        if notion_sync.is_enabled():
+            result = await asyncio.to_thread(notion_sync.restore_local_from_notion)
+            print(f"[startup] Notion cards restore: {result}")
+        if notion_sync.is_briefs_enabled():
+            result = await asyncio.to_thread(
+                notion_sync.restore_local_briefs_from_notion
+            )
+            print(f"[startup] Notion briefs restore: {result}")
     except Exception as e:
         print(f"[startup] Notion restore failed (non-fatal): {e}")
 

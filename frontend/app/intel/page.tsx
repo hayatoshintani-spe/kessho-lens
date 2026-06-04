@@ -32,41 +32,54 @@ export default function IntelIndexPage() {
   async function handleRefreshNow() {
     if (isRefreshing) return;
     setIsRefreshing(true);
-    setRefreshMsg('最新ニュースを取得中… (最大2分かかります)');
-    // バックエンドを直接叩く。Vercel serverless の 10秒タイムアウト回避のため
-    // Next.js プロキシを経由しない。CRON_SECRET はブラウザに露出するが
-    // 本アプリは単一運用者向けで影響範囲は限定的（メール送信/コスト消費のみ）。
-    const apiBase = process.env.NEXT_PUBLIC_API_BASE_URL ?? '';
-    const secret = process.env.NEXT_PUBLIC_CRON_SECRET ?? '';
-    if (!apiBase || !secret) {
-      setRefreshMsg(
-        '更新に失敗: NEXT_PUBLIC_API_BASE_URL / NEXT_PUBLIC_CRON_SECRET が未設定です',
-      );
-      setIsRefreshing(false);
-      return;
-    }
+    setRefreshMsg('起動中…');
     try {
-      const res = await fetch(`${apiBase}/api/intel/cron/daily-brief`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${secret}`,
-        },
-        signal: AbortSignal.timeout(150_000),
-      });
-      const data = await res.json();
-      if (!res.ok) {
-        setRefreshMsg(`更新に失敗: ${data.detail ?? data.error ?? res.statusText}`);
+      // 1. プロキシ経由でバックグラウンド実行を開始(即時返却なので Vercel 10s に収まる)
+      const startRes = await fetch('/api/intel/refresh-today', { method: 'POST' });
+      const startData = await startRes.json();
+      if (!startRes.ok) {
+        setRefreshMsg(`更新に失敗: ${startData.error ?? startRes.statusText}`);
+        setIsRefreshing(false);
         return;
       }
-      if (data.status === 'skipped') {
-        setRefreshMsg(`取得できる新規ニュースがありませんでした (${data.date})`);
-      } else {
-        const ingested = data.ingest?.created ?? 0;
-        const sent = data.email?.status === 'sent' ? '配信済み' : '配信スキップ';
-        setRefreshMsg(`✅ 完了: ${ingested}件取得、${sent}。3秒後に再読み込みします`);
-        setTimeout(() => window.location.reload(), 3000);
+
+      // 2. 進捗をポーリング (最大 3 分)
+      const deadline = Date.now() + 180_000;
+      const apiBase = process.env.NEXT_PUBLIC_API_BASE_URL ?? '';
+      while (Date.now() < deadline) {
+        await new Promise(r => setTimeout(r, 4_000));
+        try {
+          const sRes = await fetch(`${apiBase}/api/intel/cron/status`, {
+            cache: 'no-store',
+          });
+          if (!sRes.ok) continue;
+          const s = await sRes.json();
+          if (s.state === 'running') {
+            setRefreshMsg(`実行中: ${s.message ?? ''}`);
+            continue;
+          }
+          if (s.state === 'skipped') {
+            setRefreshMsg(`取得できる新規ニュースがありませんでした (${s.date})`);
+            setIsRefreshing(false);
+            return;
+          }
+          if (s.state === 'done') {
+            const ingested = s.ingest?.created ?? 0;
+            const sent = s.email?.status === 'sent' ? '配信済み' : '配信スキップ';
+            setRefreshMsg(`✅ 完了: ${ingested}件取得、${sent}。3秒後に再読み込みします`);
+            setTimeout(() => window.location.reload(), 3000);
+            return;
+          }
+          if (s.state === 'error') {
+            setRefreshMsg(`更新に失敗: ${s.message ?? '不明なエラー'}`);
+            setIsRefreshing(false);
+            return;
+          }
+        } catch {
+          // 一時的なネットワーク失敗は無視して継続
+        }
       }
+      setRefreshMsg('タイムアウト(3分)。完了している可能性があるので画面を再読み込みしてください');
     } catch (e) {
       setRefreshMsg(`更新に失敗: ${e instanceof Error ? e.message : String(e)}`);
     } finally {

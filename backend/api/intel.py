@@ -8,10 +8,11 @@ Tsuburaya Intelligence Brief API
 
 import os
 import asyncio
+import time
 from datetime import datetime, timezone
 from typing import List, Optional
 
-from fastapi import APIRouter, HTTPException, Query, Request
+from fastapi import APIRouter, BackgroundTasks, HTTPException, Query, Request
 from pydantic import BaseModel
 
 from src.data.storage import Storage
@@ -274,13 +275,21 @@ class NotionSetupRequest(BaseModel):
 
 @router.post("/intel/notion/setup")
 async def notion_setup(req: NotionSetupRequest):
-    """
-    Notion DB を新規作成する。
-    Notion Integration を親ページに招待しておく必要がある。
-    """
+    """Cards DB を新規作成する。Integration を親ページに招待しておくこと。"""
     if not os.getenv("NOTION_API_KEY"):
         raise HTTPException(status_code=400, detail="NOTION_API_KEY が未設定です")
     result = notion_sync.create_cards_database(req.parent_page_id)
+    if result.get("error"):
+        raise HTTPException(status_code=400, detail=result["error"])
+    return result
+
+
+@router.post("/intel/notion/setup-briefs")
+async def notion_setup_briefs(req: NotionSetupRequest):
+    """Briefs DB を新規作成する。Integration を親ページに招待しておくこと。"""
+    if not os.getenv("NOTION_API_KEY"):
+        raise HTTPException(status_code=400, detail="NOTION_API_KEY が未設定です")
+    result = notion_sync.create_briefs_database(req.parent_page_id)
     if result.get("error"):
         raise HTTPException(status_code=400, detail=result["error"])
     return result
@@ -368,62 +377,126 @@ def _auto_ingest_enabled() -> bool:
     return val not in ("0", "false", "no", "off")
 
 
-@router.post("/intel/cron/daily-brief")
-async def cron_daily_brief(request: Request):
-    """
-    日次 Daily Brief 生成 + メール配信を実行するクロンエンドポイント。
-    Vercel Cron / Render Cron / GitHub Actions などから呼び出す。
-    Authorization: Bearer <CRON_SECRET> が必須。
+# Daily-brief 実行の進捗。プロセス内メモリで持つ（再起動で消えるが、
+# Brief 生成は数分以内に終わるためポーリング中に消えることはほぼ無い）。
+_DAILY_BRIEF_STATE: dict = {
+    "state": "idle",       # idle | running | done | error | skipped
+    "date": None,           # YYYY-MM-DD
+    "started_at": 0.0,      # epoch sec
+    "finished_at": 0.0,
+    "message": "",
+    "ingest": None,
+    "email": None,
+    "notion_cards": None,
+    "notion_brief": None,
+}
 
-    フロー: (当日 Brief が未生成なら) ニュース自動取得 → カード生成
-            → Daily Brief 生成 → メール配信
+
+def _run_daily_brief_pipeline(date: str) -> None:
+    """同期的に Brief 生成パイプラインを最後まで回す（BackgroundTask から呼ばれる）。
+    例外は state に詰めて吸収する。
+    """
+    global _DAILY_BRIEF_STATE
+    state = _DAILY_BRIEF_STATE
+    try:
+        state["message"] = "ニュース取得中..."
+        ingest_summary = None
+        if _auto_ingest_enabled() and not Storage.get_intel_brief(date, "daily"):
+            try:
+                ingest_summary = news_ingest.ingest_cards_for_date(date)
+            except Exception as e:
+                print(f"[intel] 自動ニュース取得エラー: {e}")
+                ingest_summary = {"error": str(e)}
+        state["ingest"] = ingest_summary
+
+        state["message"] = "ブリーフ生成中..."
+        brief, top_cards = _ensure_brief_for_date(date)
+        if not brief:
+            state["state"] = "skipped"
+            state["message"] = f"{date} 付のカードが無いため Brief 生成を見送りました"
+            state["finished_at"] = time.time()
+            return
+
+        state["message"] = "メール送信中..."
+        delivery = email_sender.send_brief_email(brief, top_cards)
+        state["email"] = delivery
+
+        if notion_sync.is_enabled():
+            try:
+                state["message"] = "Notion (カード) 同期中..."
+                cards_today = [
+                    c for c in Storage.get_intel_cards(limit=500)
+                    if c.get("date") == date
+                ]
+                state["notion_cards"] = notion_sync.sync_all_cards(cards_today)
+            except Exception as e:
+                print(f"[intel] Notion カード同期エラー: {e}")
+                state["notion_cards"] = {"error": str(e)}
+
+            if notion_sync.is_briefs_enabled():
+                try:
+                    state["message"] = "Notion (ブリーフ) 同期中..."
+                    state["notion_brief"] = notion_sync.sync_brief(brief)
+                except Exception as e:
+                    print(f"[intel] Notion ブリーフ同期エラー: {e}")
+                    state["notion_brief"] = {"error": str(e)}
+
+        state["state"] = "done"
+        state["message"] = "完了"
+        state["finished_at"] = time.time()
+    except Exception as e:
+        print(f"[intel] daily-brief pipeline error: {e}")
+        state["state"] = "error"
+        state["message"] = f"エラー: {e}"
+        state["finished_at"] = time.time()
+
+
+@router.post("/intel/cron/daily-brief")
+async def cron_daily_brief(request: Request, background_tasks: BackgroundTasks):
+    """日次 Daily Brief 生成 + メール配信を起動するクロンエンドポイント。
+    Authorization: Bearer <CRON_SECRET> が必須。
+    バックグラウンドで処理し即時 202 を返す。Vercel 10秒タイムアウトを回避し、
+    クライアントは /intel/cron/status をポーリングで進捗確認する。
     """
     _verify_cron_auth(request)
     date = _resolve_today_in_brief_tz()
 
-    ingest_summary = None
-    # 当日の Brief がまだ無ければニュースを自動取得してカード化する
-    if _auto_ingest_enabled() and not Storage.get_intel_brief(date, "daily"):
-        try:
-            ingest_summary = await asyncio.to_thread(
-                news_ingest.ingest_cards_for_date, date
-            )
-        except Exception as e:  # 取得失敗は致命的にしない（既存カードで継続）
-            print(f"[intel] 自動ニュース取得エラー: {e}")
-            ingest_summary = {"error": str(e)}
-
-    brief, top_cards = _ensure_brief_for_date(date)
-    if not brief:
+    if _DAILY_BRIEF_STATE["state"] == "running":
         return {
-            "status": "skipped",
-            "date": date,
-            "reason": f"{date} 付のカードが無いため Brief 生成を見送りました",
-            "ingest": ingest_summary,
-            "email": None,
+            "status": "already_running",
+            "date": _DAILY_BRIEF_STATE["date"],
+            "message": _DAILY_BRIEF_STATE.get("message", ""),
         }
-    delivery = email_sender.send_brief_email(brief, top_cards)
 
-    # Notion 連携が有効なら、当日のカードを Notion へ永続化（best-effort）
-    notion_result = None
-    if notion_sync.is_enabled():
-        try:
-            cards_today = [
-                c for c in Storage.get_intel_cards(limit=500) if c.get("date") == date
-            ]
-            notion_result = await asyncio.to_thread(
-                notion_sync.sync_all_cards, cards_today
-            )
-        except Exception as e:
-            print(f"[intel] Notion 同期エラー: {e}")
-            notion_result = {"error": str(e)}
-
-    return {
-        "status": "ok",
+    _DAILY_BRIEF_STATE.update({
+        "state": "running",
         "date": date,
-        "brief_built": True,
-        "ingest": ingest_summary,
-        "email": delivery,
-        "notion": notion_result,
+        "started_at": time.time(),
+        "finished_at": 0.0,
+        "message": "起動中...",
+        "ingest": None,
+        "email": None,
+        "notion_cards": None,
+        "notion_brief": None,
+    })
+    background_tasks.add_task(_run_daily_brief_pipeline, date)
+    return {"status": "started", "date": date}
+
+
+@router.get("/intel/cron/status")
+async def cron_status():
+    """直近の daily-brief 実行の進捗。フロントエンドのポーリング用。"""
+    s = _DAILY_BRIEF_STATE
+    return {
+        "state": s["state"],
+        "date": s["date"],
+        "message": s.get("message", ""),
+        "started_at": s["started_at"],
+        "finished_at": s["finished_at"],
+        "ingest": s["ingest"],
+        "email": s["email"],
+        "notion_cards": s["notion_cards"],
+        "notion_brief": s["notion_brief"],
     }
 
 

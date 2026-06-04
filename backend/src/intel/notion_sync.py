@@ -31,6 +31,11 @@ def is_enabled() -> bool:
     return bool(os.getenv("NOTION_API_KEY") and os.getenv("NOTION_CARDS_DB_ID"))
 
 
+def is_briefs_enabled() -> bool:
+    """Brief 永続化用 DB が設定されていれば True"""
+    return bool(os.getenv("NOTION_API_KEY") and os.getenv("NOTION_BRIEFS_DB_ID"))
+
+
 def _headers() -> Dict[str, str]:
     return {
         "Authorization": f"Bearer {os.getenv('NOTION_API_KEY')}",
@@ -567,3 +572,247 @@ def restore_local_from_notion() -> Dict:
     # Notion を source of truth とし、ローカルを上書き
     Storage.save_intel_cards(cards)
     return {"restored": len(cards), "skipped": 0, "error": None}
+
+
+# ─── Briefs DB: 永続化 / 復元 ───────────────────────────────────────────
+
+
+def _brief_to_json_rich_text(brief: Dict) -> List[Dict]:
+    """Brief 全体を JSON 化し、2000 文字制限を踏まえてチャンク分割する。"""
+    blob = json.dumps(brief, ensure_ascii=False, separators=(",", ":"))
+    chunks: List[Dict] = []
+    for i in range(0, len(blob), _CARD_JSON_CHUNK):
+        part = blob[i : i + _CARD_JSON_CHUNK]
+        chunks.append({"type": "text", "text": {"content": part}})
+    return chunks
+
+
+def _read_brief_json_property(page: Dict) -> Optional[Dict]:
+    """Notion ページの Brief JSON プロパティを連結して dict にデコード"""
+    props = page.get("properties", {})
+    field = props.get("Brief JSON") or {}
+    items = field.get("rich_text") or []
+    if not items:
+        return None
+    blob = "".join(
+        (it.get("plain_text") or it.get("text", {}).get("content", ""))
+        for it in items
+    )
+    if not blob:
+        return None
+    try:
+        return json.loads(blob)
+    except (ValueError, TypeError):
+        return None
+
+
+def _brief_to_properties(brief: Dict) -> Dict:
+    date = brief.get("date") or ""
+    btype = brief.get("brief_type", "daily")
+    key = f"{date}__{btype}"
+    return {
+        "Title": {"title": _rich_text(brief.get("title") or f"{date} {btype} brief")},
+        "Brief Key": {"rich_text": _rich_text(key)},
+        "Brief JSON": {"rich_text": _brief_to_json_rich_text(brief)},
+        "Date": {"date": {"start": date}} if date else {"date": None},
+        "Brief Type": {"select": {"name": btype}} if btype else None,
+        "Executive Summary": {
+            "rich_text": _rich_text(brief.get("executive_summary", ""))
+        },
+        "Card Count": {"number": len(brief.get("top_topics", []))},
+    }
+
+
+def _brief_to_blocks(brief: Dict) -> List[Dict]:
+    """Brief を人間可読なページ本文へ"""
+    blocks: List[Dict] = []
+    summary = brief.get("executive_summary", "")
+    if summary:
+        blocks.append(_heading("📋 エグゼクティブサマリ"))
+        blocks.append(_paragraph(summary))
+        blocks.append(_divider())
+
+    for section in brief.get("sections", []):
+        blocks.append(_heading(section.get("heading", "(無題)")))
+        body = section.get("body", "")
+        # 2000 文字制限のため段落単位で分割
+        for chunk_start in range(0, len(body), 1800):
+            blocks.append(_paragraph(body[chunk_start : chunk_start + 1800]))
+
+    actions = brief.get("next_actions", [])
+    if actions:
+        blocks.append(_divider())
+        blocks.append(_heading("✅ 次アクション"))
+        for a in actions:
+            line = f"[{a.get('priority', '')}] {a.get('who', '')}: {a.get('what', '')}"
+            blocks.append(_bullet(line))
+    return blocks
+
+
+def _find_existing_brief_page(
+    client: httpx.Client, db_id: str, brief_key: str,
+) -> Optional[str]:
+    resp = client.post(
+        f"{NOTION_API_BASE}/databases/{db_id}/query",
+        json={
+            "filter": {
+                "property": "Brief Key",
+                "rich_text": {"equals": brief_key},
+            },
+            "page_size": 1,
+        },
+    )
+    if resp.status_code != 200:
+        return None
+    results = resp.json().get("results", [])
+    return results[0]["id"] if results else None
+
+
+def sync_brief(brief: Dict, db_id: Optional[str] = None) -> Dict:
+    """Brief を Briefs DB に upsert"""
+    if not is_briefs_enabled():
+        return {"action": "skipped", "page_id": None, "url": None,
+                "error": "notion_briefs_not_configured"}
+    db_id = db_id or os.getenv("NOTION_BRIEFS_DB_ID")
+    date = brief.get("date")
+    btype = brief.get("brief_type", "daily")
+    if not date or not db_id:
+        return {"action": "error", "page_id": None, "url": None,
+                "error": "missing_date_or_db_id"}
+    key = f"{date}__{btype}"
+    props = {k: v for k, v in _brief_to_properties(brief).items() if v is not None}
+    blocks = _brief_to_blocks(brief)
+    try:
+        with httpx.Client(headers=_headers(), timeout=30.0) as client:
+            existing_id = _find_existing_brief_page(client, db_id, key)
+            if existing_id:
+                resp = client.patch(
+                    f"{NOTION_API_BASE}/pages/{existing_id}",
+                    json={"properties": props},
+                )
+                if resp.status_code != 200:
+                    return {"action": "error", "page_id": existing_id, "url": None,
+                            "error": f"page_update_failed: {resp.status_code} {resp.text[:200]}"}
+                _replace_page_children(client, existing_id, blocks)
+                return {"action": "updated", "page_id": existing_id,
+                        "url": resp.json().get("url"), "error": None}
+            resp = client.post(
+                f"{NOTION_API_BASE}/pages",
+                json={
+                    "parent": {"database_id": db_id},
+                    "properties": props,
+                    "children": blocks[:100],
+                },
+            )
+            if resp.status_code != 200:
+                return {"action": "error", "page_id": None, "url": None,
+                        "error": f"page_create_failed: {resp.status_code} {resp.text[:200]}"}
+            page = resp.json()
+            page_id = page.get("id")
+            if len(blocks) > 100 and page_id:
+                for i in range(100, len(blocks), 100):
+                    client.patch(
+                        f"{NOTION_API_BASE}/blocks/{page_id}/children",
+                        json={"children": blocks[i : i + 100]},
+                    )
+            return {"action": "created", "page_id": page_id,
+                    "url": page.get("url"), "error": None}
+    except httpx.HTTPError as e:
+        return {"action": "error", "page_id": None, "url": None, "error": str(e)}
+
+
+def fetch_all_briefs(db_id: Optional[str] = None) -> List[Dict]:
+    """Briefs DB から全 Brief を取得して dict のリストとして返す"""
+    if not is_briefs_enabled():
+        return []
+    db_id = db_id or os.getenv("NOTION_BRIEFS_DB_ID")
+    if not db_id:
+        return []
+    briefs: List[Dict] = []
+    next_cursor: Optional[str] = None
+    try:
+        with httpx.Client(headers=_headers(), timeout=30.0) as client:
+            while True:
+                payload: Dict = {"page_size": 100}
+                if next_cursor:
+                    payload["start_cursor"] = next_cursor
+                resp = client.post(
+                    f"{NOTION_API_BASE}/databases/{db_id}/query",
+                    json=payload,
+                )
+                if resp.status_code != 200:
+                    print(
+                        f"[notion] fetch_all_briefs: query failed "
+                        f"{resp.status_code} {resp.text[:200]}"
+                    )
+                    break
+                data = resp.json()
+                for page in data.get("results", []):
+                    brief = _read_brief_json_property(page)
+                    if brief and brief.get("date"):
+                        briefs.append(brief)
+                if not data.get("has_more"):
+                    break
+                next_cursor = data.get("next_cursor")
+    except httpx.HTTPError as e:
+        print(f"[notion] fetch_all_briefs error: {e}")
+        return briefs
+    return briefs
+
+
+def restore_local_briefs_from_notion() -> Dict:
+    """Notion の Brief をローカル JSON ストアへ反映する（起動時の復元用）"""
+    if not is_briefs_enabled():
+        return {"restored": 0, "skipped": 0, "error": "notion_briefs_not_configured"}
+    from ..data.storage import Storage, write_json
+    try:
+        briefs = fetch_all_briefs()
+    except Exception as e:
+        return {"restored": 0, "skipped": 0, "error": f"fetch_failed: {e}"}
+    if not briefs:
+        return {"restored": 0, "skipped": 0, "error": None}
+    write_json("intel_briefs.json", briefs)
+    return {"restored": len(briefs), "skipped": 0, "error": None}
+
+
+def create_briefs_database(parent_page_id: str) -> Dict:
+    """親ページに Daily/Weekly Brief 永続化用のDBを作成する"""
+    if not os.getenv("NOTION_API_KEY"):
+        return {"error": "NOTION_API_KEY not set"}
+    schema = {
+        "parent": {"type": "page_id", "page_id": parent_page_id},
+        "title": [{"type": "text", "text": {"content": "Tsuburaya Intel Briefs"}}],
+        "properties": {
+            "Title": {"title": {}},
+            "Brief Key": {"rich_text": {}},
+            "Brief JSON": {"rich_text": {}},
+            "Date": {"date": {}},
+            "Brief Type": {
+                "select": {
+                    "options": [
+                        {"name": "daily", "color": "blue"},
+                        {"name": "weekly", "color": "green"},
+                        {"name": "monthly", "color": "orange"},
+                    ]
+                }
+            },
+            "Executive Summary": {"rich_text": {}},
+            "Card Count": {"number": {}},
+        },
+    }
+    try:
+        with httpx.Client(headers=_headers(), timeout=30.0) as client:
+            resp = client.post(f"{NOTION_API_BASE}/databases", json=schema)
+            if resp.status_code != 200:
+                return {"error": f"create_failed: {resp.status_code} {resp.text[:500]}"}
+            data = resp.json()
+            return {
+                "database_id": data.get("id"),
+                "url": data.get("url"),
+                "message": (
+                    f"Briefs database created. "
+                    f"Set NOTION_BRIEFS_DB_ID={data.get('id')} in your env."
+                ),
+            }
+    except httpx.HTTPError as e:
+        return {"error": str(e)}

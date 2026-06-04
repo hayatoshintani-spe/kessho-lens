@@ -6,6 +6,9 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 
+// Vercel Hobby は最大 60 秒。Render コールドスタート 30〜50 秒を吸収する余地を持つ。
+export const maxDuration = 60;
+
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://localhost:8000';
 const CRON_SECRET = process.env.CRON_SECRET ?? '';
 
@@ -18,14 +21,15 @@ export async function POST(_req: NextRequest) {
   }
 
   try {
+    // バックエンドは BackgroundTasks で即時 202 を返す設計に変わったが、
+    // Render コールドスタート分は待つ必要があるので 90s で切る
     const res = await fetch(`${API_BASE}/api/intel/cron/daily-brief`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${CRON_SECRET}`,
       },
-      // Render コールドスタート + Anthropic 呼び出しで時間がかかる
-      signal: AbortSignal.timeout(120_000),
+      signal: AbortSignal.timeout(55_000),
     });
 
     const data = await res.json().catch(() => ({}));
