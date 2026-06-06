@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
+  LayoutDashboard,
   Newspaper,
   Database,
   GitMerge,
@@ -11,14 +12,22 @@ import {
   Plus,
   Clock,
   Mail,
+  Target,
+  CheckSquare,
+  Calendar,
+  BarChart3,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const navItems = [
-  { href: '/intel', label: 'ブリーフ', icon: Newspaper },
-  { href: '/intel/cards', label: 'カードDB', icon: Database },
+  { href: '/intel', label: 'ダッシュボード', icon: LayoutDashboard },
+  { href: '/intel/agenda', label: '週次アジェンダ', icon: Calendar },
+  { href: '/intel/themes', label: '経営課題マップ', icon: Target },
+  { href: '/intel/actions', label: 'アクション管理', icon: CheckSquare },
+  { href: '/intel/kpi', label: 'KPI', icon: BarChart3 },
+  { href: '/intel/cards', label: '改革カードDB', icon: Database },
   { href: '/intel/cards/new', label: '新規カード', icon: Plus },
-  { href: '/intel/council', label: 'AI会議', icon: GitMerge },
+  { href: '/intel/council', label: 'AI経営会議', icon: GitMerge },
   { href: '/intel/watchlist', label: 'ウォッチリスト', icon: Radar },
   { href: '/intel/delivery', label: 'メール配信', icon: Mail },
   { href: '/intel/notion', label: 'Notion連携', icon: Link2 },
@@ -26,12 +35,10 @@ const navItems = [
 
 function isItemActive(href: string, pathname: string): boolean {
   if (href === '/intel') {
-    // 「ブリーフ」は /intel と /intel/brief 配下のみアクティブ。
-    // /intel/cards などの兄弟ルートではアクティブにしない。
+    // ダッシュボードは /intel と /intel/brief 配下のみアクティブ。
     return pathname === '/intel' || pathname.startsWith('/intel/brief');
   }
   if (href === '/intel/cards') {
-    // /intel/cards/new は別ナビ項目があるので除外
     return (
       (pathname === '/intel/cards' || pathname.startsWith('/intel/cards/')) &&
       pathname !== '/intel/cards/new'
@@ -53,10 +60,10 @@ export default function Sidebar() {
           </div>
           <div>
             <div className="text-text-primary font-bold text-sm leading-tight">
-              Tsuburaya Intel
+              Kessho Lens
             </div>
             <div className="text-text-muted text-[10px] leading-tight mt-0.5 font-mono uppercase tracking-wider">
-              Intelligence Brief
+              Reform Operating System
             </div>
           </div>
         </div>
