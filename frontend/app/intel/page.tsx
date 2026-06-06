@@ -54,15 +54,27 @@ export default function IntelIndexPage() {
 
   async function handleRefreshNow() {
     if (isRefreshing) return;
+    // 暴走課金防止: 明示確認(Anthropic API を消費するため)
+    const ok = window.confirm(
+      '最新ニュースを取得し、ブリーフ生成・メール配信・Notion 保存まで実行します。\n'
+      + 'Anthropic API トークンを消費します(目安: 1回 ¥10〜30)。\n'
+      + '実行しますか?',
+    );
+    if (!ok) return;
     setIsRefreshing(true);
     setRefreshMsg('起動中…');
     try {
       const startRes = await fetch('/api/intel/refresh-today', { method: 'POST' });
       const startData = await startRes.json();
       if (!startRes.ok) {
-        setRefreshMsg(`更新に失敗: ${startData.error ?? startRes.statusText}`);
+        setRefreshMsg(`更新に失敗: ${startData.error ?? startData.details?.detail ?? startRes.statusText}`);
         setIsRefreshing(false);
         return;
+      }
+      if (typeof startData.runs_remaining_24h === 'number') {
+        setRefreshMsg(
+          `起動済 (24h内 残り ${startData.runs_remaining_24h}/${startData.daily_limit} 回)`,
+        );
       }
       const deadline = Date.now() + 180_000;
       const apiBase = process.env.NEXT_PUBLIC_API_BASE_URL ?? '';

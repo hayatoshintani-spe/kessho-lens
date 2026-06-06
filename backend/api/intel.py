@@ -391,6 +391,22 @@ _DAILY_BRIEF_STATE: dict = {
     "notion_brief": None,
 }
 
+# 暴走防止: 24h 以内の実行回数をカウントし、上限を超えたら拒否する。
+# DAILY_BRIEF_MAX_RUNS_PER_DAY で上書き可能(既定 5)。
+_DAILY_BRIEF_RUN_TIMESTAMPS: list[float] = []
+
+
+def _within_last_24h(ts: float, now: float) -> bool:
+    return now - ts < 24 * 3600
+
+
+def _daily_brief_runs_remaining() -> tuple[int, int]:
+    """(残り実行数, 1日上限)"""
+    limit = int(os.getenv("DAILY_BRIEF_MAX_RUNS_PER_DAY", "5"))
+    now = time.time()
+    used = sum(1 for ts in _DAILY_BRIEF_RUN_TIMESTAMPS if _within_last_24h(ts, now))
+    return max(0, limit - used), limit
+
 
 def _run_daily_brief_pipeline(date: str) -> None:
     """同期的に Brief 生成パイプラインを最後まで回す（BackgroundTask から呼ばれる）。
@@ -468,10 +484,29 @@ async def cron_daily_brief(request: Request, background_tasks: BackgroundTasks):
             "message": _DAILY_BRIEF_STATE.get("message", ""),
         }
 
+    # 24h 内の実行回数上限を超えていたら拒否(Anthropic 暴走課金防止)
+    remaining, limit = _daily_brief_runs_remaining()
+    if remaining <= 0:
+        raise HTTPException(
+            status_code=429,
+            detail=(
+                f"1日の実行上限 {limit} 回に達しました。"
+                f"24時間後に再度お試しください。"
+                f"上限変更は環境変数 DAILY_BRIEF_MAX_RUNS_PER_DAY で設定可能。"
+            ),
+        )
+
+    # 24h より古いタイムスタンプを掃除
+    now = time.time()
+    _DAILY_BRIEF_RUN_TIMESTAMPS[:] = [
+        ts for ts in _DAILY_BRIEF_RUN_TIMESTAMPS if _within_last_24h(ts, now)
+    ]
+    _DAILY_BRIEF_RUN_TIMESTAMPS.append(now)
+
     _DAILY_BRIEF_STATE.update({
         "state": "running",
         "date": date,
-        "started_at": time.time(),
+        "started_at": now,
         "finished_at": 0.0,
         "message": "起動中...",
         "ingest": None,
@@ -480,7 +515,12 @@ async def cron_daily_brief(request: Request, background_tasks: BackgroundTasks):
         "notion_brief": None,
     })
     background_tasks.add_task(_run_daily_brief_pipeline, date)
-    return {"status": "started", "date": date}
+    return {
+        "status": "started",
+        "date": date,
+        "runs_remaining_24h": remaining - 1,
+        "daily_limit": limit,
+    }
 
 
 @router.get("/intel/cron/status")
