@@ -117,7 +117,14 @@ RLS は全テーブルで有効化済み。**ユーザーは自分のデータ�
 
 ## テスト
 
-純粋ロジック (タスク配分 / 復習スケジューラ / フォーマッタ) は vitest で検証されています。
+vitest で検証しています。純粋ロジックは node 環境、React コンポーネントは
+`@testing-library/react` + jsdom 環境で実行します（テストファイル先頭の
+`// @vitest-environment jsdom` ディレクティブで切り替え）。
+
+| 種別 | 対象 |
+|---|---|
+| ロジック | `planDailyTasks` / `nextReview` (SM-2) / `format` |
+| コンポーネント | `SelfRatingStars` / `TodayTaskList` / `SessionTimer` |
 
 ```bash
 npm test          # 1回実行
@@ -144,7 +151,7 @@ CI (GitHub Actions) でも push / PR 時に自動実行されます。
 - [ ] スコア予測モデル (学習履歴 → 推定 TOEIC)
 - [ ] 復習キューを `/study/vocabulary` だけでなく他スキルにも拡張
 - [x] テスト (`vitest`) — タスク配分 / 復習スケジューラ / フォーマッタ
-- [ ] コンポーネントテスト (`@testing-library/react`)
+- [x] コンポーネントテスト (`@testing-library/react`) — 評価★ / 今日のタスク / タイマー
 - [ ] E2E (`Playwright`)
 - [x] CI (GitHub Actions: type-check / test / build)
 
