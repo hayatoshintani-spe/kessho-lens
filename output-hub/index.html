@@ -95,6 +95,37 @@
   .chip:hover { border-color: #10b981; color: var(--text); }
   .chip.active { background: #064e3b; border-color: #064e3b; color: #fff; }
 
+  .sort { display: flex; align-items: center; gap: 8px; margin-left: auto; }
+  .sort label { font-size: 12px; color: var(--text-muted); font-weight: 600; white-space: nowrap; }
+  .sort select {
+    border: 1px solid var(--border);
+    background: #fff;
+    color: var(--text);
+    padding: 8px 30px 8px 12px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    outline: none;
+    appearance: none;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    transition: border-color .15s, box-shadow .15s;
+  }
+  .sort select:focus { border-color: #10b981; box-shadow: 0 0 0 3px rgba(16,185,129,.12); }
+
+  .filters-status { margin-top: 10px; }
+  /* status filter chips: dot-colored to hint the status */
+  .chip[data-status] .sdot {
+    display: inline-block; width: 8px; height: 8px; border-radius: 50%;
+    margin-right: 6px; vertical-align: middle;
+  }
+  .sdot-公開中 { background: #16a34a; }
+  .sdot-開発中 { background: #ca8a04; }
+  .sdot-停止中 { background: #dc2626; }
+  .sdot-非公開 { background: #9ca3af; }
+
   /* ---------- Stats ---------- */
   .stats { display: flex; flex-wrap: wrap; gap: 10px; margin: 18px 0 0; }
   .stat {
@@ -230,7 +261,19 @@
         <input id="search" type="search" placeholder="名前・説明・技術タグで検索…" autocomplete="off" />
       </div>
       <div class="filters" id="category-filters"></div>
+      <div class="sort">
+        <label for="sort-select">並び替え</label>
+        <select id="sort-select">
+          <option value="default">登録順</option>
+          <option value="name-asc">名前 (昇順)</option>
+          <option value="name-desc">名前 (降順)</option>
+          <option value="category">カテゴリ順</option>
+          <option value="status">ステータス順</option>
+        </select>
+      </div>
     </div>
+
+    <div class="filters filters-status" id="status-filters"></div>
 
     <div class="stats" id="stats"></div>
 
@@ -255,20 +298,46 @@ const escapeHtml = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({
 }[c]));
 
 let ALL = [];
-let state = { q: "", category: "すべて" };
+let state = { q: "", category: "すべて", status: "すべて", sort: "default" };
+
+const STATUS_ORDER = { "公開中": 0, "開発中": 1, "停止中": 2, "非公開": 3 };
+const collator = new Intl.Collator("ja");
+
+function sortSites(list) {
+  const arr = list.slice();
+  switch (state.sort) {
+    case "name-asc":
+      return arr.sort((a, b) => collator.compare(a.name || "", b.name || ""));
+    case "name-desc":
+      return arr.sort((a, b) => collator.compare(b.name || "", a.name || ""));
+    case "category":
+      return arr.sort((a, b) =>
+        collator.compare(a.category || "", b.category || "") ||
+        collator.compare(a.name || "", b.name || ""));
+    case "status":
+      return arr.sort((a, b) => {
+        const oa = STATUS_ORDER[a.status] ?? 99;
+        const ob = STATUS_ORDER[b.status] ?? 99;
+        return oa - ob || collator.compare(a.name || "", b.name || "");
+      });
+    default:
+      return arr; // 登録順（sites.json の並び）
+  }
+}
 
 function render() {
   const grid = document.getElementById("grid");
   const empty = document.getElementById("empty");
   const q = state.q.trim().toLowerCase();
 
-  const filtered = ALL.filter((s) => {
+  const filtered = sortSites(ALL.filter((s) => {
     if (state.category !== "すべて" && s.category !== state.category) return false;
+    if (state.status !== "すべて" && (s.status || "公開中") !== state.status) return false;
     if (!q) return true;
     const hay = [s.name, s.description, s.category, (s.tags || []).join(" "), s.repoPath]
       .join(" ").toLowerCase();
     return hay.includes(q);
-  });
+  }));
 
   document.getElementById("visible-count").textContent = filtered.length + "件";
   empty.hidden = filtered.length !== 0;
@@ -332,6 +401,26 @@ function renderCategoryFilters() {
   });
 }
 
+function renderStatusFilters() {
+  // データに存在するステータスのみ、定義順で並べる
+  const present = new Set(ALL.map((s) => s.status || "公開中"));
+  const ordered = Object.keys(STATUS_ORDER).filter((s) => present.has(s));
+  const statuses = ["すべて", ...ordered];
+  const box = document.getElementById("status-filters");
+  if (ordered.length <= 1) { box.innerHTML = ""; return; } // 1種類だけなら出さない
+  box.innerHTML = statuses.map((s) => {
+    const dot = s === "すべて" ? "" : `<span class="sdot sdot-${escapeHtml(s)}"></span>`;
+    return `<button class="chip${s === state.status ? " active" : ""}" data-status="${escapeHtml(s)}">${dot}${escapeHtml(s)}</button>`;
+  }).join("");
+  box.querySelectorAll(".chip").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      state.status = btn.dataset.status;
+      renderStatusFilters();
+      render();
+    });
+  });
+}
+
 function applyMeta(meta) {
   if (!meta) return;
   if (meta.badge) document.getElementById("badge").textContent = meta.badge;
@@ -356,10 +445,15 @@ async function boot() {
   }
   renderStats();
   renderCategoryFilters();
+  renderStatusFilters();
   render();
 
   document.getElementById("search").addEventListener("input", (e) => {
     state.q = e.target.value;
+    render();
+  });
+  document.getElementById("sort-select").addEventListener("change", (e) => {
+    state.sort = e.target.value;
     render();
   });
 }
