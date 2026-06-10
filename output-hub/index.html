@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>アウトプット一覧 | PERSONAL-OUTPUT-HUB</title>
+<meta name="description" content="Claude Codeで作った公開サイト・プロジェクト・資料をまとめて管理するハブ" />
+<style>
+  :root {
+    --bg: #f4f6f8;
+    --header-bg: #0f1115;
+    --card-bg: #ffffff;
+    --text: #1f2937;
+    --text-muted: #6b7280;
+    --text-faint: #9ca3af;
+    --border: #e5e7eb;
+    --accent: #16a34a;
+    --accent-bar: linear-gradient(90deg, #34d399, #10b981);
+    --link: #2563eb;
+    --tag-bg: #f3f4f6;
+    --tag-text: #4b5563;
+    --radius: 12px;
+    --shadow: 0 1px 2px rgba(0,0,0,.04), 0 8px 24px rgba(0,0,0,.05);
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Hiragino Kaku Gothic ProN",
+      "Noto Sans JP", "Yu Gothic", Meiryo, system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ---------- Header ---------- */
+  .site-header {
+    background: var(--header-bg);
+    color: #fff;
+    padding: 28px 0 36px;
+  }
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 0 24px; }
+  .eyebrow {
+    display: inline-block;
+    font-size: 11px;
+    letter-spacing: .12em;
+    font-weight: 700;
+    color: #9ca3af;
+    background: rgba(255,255,255,.06);
+    border: 1px solid rgba(255,255,255,.10);
+    padding: 4px 10px;
+    border-radius: 6px;
+    margin-bottom: 14px;
+  }
+  .site-header h1 { margin: 0 0 8px; font-size: 30px; font-weight: 800; letter-spacing: .01em; }
+  .site-header p { margin: 0; color: #b7bdc7; font-size: 14px; }
+
+  /* ---------- Toolbar ---------- */
+  .toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
+    margin: 26px 0 6px;
+  }
+  .search {
+    flex: 1 1 280px;
+    position: relative;
+  }
+  .search input {
+    width: 100%;
+    padding: 11px 14px 11px 38px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    font-size: 14px;
+    background: #fff url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%239ca3af' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='11' cy='11' r='8'/><line x1='21' y1='21' x2='16.65' y2='16.65'/></svg>") no-repeat 12px center;
+    color: var(--text);
+    outline: none;
+    transition: border-color .15s, box-shadow .15s;
+  }
+  .search input:focus { border-color: #10b981; box-shadow: 0 0 0 3px rgba(16,185,129,.12); }
+  .filters { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chip {
+    border: 1px solid var(--border);
+    background: #fff;
+    color: var(--text-muted);
+    padding: 8px 14px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all .15s;
+    white-space: nowrap;
+  }
+  .chip:hover { border-color: #10b981; color: var(--text); }
+  .chip.active { background: #064e3b; border-color: #064e3b; color: #fff; }
+
+  /* ---------- Stats ---------- */
+  .stats { display: flex; flex-wrap: wrap; gap: 10px; margin: 18px 0 0; }
+  .stat {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 18px;
+    min-width: 120px;
+  }
+  .stat .num { font-size: 22px; font-weight: 800; color: var(--text); line-height: 1.1; }
+  .stat .lbl { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+
+  /* ---------- Section ---------- */
+  .section-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 40px 0 18px;
+  }
+  .section-head .dot { font-size: 20px; }
+  .section-head h2 { margin: 0; font-size: 20px; font-weight: 800; }
+  .section-head .count {
+    font-size: 13px;
+    color: var(--text-faint);
+    font-weight: 600;
+  }
+  .section-head .right { margin-left: auto; font-size: 12px; color: var(--text-faint); }
+
+  /* ---------- Grid + Cards ---------- */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(330px, 1fr));
+    gap: 20px;
+  }
+  .card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    display: flex;
+    flex-direction: column;
+    transition: transform .15s ease, box-shadow .15s ease;
+  }
+  .card:hover { transform: translateY(-3px); box-shadow: 0 4px 8px rgba(0,0,0,.06), 0 16px 36px rgba(0,0,0,.08); }
+  .card .bar { height: 4px; background: var(--accent-bar); }
+  .card-body { padding: 18px 18px 16px; display: flex; flex-direction: column; gap: 12px; flex: 1; }
+  .card-title { display: flex; align-items: center; gap: 10px; }
+  .card-title .ico {
+    width: 30px; height: 30px;
+    display: grid; place-items: center;
+    background: var(--tag-bg);
+    border-radius: 8px;
+    font-size: 17px;
+    flex-shrink: 0;
+  }
+  .card-title h3 { margin: 0; font-size: 15.5px; font-weight: 700; line-height: 1.35; }
+
+  .status {
+    align-self: flex-start;
+    font-size: 11.5px;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 6px;
+  }
+  .status-公開中   { background: #dcfce7; color: #15803d; }
+  .status-開発中   { background: #fef9c3; color: #a16207; }
+  .status-停止中   { background: #fee2e2; color: #b91c1c; }
+  .status-非公開   { background: #e5e7eb; color: #4b5563; }
+
+  .desc { font-size: 13px; color: var(--text-muted); margin: 0; }
+
+  .url a {
+    color: var(--link);
+    font-size: 13px;
+    text-decoration: none;
+    word-break: break-all;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  }
+  .url a:hover { text-decoration: underline; }
+  .url .ext { font-size: 11px; opacity: .7; }
+
+  .repo {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 12.5px; color: var(--text-faint);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    word-break: break-all;
+  }
+
+  .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 2px; }
+  .tag {
+    font-size: 11.5px;
+    background: var(--tag-bg);
+    color: var(--tag-text);
+    padding: 4px 9px;
+    border-radius: 6px;
+    font-weight: 500;
+  }
+
+  .empty {
+    text-align: center;
+    color: var(--text-faint);
+    padding: 60px 20px;
+    font-size: 14px;
+  }
+
+  footer {
+    text-align: center;
+    color: var(--text-faint);
+    font-size: 12px;
+    padding: 40px 0 60px;
+  }
+  footer code { background: #fff; border: 1px solid var(--border); padding: 1px 6px; border-radius: 4px; }
+
+  @media (max-width: 600px) {
+    .site-header h1 { font-size: 24px; }
+    .grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="wrap">
+      <span class="eyebrow" id="badge">PERSONAL-OUTPUT-HUB</span>
+      <h1 id="hub-title">アウトプット一覧</h1>
+      <p id="hub-subtitle">Claude Codeで作った公開サイト・プロジェクト・資料をまとめて管理</p>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <div class="toolbar">
+      <div class="search">
+        <input id="search" type="search" placeholder="名前・説明・技術タグで検索…" autocomplete="off" />
+      </div>
+      <div class="filters" id="category-filters"></div>
+    </div>
+
+    <div class="stats" id="stats"></div>
+
+    <div class="section-head">
+      <span class="dot">🌐</span>
+      <h2>公開サイト</h2>
+      <span class="count" id="visible-count"></span>
+      <span class="right">Claude Codeで作って公開中のサイト一覧</span>
+    </div>
+
+    <div class="grid" id="grid"></div>
+    <div class="empty" id="empty" hidden>該当するサイトがありません。</div>
+  </main>
+
+  <footer>
+    サイトを追加するには <code>sites.json</code> の <code>sites</code> 配列に1件追記するだけ。
+  </footer>
+
+<script>
+const escapeHtml = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({
+  "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+}[c]));
+
+let ALL = [];
+let state = { q: "", category: "すべて" };
+
+function render() {
+  const grid = document.getElementById("grid");
+  const empty = document.getElementById("empty");
+  const q = state.q.trim().toLowerCase();
+
+  const filtered = ALL.filter((s) => {
+    if (state.category !== "すべて" && s.category !== state.category) return false;
+    if (!q) return true;
+    const hay = [s.name, s.description, s.category, (s.tags || []).join(" "), s.repoPath]
+      .join(" ").toLowerCase();
+    return hay.includes(q);
+  });
+
+  document.getElementById("visible-count").textContent = filtered.length + "件";
+  empty.hidden = filtered.length !== 0;
+
+  grid.innerHTML = filtered.map((s) => {
+    const tags = (s.tags || []).map((t) => `<span class="tag">${escapeHtml(t)}</span>`).join("");
+    const status = escapeHtml(s.status || "公開中");
+    const urlBlock = s.url
+      ? `<div class="url"><a href="${escapeHtml(s.url)}" target="_blank" rel="noopener">${escapeHtml(s.url)} <span class="ext">↗</span></a></div>`
+      : "";
+    const repoBlock = s.repoPath
+      ? `<div class="repo">📁 ${escapeHtml(s.repoPath)}</div>`
+      : "";
+    return `
+      <article class="card">
+        <div class="bar"></div>
+        <div class="card-body">
+          <div class="card-title">
+            <span class="ico">${escapeHtml(s.icon || "📄")}</span>
+            <h3>${escapeHtml(s.name)}</h3>
+          </div>
+          <span class="status status-${status}">${status}</span>
+          <p class="desc">${escapeHtml(s.description || "")}</p>
+          ${urlBlock}
+          ${repoBlock}
+          <div class="tags">${tags}</div>
+        </div>
+      </article>`;
+  }).join("");
+}
+
+function renderStats() {
+  const byStatus = ALL.reduce((m, s) => {
+    const k = s.status || "公開中";
+    m[k] = (m[k] || 0) + 1;
+    return m;
+  }, {});
+  const cats = new Set(ALL.map((s) => s.category).filter(Boolean));
+  const cells = [
+    { num: ALL.length, lbl: "総アウトプット数" },
+    { num: byStatus["公開中"] || 0, lbl: "公開中" },
+    { num: cats.size, lbl: "カテゴリ数" },
+  ];
+  document.getElementById("stats").innerHTML = cells.map((c) =>
+    `<div class="stat"><div class="num">${c.num}</div><div class="lbl">${escapeHtml(c.lbl)}</div></div>`
+  ).join("");
+}
+
+function renderCategoryFilters() {
+  const cats = ["すべて", ...Array.from(new Set(ALL.map((s) => s.category).filter(Boolean)))];
+  const box = document.getElementById("category-filters");
+  box.innerHTML = cats.map((c) =>
+    `<button class="chip${c === state.category ? " active" : ""}" data-cat="${escapeHtml(c)}">${escapeHtml(c)}</button>`
+  ).join("");
+  box.querySelectorAll(".chip").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      state.category = btn.dataset.cat;
+      renderCategoryFilters();
+      render();
+    });
+  });
+}
+
+function applyMeta(meta) {
+  if (!meta) return;
+  if (meta.badge) document.getElementById("badge").textContent = meta.badge;
+  if (meta.title) {
+    document.getElementById("hub-title").textContent = meta.title;
+    document.title = meta.title + " | " + (meta.badge || "OUTPUT HUB");
+  }
+  if (meta.subtitle) document.getElementById("hub-subtitle").textContent = meta.subtitle;
+}
+
+async function boot() {
+  try {
+    const res = await fetch("./sites.json", { cache: "no-cache" });
+    if (!res.ok) throw new Error("HTTP " + res.status);
+    const data = await res.json();
+    ALL = data.sites || [];
+    applyMeta(data.meta);
+  } catch (e) {
+    document.getElementById("grid").innerHTML =
+      `<div class="empty">sites.json を読み込めませんでした。ローカルで開く場合は簡易サーバー経由でアクセスしてください（例: <code>python3 -m http.server</code>）。<br><small>${escapeHtml(e.message)}</small></div>`;
+    return;
+  }
+  renderStats();
+  renderCategoryFilters();
+  render();
+
+  document.getElementById("search").addEventListener("input", (e) => {
+    state.q = e.target.value;
+    render();
+  });
+}
+
+boot();
+</script>
+</body>
+</html>

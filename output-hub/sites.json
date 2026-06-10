@@ -1,0 +1,69 @@
+{
+  "meta": {
+    "title": "アウトプット一覧",
+    "subtitle": "Claude Codeで作った公開サイト・プロジェクト・資料をまとめて管理",
+    "badge": "PERSONAL-OUTPUT-HUB"
+  },
+  "sites": [
+    {
+      "name": "DOPAMINZOKU ポーカーダッシュボード",
+      "icon": "🎰",
+      "status": "公開中",
+      "category": "ポーカー",
+      "description": "ポーカーコミュニティ「DOPAMINZOKU」のポイント・ハンド・トーナメント成績を可視化するダッシュボード。Google Sheetsをデータソースにリアルタイム反映。",
+      "url": "https://dopaminzoku.pages.dev/",
+      "repoPath": "ポーカー/poker-dashboard",
+      "tags": ["Cloudflare Pages", "Google Sheets API", "Chart.js"]
+    },
+    {
+      "name": "営業ダッシュボード",
+      "icon": "📊",
+      "status": "公開中",
+      "category": "ポーカー",
+      "description": "営業日次の数値を集計・可視化するダッシュボード。Googleフォーム入力 → スプレッドシート集計 → サイト表示の流れ。管理画面付き。",
+      "url": "https://sales-dashboard-2ba.pages.dev/",
+      "repoPath": "ポーカー/sales-dashboard",
+      "tags": ["Cloudflare Pages", "Apps Script", "Google Sheets"]
+    },
+    {
+      "name": "コーヒー知識サイト",
+      "icon": "☕",
+      "status": "公開中",
+      "category": "TENTSUANA BASE",
+      "description": "きゃろっと内倉メルマガから抽出したコーヒー知識をカード形式でまとめたサイト。毎週メルマガを取得して自動更新。",
+      "url": "https://coffee-knowledge.pages.dev/",
+      "repoPath": "TENTSUANA BASE/coffee-knowledge-site",
+      "tags": ["Cloudflare Pages", "静的HTML", "メルマガ自動更新"]
+    },
+    {
+      "name": "GRAND NIKKO × TENTSUANA BASE LP",
+      "icon": "🏨",
+      "status": "公開中",
+      "category": "TENTSUANA BASE",
+      "description": "2026/7/4-5 グランドニッコー東京台場プレオープンサウナイベントのランディングページ。180名動員目標。LINE/メール共有でOGPサムネイル展開対応。",
+      "url": "https://grand-nikko-tentsauna-lp.k-uryu0430.workers.dev/",
+      "repoPath": "TENTSUANA BASE/grand_nikko_lp",
+      "tags": ["Cloudflare Workers", "静的HTML", "イベントLP", "OGP"]
+    },
+    {
+      "name": "IKEBUKURO BASE 紹介サイト",
+      "icon": "🏠",
+      "status": "公開中",
+      "category": "TENTSUANA BASE",
+      "description": "池袋拠点の紹介サイト。LINE Bot連携・会員専用カレンダー（個別URL発行/180日有効）・管理画面付き。Webhookと自動再ビルドCronで運用。カスタムドメイン ikebukuro.tentsaunabase.com で公開。",
+      "url": "https://ikebukuro.tentsaunabase.com/",
+      "repoPath": "TENTSUANA BASE/ikebukuro-base-site",
+      "tags": ["Vercel", "Next.js", "LINE Bot", "カスタムドメイン"]
+    },
+    {
+      "name": "ふりそで予約システム",
+      "icon": "👘",
+      "status": "公開中",
+      "category": "ふりそで",
+      "description": "振袖の予約管理システム。マスター管理・会社/店舗ダッシュボード・予約一覧（編集/新規/CSVインポート）・流入分析・メール同期・Webhook連携(CF7/LP)・お客様予約ページなど一通り揃った業務システム。",
+      "url": "https://furiyoyaku.vercel.app/",
+      "repoPath": "ふりそで/furiyoyaku",
+      "tags": ["Vercel", "Next.js", "業務システム"]
+    }
+  ]
+}
