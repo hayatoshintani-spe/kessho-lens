@@ -1,0 +1,6 @@
+# Cloudflare Pages 用ヘッダー設定
+# 限定公開のため、検索エンジンのインデックスを多層で拒否する。
+/*
+  X-Robots-Tag: noindex, nofollow
+  Referrer-Policy: no-referrer
+  X-Content-Type-Options: nosniff
