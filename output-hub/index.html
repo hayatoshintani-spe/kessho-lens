@@ -409,7 +409,8 @@ function renderStatusFilters() {
   const ordered = Object.keys(STATUS_ORDER).filter((s) => present.has(s));
   const statuses = ["すべて", ...ordered];
   const box = document.getElementById("status-filters");
-  if (ordered.length <= 1) { box.innerHTML = ""; return; } // 1種類だけなら出さない
+  if (ordered.length <= 1) { box.innerHTML = ""; box.style.display = "none"; return; } // 1種類だけなら出さない
+  box.style.display = "flex";
   box.innerHTML = statuses.map((s) => {
     const dot = s === "すべて" ? "" : `<span class="sdot sdot-${escapeHtml(s)}"></span>`;
     return `<button class="chip${s === state.status ? " active" : ""}" data-status="${escapeHtml(s)}">${dot}${escapeHtml(s)}</button>`;
