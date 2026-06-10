@@ -1,0 +1,86 @@
+name: Daily Brief
+
+# 毎日 07:00 JST = 22:00 UTC に Render バックエンドの daily-brief を叩く。
+# Vercel Cron は Hobby プラン制約 + 環境変数依存で信頼性が低いため、
+# GitHub Actions を一次スケジューラとして使う。Vercel Cron は冗長な保険。
+#
+# 必須シークレット:
+#   - BACKEND_URL: Render バックエンドの公開 URL (例: https://kessho-lens-backend.onrender.com)
+#   - CRON_SECRET: Render に設定済みの CRON_SECRET と同じ値
+
+on:
+  schedule:
+    - cron: "0 22 * * *"  # 22:00 UTC = 07:00 JST
+  workflow_dispatch: {}    # 手動実行も可能
+
+permissions:
+  contents: read
+
+concurrency:
+  group: daily-brief
+  cancel-in-progress: false
+
+jobs:
+  trigger:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Validate secrets
+        env:
+          BACKEND_URL: ${{ secrets.BACKEND_URL }}
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+        run: |
+          if [ -z "$BACKEND_URL" ]; then
+            echo "::error::BACKEND_URL secret is not set"
+            exit 1
+          fi
+          if [ -z "$CRON_SECRET" ]; then
+            echo "::error::CRON_SECRET secret is not set"
+            exit 1
+          fi
+          echo "BACKEND_URL=${BACKEND_URL}"
+
+      - name: Warm backend (Render cold-start)
+        env:
+          BACKEND_URL: ${{ secrets.BACKEND_URL }}
+        run: |
+          # コールドスタート吸収のため health を叩く。失敗してもエラーにしない。
+          curl -fsS --retry 3 --retry-delay 5 --max-time 60 \
+            "${BACKEND_URL}/api/health" || echo "warmup failed, continuing"
+
+      - name: Trigger daily brief
+        env:
+          BACKEND_URL: ${{ secrets.BACKEND_URL }}
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+        run: |
+          set -euo pipefail
+          response=$(curl -sS -w "\n%{http_code}" --max-time 90 \
+            -X POST "${BACKEND_URL}/api/intel/cron/daily-brief" \
+            -H "Authorization: Bearer ${CRON_SECRET}" \
+            -H "Content-Type: application/json")
+          body=$(echo "$response" | head -n -1)
+          code=$(echo "$response" | tail -n 1)
+          echo "HTTP $code"
+          echo "$body" | head -c 2000
+          if [ "$code" != "200" ] && [ "$code" != "202" ]; then
+            echo "::error::Backend returned $code"
+            exit 1
+          fi
+
+      - name: Poll for completion
+        env:
+          BACKEND_URL: ${{ secrets.BACKEND_URL }}
+        run: |
+          # 最大 5 分ポーリング。done / skipped / error で終了。
+          for i in $(seq 1 60); do
+            sleep 5
+            status=$(curl -sS --max-time 20 "${BACKEND_URL}/api/intel/cron/status" || echo '{}')
+            state=$(echo "$status" | python3 -c 'import sys,json;print(json.load(sys.stdin).get("state",""))' 2>/dev/null || echo "")
+            message=$(echo "$status" | python3 -c 'import sys,json;print(json.load(sys.stdin).get("message",""))' 2>/dev/null || echo "")
+            echo "[$i/60] state=$state | $message"
+            case "$state" in
+              done|skipped) echo "::notice::cron finished: $state"; exit 0 ;;
+              error) echo "::error::cron error: $message"; exit 1 ;;
+            esac
+          done
+          echo "::warning::polling timed out after 5 minutes; brief may still be running"
