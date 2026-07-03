@@ -329,6 +329,84 @@ em{font-style:normal;color:var(--red);font-weight:800}
 .closing .brand .x{color:var(--red)}
 .disclaimer{margin-top:30px;font-size:11px;color:rgba(237,241,247,.38);letter-spacing:.05em}
 
+/* ---------- ウルトラマン モチーフ ---------- */
+.uman{position:absolute;pointer-events:none}
+.uman-cover{right:118px;top:104px;width:330px;height:429px;filter:drop-shadow(0 34px 60px rgba(0,0,0,.55))}
+.uman-close{right:150px;top:150px;width:250px;height:325px;opacity:.92;filter:drop-shadow(0 24px 50px rgba(0,0,0,.5))}
+.xbeam{position:absolute;top:110px;right:30px;width:520px;height:520px;opacity:.5;pointer-events:none}
+.xbeam i{
+  position:absolute;left:0;top:50%;width:520px;height:7px;border-radius:6px;
+  background:linear-gradient(90deg,transparent,rgba(87,208,240,.9) 32%,#EAFBFF 50%,rgba(87,208,240,.9) 68%,transparent);
+  box-shadow:0 0 26px rgba(87,208,240,.75);
+}
+.xbeam i:first-child{transform:rotate(24deg)}
+.xbeam i:last-child{transform:rotate(-66deg)}
+
+/* ---------- 企画カード ビジュアルバンド ---------- */
+.plan-card{position:relative;padding-right:126px}
+.vband{
+  position:absolute;top:14px;right:14px;bottom:14px;width:92px;border-radius:10px;overflow:hidden;
+  background:
+    radial-gradient(120px 90px at 50% 18%, rgba(87,208,240,.16), transparent 65%),
+    linear-gradient(168deg,#17233C,#3B0810 62%,#7A0F1D);
+  display:flex;align-items:center;justify-content:center;
+}
+.vband::before{
+  content:"";position:absolute;inset:0;
+  background:repeating-linear-gradient(115deg,rgba(255,255,255,.05) 0 2px,transparent 2px 15px);
+}
+.vband .tag{
+  position:absolute;right:6px;top:10px;writing-mode:vertical-rl;
+  font-size:9px;font-weight:800;letter-spacing:.34em;color:rgba(255,255,255,.45);
+}
+.vband .m-timer{width:34px;height:34px;border-radius:50%;
+  background:radial-gradient(circle at 38% 34%,#CFF3FF,#57D0F0 55%,#1E7FA3 100%);
+  box-shadow:0 0 16px rgba(87,208,240,.9),0 0 40px rgba(87,208,240,.4),0 0 0 7px rgba(87,208,240,.14),0 0 0 15px rgba(87,208,240,.06);
+}
+.vband .m-cross{position:relative;width:60px;height:60px}
+.vband .m-cross i{
+  position:absolute;left:-6px;top:27px;width:72px;height:5px;border-radius:4px;
+  background:linear-gradient(90deg,transparent,#9FE7FA 30%,#fff 50%,#9FE7FA 70%,transparent);
+  box-shadow:0 0 14px rgba(87,208,240,.9);
+}
+.vband .m-cross i:first-child{transform:rotate(28deg)}
+.vband .m-cross i:last-child{transform:rotate(-62deg)}
+.vband svg{width:52px;height:52px;filter:drop-shadow(0 0 12px rgba(230,0,18,.55))}
+.vband .m-head{width:44px;height:57px;filter:drop-shadow(0 0 14px rgba(87,208,240,.45))}
+
+/* ---------- オープニングムービー ---------- */
+.video-slide .vhead h2{font-size:29px;font-weight:900;line-height:1.45;letter-spacing:.01em}
+.video-slide .vhead p{margin-top:6px;font-size:14.5px;color:rgba(237,241,247,.7);line-height:1.7}
+.cinema{
+  position:relative;width:680px;aspect-ratio:16/9;margin:18px auto 0;border-radius:14px;overflow:hidden;
+  border:1px solid rgba(174,184,198,.35);cursor:pointer;
+  background:
+    radial-gradient(560px 300px at 50% 0%, rgba(87,208,240,.12), transparent 60%),
+    radial-gradient(700px 420px at 82% 110%, rgba(230,0,18,.30), transparent 60%),
+    linear-gradient(160deg,#101A2E,#070C16 70%);
+  box-shadow:0 26px 70px rgba(0,0,0,.6),0 0 0 8px rgba(255,255,255,.03);
+}
+.cinema:focus-visible{outline:2px solid var(--timer);outline-offset:3px}
+.cinema .wm{position:absolute;right:28px;bottom:-20px;width:140px;height:182px;opacity:.5}
+.cine-inner{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px}
+.playbtn{
+  width:72px;height:72px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  background:radial-gradient(circle at 36% 32%,#FF8B94,var(--red) 58%,#8A000C 100%);
+  box-shadow:0 0 26px rgba(230,0,18,.85),0 0 70px rgba(230,0,18,.4),inset 0 2px 6px rgba(255,255,255,.35);
+}
+.playbtn .tri{
+  width:0;height:0;border-style:solid;border-width:15px 0 15px 25px;
+  border-color:transparent transparent transparent #fff;margin-left:7px;
+}
+.cinema:hover .playbtn{transform:scale(1.06);transition:transform .2s}
+.cine-t{font-size:17px;font-weight:800;letter-spacing:.3em;color:#EDF1F7}
+.cine-s{font-size:12.5px;color:rgba(237,241,247,.55);letter-spacing:.1em}
+.vmeta{
+  margin:14px auto 0;width:680px;display:flex;justify-content:space-between;gap:18px;
+  font-size:11.5px;color:rgba(237,241,247,.55);letter-spacing:.03em;
+}
+.vmeta a{color:var(--timer);text-decoration:none;font-weight:700}
+
 /* ---------- HUD ---------- */
 .hud{
   position:fixed;right:22px;bottom:20px;display:flex;gap:10px;align-items:center;z-index:50;
@@ -357,12 +435,53 @@ em{font-style:normal;color:var(--red);font-weight:800}
 </head>
 <body>
 
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+<defs>
+  <linearGradient id="skin" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#EAEFF6"/>
+    <stop offset=".45" stop-color="#AEB8C6"/>
+    <stop offset="1" stop-color="#54627A"/>
+  </linearGradient>
+  <linearGradient id="skin-shade" x1="0" y1="0" x2="1" y2="0">
+    <stop offset="0" stop-color="#0B1220" stop-opacity=".55"/>
+    <stop offset=".35" stop-color="#0B1220" stop-opacity="0"/>
+    <stop offset=".8" stop-color="#0B1220" stop-opacity="0"/>
+    <stop offset="1" stop-color="#0B1220" stop-opacity=".35"/>
+  </linearGradient>
+  <radialGradient id="eye" cx=".5" cy=".42" r=".8">
+    <stop offset="0" stop-color="#FFFDF2"/>
+    <stop offset=".55" stop-color="#FFE98A"/>
+    <stop offset="1" stop-color="#D9A62E"/>
+  </radialGradient>
+  <filter id="eyeblur" x="-70%" y="-70%" width="240%" height="240%">
+    <feGaussianBlur stdDeviation="7"/>
+  </filter>
+  <!-- ウルトラマン マスク(オリジナル描き起こし) -->
+  <symbol id="uman-head" viewBox="0 0 200 260">
+    <path d="M100,16 C152,16 180,62 180,128 C180,198 148,246 100,246 C52,246 20,198 20,128 C20,62 48,16 100,16 Z" fill="url(#skin)"/>
+    <path d="M100,16 C152,16 180,62 180,128 C180,198 148,246 100,246 C52,246 20,198 20,128 C20,62 48,16 100,16 Z" fill="url(#skin-shade)"/>
+    <path d="M100,6 C107,44 107,88 100,126 C93,88 93,44 100,6 Z" fill="#78879C"/>
+    <path d="M66,196 C88,212 112,212 134,196 C120,222 80,222 66,196 Z" fill="#8E9BAD" opacity=".5"/>
+    <ellipse cx="61" cy="124" rx="32" ry="18" transform="rotate(-13 61 124)" fill="url(#eye)" filter="url(#eyeblur)" opacity=".9"/>
+    <ellipse cx="139" cy="124" rx="32" ry="18" transform="rotate(13 139 124)" fill="url(#eye)" filter="url(#eyeblur)" opacity=".9"/>
+    <ellipse cx="61" cy="124" rx="28" ry="14.5" transform="rotate(-13 61 124)" fill="url(#eye)"/>
+    <ellipse cx="139" cy="124" rx="28" ry="14.5" transform="rotate(13 139 124)" fill="url(#eye)"/>
+  </symbol>
+  <!-- 防衛隊エンブレム(流星アロー) -->
+  <symbol id="uman-arrow" viewBox="0 0 60 60">
+    <path d="M30,4 L56,52 L30,38 L4,52 Z" fill="#E60012"/>
+    <path d="M30,12 L47,45 L30,35.5 L13,45 Z" fill="#FF8B94" opacity=".55"/>
+  </symbol>
+</defs>
+</svg>
+
 <div class="viewport">
 <div class="deck" id="deck">
 
 <!-- ═══════════ 01 表紙 ═══════════ -->
 <section class="slide s-dark cover">
   <div class="beam" aria-hidden="true"></div>
+  <svg class="uman uman-cover" aria-hidden="true"><use href="#uman-head"/></svg>
   <div class="brandline">ULTRAMAN <span class="x">×</span> SoftBank</div>
   <div>
     <p class="to">ソフトバンク株式会社 御中</p>
@@ -376,7 +495,31 @@ em{font-style:normal;color:var(--red);font-weight:800}
   </div>
 </section>
 
-<!-- ═══════════ 02 提案スタンス ═══════════ -->
+<!-- ═══════════ 02 オープニングムービー ═══════════ -->
+<section class="slide s-dark video-slide">
+  <p class="eyebrow">OPENING MOVIE</p>
+  <div class="body-block">
+    <div class="vhead">
+      <h2>まず、この映像からご覧ください。</h2>
+      <p>60年にわたり家族の隣で戦い続けてきたヒーローの「いま」を、90秒でご紹介します。</p>
+    </div>
+    <div class="cinema" id="cinema" role="button" tabindex="0" aria-label="ウルトラマン ブランドムービーを再生">
+      <svg class="wm" aria-hidden="true"><use href="#uman-head"/></svg>
+      <div class="cine-inner">
+        <span class="playbtn" aria-hidden="true"><span class="tri"></span></span>
+        <p class="cine-t">ULTRAMAN — BRAND MOVIE</p>
+        <p class="cine-s">クリックで再生（音声が流れます）</p>
+      </div>
+    </div>
+    <div class="vmeta num">
+      <span>▶ <a href="https://youtu.be/-N7AImoFI8w" target="_blank" rel="noopener">youtu.be/-N7AImoFI8w</a></span>
+      <span>全画面での上映を推奨／オフライン会場では事前ダウンロード版をご用意ください</span>
+    </div>
+  </div>
+  <div class="foot"><span>ULTRAMAN × SoftBank 店頭販促ご提案</span><span class="pg"></span></div>
+</section>
+
+<!-- ═══════════ 03 提案スタンス ═══════════ -->
 <section class="slide s-dark statement">
   <p class="eyebrow">本日のご提案の前提</p>
   <div class="body-block">
@@ -459,6 +602,7 @@ em{font-style:normal;color:var(--red);font-weight:800}
 
 <!-- ═══════════ 05 コンセプト ═══════════ -->
 <section class="slide s-dark statement">
+  <div class="xbeam" aria-hidden="true"><i></i><i></i></div>
   <p class="eyebrow">03 提案コンセプト</p>
   <div class="body-block">
     <h2>店頭販促を、"集客イベント"から<br><em>"家族商談を生む体験型IP販促"</em>へ。</h2>
@@ -555,6 +699,7 @@ em{font-style:normal;color:var(--red);font-weight:800}
   <div class="body-block">
     <div class="plan2">
       <div class="plan-card">
+        <div class="vband" aria-hidden="true"><span class="tag">SCAN</span><span class="m-timer"></span></div>
         <header><span class="no">01</span><h3>AIウルトラヒーロー診断</h3></header>
         <p class="lead">家族のスマホ・ネット利用状況をタブレットで診断し、「あなたの家族の防衛隊タイプ／ヒーロータイプ」を表示。診断項目がそのままヒアリングシートとして機能します。</p>
         <div class="flow">
@@ -569,6 +714,7 @@ em{font-style:normal;color:var(--red);font-weight:800}
         </div>
       </div>
       <div class="plan-card">
+        <div class="vband" aria-hidden="true"><span class="tag">BATTLE</span><span class="m-cross"><i></i><i></i></span></div>
         <header><span class="no">02</span><h3>ウルトラ怪獣バトルチャレンジ</h3></header>
         <p class="lead">お子さまが描いた怪獣・ヒーローをAIがカード化。保護者へのヒアリング内容に応じてカードの能力が変化し、バトル後に限定ステッカー・カードを配布します。</p>
         <div class="flow">
@@ -595,6 +741,7 @@ em{font-style:normal;color:var(--red);font-weight:800}
   <div class="body-block">
     <div class="plan2">
       <div class="plan-card">
+        <div class="vband" aria-hidden="true"><span class="tag">MISSION</span><svg><use href="#uman-arrow"/></svg></div>
         <header><span class="no">03</span><h3>ウルトラ防衛隊ミッション</h3></header>
         <p class="lead">家族で「防衛隊員」として店舗内ミッションに参加。ミッション達成の過程で、スマホ料金・家族割・ネット回線・でんき・PayPayの利用状況を自然に確認します。</p>
         <div class="flow">
@@ -609,6 +756,7 @@ em{font-style:normal;color:var(--red);font-weight:800}
         </div>
       </div>
       <div class="plan-card">
+        <div class="vband" aria-hidden="true"><span class="tag">GREETING</span><svg class="m-head"><use href="#uman-head"/></svg></div>
         <header><span class="no">04</span><h3>ウルトラマン撮影会・グリーティング</h3></header>
         <p class="lead">FY27以降の着ぐるみ空白を直接補完するリアル集客施策。旗艦店・商業施設・量販イベントで展開し、撮影データ配布をQR導線で店頭送客につなげます。</p>
         <div class="flow">
@@ -869,6 +1017,7 @@ em{font-style:normal;color:var(--red);font-weight:800}
 <!-- ═══════════ 17 裏表紙 ═══════════ -->
 <section class="slide s-dark closing">
   <div class="beam" aria-hidden="true" style="opacity:.55"></div>
+  <svg class="uman uman-close" aria-hidden="true"><use href="#uman-head"/></svg>
   <div class="body-block">
     <h2>家族の未来を、<br>いっしょに守る。</h2>
     <p class="sub">ウルトラマンとソフトバンクショップで、<br>日本中の家族に「体験して良かった」と言われる店頭を。</p>
@@ -936,6 +1085,22 @@ em{font-style:normal;color:var(--red);font-weight:800}
     tx = null;
   }, {passive:true});
   window.addEventListener('resize', fit);
+
+  // オープニングムービー：クリックでYouTube埋め込みを起動
+  var cinema = document.getElementById('cinema');
+  function playMovie(){
+    if (cinema.classList.contains('on')) return;
+    cinema.classList.add('on');
+    cinema.innerHTML = '<iframe src="https://www.youtube.com/embed/-N7AImoFI8w?autoplay=1&rel=0" ' +
+      'title="ULTRAMAN brand movie" allow="autoplay; encrypted-media; fullscreen" allowfullscreen ' +
+      'style="position:absolute;inset:0;width:100%;height:100%;border:0"></iframe>';
+  }
+  if (cinema){
+    cinema.addEventListener('click', function(e){ e.stopPropagation(); playMovie(); });
+    cinema.addEventListener('keydown', function(e){
+      if (e.key === 'Enter') { e.stopPropagation(); playMovie(); }
+    });
+  }
 
   var h = parseInt((location.hash || '').replace('#', ''), 10);
   show(isNaN(h) ? 0 : h - 1);
