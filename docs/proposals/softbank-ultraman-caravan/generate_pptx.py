@@ -5,6 +5,7 @@ python-pptx で 16:9 の PPTX を出力する。
 
 usage: python3 generate_pptx.py [output.pptx]
 """
+import os
 import sys
 
 from pptx import Presentation
@@ -13,18 +14,24 @@ from pptx.dml.color import RGBColor
 from pptx.enum.text import PP_ALIGN, MSO_ANCHOR
 from pptx.enum.shapes import MSO_SHAPE
 
-# ---- palette ----------------------------------------------------------------
-INK = RGBColor(0x21, 0x25, 0x2B)      # 本文ダークグレー
+# ---- palette (円谷プロ資料フォーマット準拠) ---------------------------------
+INK = RGBColor(0x1A, 0x1A, 0x1A)      # 本文ブラック
 SUB = RGBColor(0x5A, 0x62, 0x6B)      # 補足グレー
-RED = RGBColor(0xD6, 0x00, 0x12)      # アクセント(ヒーローレッド)
-NAVY = RGBColor(0x12, 0x1A, 0x2E)     # 濃紺(表紙・中扉)
-SILVER = RGBColor(0x8E, 0x94, 0x9B)   # シルバー
+RED = RGBColor(0xC0, 0x00, 0x00)      # アクセント(円谷レッド/Strictly Confidential)
+NAVY = RGBColor(0x23, 0x22, 0x78)     # ブランドネイビー(帯グラデーションの基調色)
+TSUB_NAVY = RGBColor(0x1F, 0x33, 0x8C) # 表紙クレジットのネイビー
+SILVER = RGBColor(0x8E, 0x94, 0x9B)   # グレー(フッター・ページ番号)
 PALE = RGBColor(0xF2, 0xF4, 0xF6)     # 薄グレー背景
 PALE_RED = RGBColor(0xFB, 0xEA, 0xEB) # 薄赤背景
 WHITE = RGBColor(0xFF, 0xFF, 0xFF)
 LINE = RGBColor(0xD5, 0xD9, 0xDE)
 
-FONT = "Yu Gothic"
+FONT = "Meiryo"
+
+# 円谷フォーマットのブランド帯(元資料PDFから抽出した素材)
+ASSETS = os.path.join(os.path.dirname(os.path.abspath(__file__)), "assets")
+BAND_IMG = os.path.join(ASSETS, "band_header.png")   # 横帯(グラデーション+TSUBURAYAロゴ)
+COVER_IMG = os.path.join(ASSETS, "band_cover.png")   # 表紙用縦帯(グラデーション+ロゴ)
 
 SW = Inches(13.333)
 SH = Inches(7.5)
@@ -94,20 +101,22 @@ def textbox(slide, x, y, w, h, lines, align=PP_ALIGN.LEFT, anchor=MSO_ANCHOR.TOP
 
 
 def header(slide, title, sub=None):
-    rect(slide, Inches(0.55), Inches(0.42), Inches(0.13), Inches(0.62), fill=RED)
-    textbox(slide, Inches(0.85), Inches(0.38), Inches(11.9), Inches(0.7),
-            [(title, 25, INK, True)])
+    # 円谷フォーマット:グラデーション帯(TSUBURAYAロゴ入り)+白抜き太字タイトル
+    slide.shapes.add_picture(BAND_IMG, 0, 0, width=SW, height=Inches(0.86))
+    textbox(slide, Inches(0.5), Inches(0.08), Inches(11.2), Inches(0.7),
+            [(title, 21, WHITE, True)], anchor=MSO_ANCHOR.MIDDLE)
     if sub:
-        textbox(slide, Inches(0.85), Inches(1.02), Inches(11.9), Inches(0.4),
+        textbox(slide, Inches(0.55), Inches(0.98), Inches(12.2), Inches(0.4),
                 [(sub, 12.5, SUB, False)])
-    rect(slide, Inches(0.55), Inches(1.42), Inches(12.23), Pt(1.4), fill=LINE)
     footer(slide)
 
 
 def footer(slide):
-    textbox(slide, Inches(0.55), Inches(7.06), Inches(9.0), Inches(0.3),
-            [("SoftBank × ウルトラマン 未来防衛隊キャラバン(ご提案)", 9, SILVER, False)])
-    textbox(slide, Inches(12.2), Inches(7.06), Inches(0.6), Inches(0.3),
+    textbox(slide, Inches(5.17), Inches(7.16), Inches(3.0), Inches(0.28),
+            [("© TSUBURAYA PRODUCTIONS", 8, SILVER, False)], align=PP_ALIGN.CENTER)
+    textbox(slide, Inches(10.25), Inches(7.1), Inches(2.2), Inches(0.3),
+            [("Strictly Confidential", 10, RED, True)], align=PP_ALIGN.RIGHT)
+    textbox(slide, Inches(12.6), Inches(7.1), Inches(0.5), Inches(0.3),
             [(str(page_no[0]), 10, SILVER, False)], align=PP_ALIGN.RIGHT)
 
 
@@ -198,18 +207,17 @@ def flow_down(slide, x, y, w, steps, box_h=0.52, gap=0.16, size=13,
 
 
 def divider(num, title, sub=None):
+    # 円谷フォーマットの中扉(Appendixページ様式):白地+上部帯+中央太字見出し
     s = add_slide()
-    rect(s, 0, 0, SW, SH, fill=NAVY)
-    rect(s, Inches(0.9), Inches(3.05), Inches(0.16), Inches(1.15), fill=RED)
-    textbox(s, Inches(1.35), Inches(2.55), Inches(11), Inches(0.6),
-            [(num, 18, SILVER, True)])
-    textbox(s, Inches(1.35), Inches(3.05), Inches(11.2), Inches(1.2),
-            [(title, 34, WHITE, True)])
+    s.shapes.add_picture(BAND_IMG, 0, 0, width=SW, height=Inches(1.05))
+    textbox(s, Inches(0.5), Inches(0.18), Inches(11.0), Inches(0.7),
+            [(num, 15, WHITE, True)], anchor=MSO_ANCHOR.MIDDLE)
+    textbox(s, Inches(0.9), Inches(2.95), Inches(11.5), Inches(1.2),
+            [(title, 34, INK, True)], align=PP_ALIGN.CENTER)
     if sub:
-        textbox(s, Inches(1.35), Inches(4.35), Inches(10.8), Inches(1.2),
-                [(sub, 15, RGBColor(0xC3, 0xC9, 0xD2), False)])
-    textbox(s, Inches(12.2), Inches(7.06), Inches(0.6), Inches(0.3),
-            [(str(page_no[0]), 10, SILVER, False)], align=PP_ALIGN.RIGHT)
+        textbox(s, Inches(1.5), Inches(4.3), Inches(10.3), Inches(1.4),
+                [(sub, 14, SUB, False)], align=PP_ALIGN.CENTER)
+    footer(s)
     return s
 
 
@@ -217,22 +225,29 @@ def divider(num, title, sub=None):
 # 1. 表紙
 # =============================================================================
 s = add_slide()
-rect(s, 0, 0, SW, SH, fill=NAVY)
-rect(s, 0, Inches(4.9), SW, Inches(0.06), fill=RED)
-textbox(s, Inches(0.9), Inches(1.15), Inches(11.5), Inches(0.5),
-        [("ソフトバンク株式会社 御中", 15, RGBColor(0xC3, 0xC9, 0xD2), False)])
-textbox(s, Inches(0.9), Inches(1.95), Inches(11.6), Inches(2.6), [
-    ("SoftBank × ウルトラマン", 30, SILVER, True),
-    ("未来防衛隊キャラバン", 54, WHITE, True),
-], space_after=10)
-textbox(s, Inches(0.9), Inches(4.05), Inches(11.6), Inches(0.9), [
-    ("商業施設に親子・ファミリーを呼び込み、SoftBankショップ・BB・でんき・モバイル相談へ送客する", 16, WHITE, False),
-    ("店頭イベント戦略のご提案", 16, WHITE, False),
-], space_after=4)
-textbox(s, Inches(0.9), Inches(5.35), Inches(11.5), Inches(1.4), [
-    ("ウルトラマンが、家族を商業施設へ呼び込む。SoftBankが、暮らしの通信・電気・安心を守る。", 13.5, RGBColor(0xE8, 0xB4, 0xB8), False),
-    ("2026年7月|Confidential|金額はすべて税別・概算", 12, SILVER, False),
-], space_after=8)
+s.shapes.add_picture(COVER_IMG, 0, 0, width=Inches(4.09), height=SH)
+textbox(s, Inches(4.5), Inches(1.1), Inches(8.4), Inches(0.5),
+        [("ソフトバンク株式会社 御中", 14, SUB, False)], align=PP_ALIGN.CENTER)
+textbox(s, Inches(4.5), Inches(2.1), Inches(8.4), Inches(2.2), [
+    ("SoftBank × ウルトラマン", 26, INK, True),
+    ("未来防衛隊キャラバン", 44, INK, True),
+], align=PP_ALIGN.CENTER, space_after=12)
+textbox(s, Inches(4.5), Inches(4.25), Inches(8.4), Inches(1.0), [
+    ("商業施設に親子・ファミリーを呼び込み、", 14, INK, False),
+    ("SoftBankショップ・BB・でんき・モバイル相談へ送客する店頭イベント戦略のご提案", 14, INK, False),
+], align=PP_ALIGN.CENTER, space_after=4)
+textbox(s, Inches(4.5), Inches(5.35), Inches(8.4), Inches(0.5), [
+    ("ウルトラマンが、家族を商業施設へ呼び込む。SoftBankが、暮らしの通信・電気・安心を守る。", 12, SUB, False),
+], align=PP_ALIGN.CENTER)
+textbox(s, Inches(4.5), Inches(5.95), Inches(8.4), Inches(1.0), [
+    ("2026年7月", 15, TSUB_NAVY, True),
+    ("(株)円谷プロダクション", 15, TSUB_NAVY, True),
+    ("金額はすべて税別・概算", 10.5, SILVER, False),
+], align=PP_ALIGN.CENTER, space_after=3)
+textbox(s, Inches(5.17), Inches(7.16), Inches(3.0), Inches(0.28),
+        [("© TSUBURAYA PRODUCTIONS", 8, SILVER, False)], align=PP_ALIGN.CENTER)
+textbox(s, Inches(10.25), Inches(7.1), Inches(2.5), Inches(0.3),
+        [("Strictly Confidential", 10, RED, True)], align=PP_ALIGN.RIGHT)
 
 # =============================================================================
 # 2. エグゼクティブサマリー
@@ -972,19 +987,20 @@ textbox(s, Inches(0.85), Inches(6.05), Inches(11.8), Inches(0.9), [
 # 29. クロージング
 # =============================================================================
 s = add_slide()
-rect(s, 0, 0, SW, SH, fill=NAVY)
-rect(s, Inches(0.9), Inches(1.5), Inches(0.16), Inches(2.5), fill=RED)
-textbox(s, Inches(1.35), Inches(1.45), Inches(11.0), Inches(2.7), [
-    ("本企画の最終メッセージ", 15, SILVER, True),
-    ("ウルトラマンでSoftBankを目立たせる企画ではない。", 25, WHITE, True),
-    ("ウルトラマンを目的来館の核にして、商業施設に顧客を呼び込み、", 25, WHITE, True),
-    ("SoftBankの店頭相談・BB・でんき・モバイル獲得へつなげる企画である。", 25, WHITE, True),
+s.shapes.add_picture(BAND_IMG, 0, 0, width=SW, height=Inches(1.05))
+textbox(s, Inches(0.5), Inches(0.18), Inches(11.0), Inches(0.7),
+        [("本企画の最終メッセージ", 15, WHITE, True)], anchor=MSO_ANCHOR.MIDDLE)
+rect(s, Inches(0.9), Inches(2.35), Inches(0.16), Inches(2.15), fill=RED)
+textbox(s, Inches(1.35), Inches(2.3), Inches(11.2), Inches(2.5), [
+    ("ウルトラマンでSoftBankを目立たせる企画ではない。", 24, INK, True),
+    ("ウルトラマンを目的来館の核にして、商業施設に顧客を呼び込み、", 24, INK, True),
+    ("SoftBankの店頭相談・BB・でんき・モバイル獲得へつなげる企画である。", 24, INK, True),
 ], space_after=12)
-textbox(s, Inches(1.35), Inches(4.6), Inches(10.8), Inches(1.6), [
-    ("現行IP施策との整合/FY27以降の課題/商業施設送客/コンシューマ事業への貢献 — すべてが一本につながります。", 14.5, RGBColor(0xC3, 0xC9, 0xD2), False),
-    ("ご清聴ありがとうございました。", 14.5, RGBColor(0xC3, 0xC9, 0xD2), False),
+textbox(s, Inches(1.35), Inches(5.15), Inches(10.8), Inches(1.4), [
+    ("現行IP施策との整合/FY27以降の課題/商業施設送客/コンシューマ事業への貢献 — すべてが一本につながります。", 14, SUB, False),
+    ("ご清聴ありがとうございました。", 14, SUB, False),
 ], space_after=10)
-rect(s, 0, Inches(6.9), SW, Inches(0.06), fill=RED)
+footer(s)
 
 out = sys.argv[1] if len(sys.argv) > 1 else "SoftBank_Ultraman_未来防衛隊キャラバン_提案資料.pptx"
 prs.save(out)
