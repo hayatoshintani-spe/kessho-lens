@@ -15,16 +15,16 @@ from pptx.enum.shapes import MSO_SHAPE
 from pptx.enum.lang import MSO_LANGUAGE_ID
 from pptx.oxml.ns import qn
 
-# ---- design tokens(参考フォーマット準拠)----
+# ---- design tokens(参考フォーマット準拠・ネイビー基調)----
 WHITE  = RGBColor(0xFF, 0xFF, 0xFF)
-INK    = RGBColor(0x2E, 0x2E, 0x38)   # 見出し・本文強調
-BODY   = RGBColor(0x4E, 0x4E, 0x5A)   # 本文
-MUTED  = RGBColor(0x9B, 0x9B, 0xA8)   # 注記・フッター
-PURPLE = RGBColor(0x7B, 0x2F, 0xE0)   # アクセント(アイキャッチ・罫線・強調)
-DK     = RGBColor(0x3B, 0x12, 0x73)   # 濃紫(リード・表ヘッダー・濃カード)
-LILAC  = RGBColor(0xF1, 0xEC, 0xFA)   # 薄紫(コールアウト・カード)
-GRAYF  = RGBColor(0xF5, 0xF5, 0xF7)   # 薄グレー(カード・表の縞)
-LINEC  = RGBColor(0xE4, 0xE4, 0xEC)   # 罫線
+INK    = RGBColor(0x28, 0x2D, 0x38)   # 見出し・本文強調
+BODY   = RGBColor(0x49, 0x51, 0x60)   # 本文
+MUTED  = RGBColor(0x97, 0x9E, 0xAC)   # 注記・フッター
+PURPLE = RGBColor(0x1F, 0x4E, 0x96)   # アクセント=ロイヤルネイビー(アイキャッチ・罫線・強調)
+DK     = RGBColor(0x12, 0x24, 0x4B)   # 濃紺(リード・表ヘッダー・濃カード)
+LILAC  = RGBColor(0xEB, 0xF0, 0xF8)   # 薄青(コールアウト・カード)
+GRAYF  = RGBColor(0xF4, 0xF5, 0xF7)   # 薄グレー(カード・表の縞)
+LINEC  = RGBColor(0xE0, 0xE5, 0xEE)   # 罫線
 
 JP_FONT = "Yu Gothic"
 SLIDE_W = Inches(13.333)
@@ -208,7 +208,7 @@ def cards(slide, items, y, h=1.55, n_cols=None, title_size=13, body_size=10):
         x = ML + Emu(int((w + gap) * col))
         yy = Inches(y) + Emu(int((Inches(h) + gap) * row))
         if variant == "dark":
-            fill, border, tc, bc = DK, None, WHITE, RGBColor(0xD8, 0xCB, 0xF2)
+            fill, border, tc, bc = DK, None, WHITE, RGBColor(0xC6, 0xD4, 0xEA)
         elif variant == "gray":
             fill, border, tc, bc = GRAYF, LINEC, INK, BODY
         else:
@@ -707,6 +707,6 @@ statement(s, [
     ("――ぜひ本日を起点に、個別にご相談ください。", "purple"),
 ], y=2.7)
 
-OUT = "ULTRAMAN_LICENSEE_PRESENTATION_draft_v2.pptx"
+OUT = "ULTRAMAN_LICENSEE_PRESENTATION_draft_v3.pptx"
 prs.save(OUT)
 print(f"saved {OUT} with {len(prs.slides._sldIdLst)} slides")
