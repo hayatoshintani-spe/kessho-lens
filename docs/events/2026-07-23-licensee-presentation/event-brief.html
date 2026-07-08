@@ -1,0 +1,313 @@
+<title>ULTRAMAN LICENSEE PRESENTATION 2027 — 運営ブリーフ</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  :root {
+    /* palette grounded in Ultraman: M78 space navy, suit silver, color-timer red/cyan */
+    --space:        #0c1226;
+    --space-2:      #121a35;
+    --panel:        #16204180;
+    --panel-solid:  #172142;
+    --line:         #27335c;
+    --silver:       #c9d1e0;
+    --silver-dim:   #8a95b0;
+    --ink:          #eef2fb;
+    --timer-red:    #ff3b34;
+    --timer-red-2:  #ff6a52;
+    --timer-cyan:   #37c6ec;
+    --gold:         #f4c04e;
+    --good:         #43c9a0;
+    --warn:         #f4c04e;
+    --crit:         #ff3b34;
+    --shadow:       0 18px 50px -22px rgba(0,0,0,.7);
+    --radius:       14px;
+    --maxw:         1080px;
+    --fs-display:   clamp(2.1rem, 5.4vw, 4rem);
+    --font-jp: "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Yu Gothic", "YuGothic", "Noto Sans JP", "Meiryo", sans-serif;
+    --font-mono: ui-monospace, "SF Mono", "Cascadia Mono", "Roboto Mono", Menlo, Consolas, monospace;
+  }
+  @media (prefers-color-scheme: light) {
+    :root {
+      --space:      #eef1f8;
+      --space-2:    #e4e9f4;
+      --panel:      #ffffffcc;
+      --panel-solid:#ffffff;
+      --line:       #d3dae8;
+      --silver:     #37415e;
+      --silver-dim: #6b7590;
+      --ink:        #131a2e;
+      --shadow:     0 16px 40px -24px rgba(30,45,90,.35);
+    }
+  }
+  :root[data-theme="dark"] {
+    --space:#0c1226; --space-2:#121a35; --panel:#16204180; --panel-solid:#172142;
+    --line:#27335c; --silver:#c9d1e0; --silver-dim:#8a95b0; --ink:#eef2fb;
+    --shadow:0 18px 50px -22px rgba(0,0,0,.7);
+  }
+  :root[data-theme="light"] {
+    --space:#eef1f8; --space-2:#e4e9f4; --panel:#ffffffcc; --panel-solid:#ffffff;
+    --line:#d3dae8; --silver:#37415e; --silver-dim:#6b7590; --ink:#131a2e;
+    --shadow:0 16px 40px -24px rgba(30,45,90,.35);
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: var(--font-jp);
+    color: var(--ink);
+    background:
+      radial-gradient(1200px 700px at 78% -8%, rgba(55,198,236,.10), transparent 60%),
+      radial-gradient(900px 600px at 5% 4%, rgba(255,59,52,.10), transparent 55%),
+      linear-gradient(180deg, var(--space), var(--space-2));
+    background-attachment: fixed;
+    line-height: 1.72;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: var(--maxw); margin: 0 auto; padding: 0 22px 96px; }
+
+  /* ---------- header ---------- */
+  header { padding: 54px 0 30px; }
+  .eyebrow {
+    font-family: var(--font-mono);
+    font-size: .74rem; letter-spacing: .34em; text-transform: uppercase;
+    color: var(--timer-cyan); margin: 0 0 18px;
+  }
+  h1 {
+    font-size: var(--fs-display);
+    line-height: 1.03; margin: 0; font-weight: 800;
+    letter-spacing: -.01em; text-wrap: balance;
+    color: var(--ink);
+  }
+  h1 .thin { display:block; font-weight: 500; color: var(--silver); font-size: .42em; letter-spacing: .01em; margin-top: 16px; }
+  .lede {
+    margin: 24px 0 0; max-width: 60ch;
+    font-size: 1.12rem; color: var(--silver);
+    border-left: 3px solid var(--timer-red); padding-left: 18px;
+  }
+  .lede b { color: var(--ink); font-weight: 700; }
+
+  /* ---------- color timer countdown ---------- */
+  .timer {
+    display: flex; flex-wrap: wrap; align-items: center; gap: 22px;
+    margin-top: 34px; padding: 20px 24px;
+    background: var(--panel); backdrop-filter: blur(8px);
+    border: 1px solid var(--line); border-radius: var(--radius);
+    box-shadow: var(--shadow);
+  }
+  .lamp { position: relative; width: 46px; height: 46px; flex: none; }
+  .lamp .core {
+    position:absolute; inset:0; border-radius:50%;
+    background: radial-gradient(circle at 38% 35%, var(--timer-red-2), var(--timer-red) 55%, #8f120c 100%);
+    box-shadow: 0 0 0 4px rgba(255,59,52,.15), 0 0 26px 4px rgba(255,59,52,.55);
+    animation: blink 1.15s ease-in-out infinite;
+  }
+  .lamp .ring { position:absolute; inset:-7px; border:2px solid var(--silver); opacity:.35; border-radius:50%; }
+  @keyframes blink { 0%,100%{opacity:1;transform:scale(1);} 50%{opacity:.55;transform:scale(.9);} }
+  @media (prefers-reduced-motion: reduce) { .lamp .core { animation: none; } }
+  .countset { display:flex; flex-wrap:wrap; gap: 12px 30px; }
+  .count .num {
+    font-family: var(--font-mono); font-variant-numeric: tabular-nums;
+    font-size: 2rem; font-weight: 700; line-height: 1; color: var(--ink);
+  }
+  .count .num.red { color: var(--timer-red-2); }
+  .count .lbl { font-size: .76rem; color: var(--silver-dim); letter-spacing: .04em; margin-top: 6px; }
+  .count .sub { font-size: .7rem; color: var(--silver-dim); }
+
+  /* ---------- section scaffolding ---------- */
+  section { margin-top: 56px; }
+  .sec-head { display:flex; align-items:baseline; gap:14px; margin-bottom: 22px; flex-wrap: wrap; }
+  .sec-idx {
+    font-family: var(--font-mono); font-size:.78rem; color: var(--timer-cyan);
+    letter-spacing:.2em; padding-top:4px;
+  }
+  h2 { font-size: 1.5rem; margin:0; font-weight: 750; letter-spacing:-.01em; }
+  .sec-note { color: var(--silver-dim); font-size:.9rem; margin: 4px 0 0; }
+
+  /* ---------- goal blocks ---------- */
+  .goal {
+    padding: 22px 24px; border-radius: var(--radius);
+    background: linear-gradient(120deg, rgba(255,59,52,.10), rgba(55,198,236,.06));
+    border: 1px solid var(--line);
+    font-size: 1.06rem; color: var(--ink);
+  }
+  .goal b { color: var(--timer-red-2); }
+  .cols { display:grid; grid-template-columns: repeat(auto-fit,minmax(260px,1fr)); gap:16px; margin-top:18px; }
+  .card {
+    background: var(--panel); border:1px solid var(--line); border-radius: var(--radius);
+    padding: 20px 22px; box-shadow: var(--shadow);
+  }
+  .card h3 { margin:0 0 8px; font-size:1.05rem; display:flex; align-items:center; gap:10px; }
+  .tag {
+    font-family: var(--font-mono); font-size:.62rem; letter-spacing:.12em; text-transform:uppercase;
+    padding: 3px 8px; border-radius: 999px; border:1px solid currentColor; flex:none;
+  }
+  .tag.exist { color: var(--timer-cyan); }
+  .tag.new   { color: var(--gold); }
+  .card p { margin:0; color: var(--silver); font-size:.95rem; }
+
+  /* ---------- win path ---------- */
+  .steps { display:grid; grid-template-columns: repeat(auto-fit,minmax(180px,1fr)); gap:14px; counter-reset: s; }
+  .step {
+    position:relative; padding: 18px 18px 18px 18px; border-radius: 12px;
+    background: var(--panel-solid); border:1px solid var(--line);
+    border-top: 3px solid var(--timer-red);
+  }
+  .step:nth-child(2){border-top-color:#ff6a52;} .step:nth-child(3){border-top-color:var(--gold);}
+  .step:nth-child(4){border-top-color:var(--good);} .step:nth-child(5){border-top-color:var(--timer-cyan);}
+  .step .n { font-family:var(--font-mono); font-size:.8rem; color:var(--silver-dim); }
+  .step h4 { margin:6px 0 6px; font-size:1rem; }
+  .step p { margin:0; font-size:.86rem; color:var(--silver); }
+
+  /* ---------- timeline ---------- */
+  .tl { border:1px solid var(--line); border-radius: var(--radius); overflow:hidden; box-shadow:var(--shadow); }
+  .tl-row {
+    display:grid; grid-template-columns: 96px 1fr; gap:0; align-items:stretch;
+    border-top:1px solid var(--line); background: var(--panel);
+  }
+  .tl-row:first-child { border-top:0; }
+  .tl-time {
+    font-family:var(--font-mono); font-variant-numeric:tabular-nums; font-size:.82rem;
+    padding:14px 12px; color:var(--timer-cyan); border-right:1px solid var(--line);
+    display:flex; align-items:center; justify-content:center; text-align:center;
+  }
+  .tl-body { padding:13px 18px; }
+  .tl-body .t { font-weight:650; font-size:.98rem; }
+  .tl-body .r { color:var(--silver-dim); font-size:.83rem; }
+  .tl-row.hot .tl-time { color: var(--timer-red-2); }
+
+  /* ---------- category grid ---------- */
+  .cats { display:grid; grid-template-columns: repeat(auto-fit,minmax(215px,1fr)); gap:14px; }
+  .cat { background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:16px 18px; }
+  .cat h4 { margin:0 0 6px; font-size:.98rem; color:var(--ink); }
+  .cat .msg { font-size:.85rem; color:var(--silver); margin:0 0 10px; }
+  .cat .ex { font-size:.74rem; color:var(--silver-dim); font-family:var(--font-mono); line-height:1.5; }
+
+  /* ---------- risks ---------- */
+  .risk { display:flex; gap:16px; padding:16px 18px; border:1px solid var(--line);
+          border-radius:12px; background:var(--panel); align-items:flex-start; }
+  .risk + .risk { margin-top:12px; }
+  .sev { flex:none; width:6px; align-self:stretch; border-radius:6px; }
+  .sev.c{background:var(--crit);} .sev.w{background:var(--warn);}
+  .risk .h { font-weight:650; margin:0 0 3px; }
+  .risk .h .lv { font-family:var(--font-mono); font-size:.64rem; letter-spacing:.1em;
+                 padding:2px 7px; border-radius:999px; margin-left:10px; vertical-align:middle; }
+  .lv.c{color:var(--crit); border:1px solid var(--crit);}
+  .lv.w{color:var(--warn); border:1px solid var(--warn);}
+  .risk p { margin:0; font-size:.87rem; color:var(--silver); }
+  .risk .due { font-family:var(--font-mono); font-size:.72rem; color:var(--silver-dim); white-space:nowrap; }
+
+  /* ---------- actions checklist ---------- */
+  .acts { list-style:none; padding:0; margin:0; display:grid; gap:9px; }
+  .acts li { display:flex; gap:13px; align-items:baseline; padding:12px 16px;
+             background:var(--panel); border:1px solid var(--line); border-radius:10px; }
+  .acts .k { font-family:var(--font-mono); font-size:.72rem; color:var(--timer-cyan); flex:none; padding-top:2px; }
+  .acts .a { font-size:.94rem; }
+  .acts .a small { color:var(--silver-dim); display:block; font-size:.78rem; }
+  .acts li.urgent { border-color: var(--timer-red); box-shadow: inset 3px 0 0 var(--timer-red); }
+
+  footer { margin-top:64px; padding-top:22px; border-top:1px solid var(--line);
+           color:var(--silver-dim); font-size:.8rem; display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px; }
+  a.doclink { color: var(--timer-cyan); text-decoration: none; }
+  a.doclink:focus-visible, .step:focus-visible { outline:2px solid var(--timer-cyan); outline-offset:3px; }
+</style>
+
+<div class="wrap">
+  <header>
+    <p class="eyebrow">Internal Brief · 円谷プロダクション</p>
+    <h1>ULTRAMAN LICENSEE<br>PRESENTATION 2027
+      <span class="thin">2027年度以降の商機を、いま一緒につくる。</span>
+    </h1>
+    <p class="lede">これは作品発表会ではない。<b>ライセンシー向けの商談創出イベント</b>。「すごかった」で終わらせず、<b>「うちも作りたい。相談したい」</b>で終わらせる。</p>
+
+    <div class="timer" role="group" aria-label="カウントダウン">
+      <div class="lamp" aria-hidden="true"><span class="ring"></span><span class="core"></span></div>
+      <div class="countset">
+        <div class="count"><div class="num">7/23</div><div class="lbl">本番 — ウルサマ・ステージ</div><div class="sub">約470席／450名想定・全体60分</div></div>
+        <div class="count"><div class="num red">15</div><div class="lbl">本番まで(日)</div></div>
+        <div class="count"><div class="num red">4</div><div class="lbl">7/14 確認会まで(実働日)</div><div class="sub">素材回収のリミット</div></div>
+      </div>
+    </div>
+  </header>
+
+  <section>
+    <div class="sec-head"><span class="sec-idx">01</span><h2>ゴールと2つの目的</h2></div>
+    <div class="goal">2027年度以降、ウルトラマンは映像・映画・イベント・流通・IPコラボ・スタイルガイドを連動させて<b>商品化し続けられるIP</b>になる。<br>いま企画に入った企業が、次の売場とキャンペーンの主導権を取れる。</div>
+    <div class="cols">
+      <div class="card">
+        <h3><span class="tag exist">既存</span>投資を増やしてもらう</h3>
+        <p>既存ライセンシーの商品化・販促投資を拡大。売上アップ、SKU拡大、発注数拡大、キャンペーン連動、売場強化につなげる。</p>
+      </div>
+      <div class="card">
+        <h3><span class="tag new">新規</span>商談化する</h3>
+        <p>広告代理店・SP・流通・食品・アパレル・雑貨・外食・デジタルに「自社でもウルトラマンで企画できる」と感じさせ、商談に落とす。</p>
+      </div>
+    </div>
+    <p class="sec-note">※ 参加者は決裁者中心ではない。担当者が社内に持ち帰って「これは商品化したい」と言える材料を渡す資料にする。</p>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="sec-idx">02</span><h2>勝ち筋</h2><p class="sec-note">体感 → 理解 → 想像 → 安心 → 行動</p></div>
+    <div class="steps">
+      <div class="step" tabindex="0"><div class="n">STEP 1</div><h4>熱量を体感</h4><p>動画とヒーローショーで「人を動かすIPだ」と最初に感じさせる。</p></div>
+      <div class="step" tabindex="0"><div class="n">STEP 2</div><h4>戦略を理解</h4><p>テレビ・映画・イベント・YouTube・IPコラボ・流通が面で動くと示す。</p></div>
+      <div class="step" tabindex="0"><div class="n">STEP 3</div><h4>商品化を想像</h4><p>業種カテゴリー別に「うちならこう作れる」と思わせる。</p></div>
+      <div class="step" tabindex="0"><div class="n">STEP 4</div><h4>実行を安心</h4><p>スタイルガイド・素材・監修フロー・相談窓口を提示する。</p></div>
+      <div class="step" tabindex="0"><div class="n">STEP 5</div><h4>すぐ動かす</h4><p>個別商談予約・企画募集・カテゴリー別相談へ誘導する。</p></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="sec-idx">03</span><h2>当日進行(60分)</h2><p class="sec-note">動画 → ヒーローショー → フォーマル挨拶。熱量を上げてから事業の話へ。</p></div>
+    <div class="tl">
+      <div class="tl-row"><div class="tl-time">0:00</div><div class="tl-body"><div class="t">MCオープニング</div><div class="r">「説明会ではなく商機共有の場」と宣言</div></div></div>
+      <div class="tl-row hot"><div class="tl-time">0:02</div><div class="tl-body"><div class="t">60周年・熱量動画</div><div class="r">マーケティングカレンダー動画に刷新(旧TOPICS動画から転換)</div></div></div>
+      <div class="tl-row hot"><div class="tl-time">0:04</div><div class="tl-body"><div class="t">ヒーローアクション</div><div class="r">4ヒーロー・見栄え重視。営業プレゼンの導入装置</div></div></div>
+      <div class="tl-row"><div class="tl-time">0:07</div><div class="tl-body"><div class="t">主催挨拶</div><div class="r">フォーマルへ。個別懸念には触れない</div></div></div>
+      <div class="tl-row"><div class="tl-time">0:10</div><div class="tl-body"><div class="t">コンテンツ戦略</div><div class="r">2027年度以降の作品・映画・TV・YouTube・イベント展開</div></div></div>
+      <div class="tl-row hot"><div class="tl-time">0:25</div><div class="tl-body"><div class="t">ライセンシー営業戦略</div><div class="r">業種カテゴリー別・募集型。本日の核</div></div></div>
+      <div class="tl-row"><div class="tl-time">0:42</div><div class="tl-body"><div class="t">IPコラボ・流通・ウルトラマート</div><div class="r">「売る場所・広げる場所」を見せる</div></div></div>
+      <div class="tl-row"><div class="tl-time">0:50</div><div class="tl-body"><div class="t">スタイルガイド・監修体制</div><div class="r">「作りたい」を「作れる」に落とす</div></div></div>
+      <div class="tl-row hot"><div class="tl-time">0:56</div><div class="tl-body"><div class="t">クロージング・商談導線</div><div class="r">QR・個別相談・企画募集・次アクション</div></div></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="sec-idx">04</span><h2>カテゴリー別の商機(募集型)</h2><p class="sec-note">過去実績の羅列ではなく「今後ご一緒したい企画」の募集として見せる。</p></div>
+    <div class="cats">
+      <div class="cat"><h4>食品・飲料</h4><p class="msg">夏のウルトラマン接点を、親子向けキャンペーンに。</p><p class="ex">限定パッケージ／購入特典／映画半券連動／夏休み販促</p></div>
+      <div class="cat"><h4>外食・カフェ</h4><p class="msg">来場・視聴の熱量を、店舗送客に接続。</p><p class="ex">コラボメニュー／来店特典／グリーティング連動</p></div>
+      <div class="cat"><h4>アパレル</h4><p class="msg">大人が着られるデザインIPとして展開。</p><p class="ex">Tシャツ／親子コーデ／怪獣デザイン／限定コレクション</p></div>
+      <div class="cat"><h4>雑貨・生活用品</h4><p class="msg">“毎日使う商品”に落とし込む。</p><p class="ex">タンブラー／タオル／文具小物／インテリア</p></div>
+      <div class="cat"><h4>文具・教育・出版</h4><p class="msg">勇気・成長・仲間・正義を学びの領域へ。</p><p class="ex">学習帳／絵本／図鑑／読書キャンペーン</p></div>
+      <div class="cat"><h4>流通・小売</h4><p class="msg">商品だけでなく、売場をつくる。</p><p class="ex">専用棚／期間限定売場／スタンプラリー／限定商品</p></div>
+      <div class="cat"><h4>広告代理店・SP</h4><p class="msg">ウルトラマンを広告・販促装置として活用。</p><p class="ex">企業タイアップ／交通広告／SNS／イベント協賛</p></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="sec-idx">05</span><h2>最重要リスク</h2><p class="sec-note">構成を間違えると「毎年やっている説明会」になる。</p></div>
+    <div class="risk"><span class="sev c"></span><div><p class="h">コンテンツ素材が薄い<span class="lv c">CRITICAL</span></p><p>450人規模で「新しい話がない」は最悪。制作部・IP側から出せる素材を必ず引き出す。</p></div><div class="due">〜7/14</div></div>
+    <div class="risk"><span class="sev c"></span><div><p class="h">営業パートが過去実績で終わる<span class="lv c">CRITICAL</span></p><p>「今後募集したい企画」とカテゴリー別提案に必ず変換する。</p></div><div class="due">〜7/16</div></div>
+    <div class="risk"><span class="sev w"></span><div><p class="h">100万人の数字が弱く見える<span class="lv w">WATCH</span></p><p>単純リーチではなく、熱量あるリアル接点として。マス→熱量→購買→継続のファネルで語る。</p></div><div class="due">〜7/14</div></div>
+    <div class="risk"><span class="sev w"></span><div><p class="h">スタイルガイドが曖昧<span class="lv w">WATCH</span></p><p>素材と監修フローが見えないと動けない。最低限の見せ方を用意。</p></div><div class="due">〜7/17</div></div>
+    <div class="risk"><span class="sev w"></span><div><p class="h">誰が話すかが曖昧<span class="lv w">WATCH</span></p><p>コンテンツ戦略=権威ある人、営業戦略=営業トップ。本気度を伝える。</p></div><div class="due">〜7/14</div></div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="sec-idx">06</span><h2>直近アクション</h2><p class="sec-note">確認会まで実働4日。順番に動かす。</p></div>
+    <ul class="acts">
+      <li class="urgent"><span class="k">TODAY</span><span class="a">素材依頼メールを送る<small>制作部・IP・営業・流通へ。Gmail下書きは作成済み(宛先を社内配布先に差し替え)</small></span></li>
+      <li class="urgent"><span class="k">TODAY</span><span class="a">動画会社へ方向性修正の一報<small>「60周年TOPICS」→「マーケティングカレンダー動画」</small></span></li>
+      <li><span class="k">7/10</span><span class="a">サンリオ・ゼロ映画・ギャラファイ・ウルトラマートの開示可否を確認</span></li>
+      <li><span class="k">7/13</span><span class="a">開示区分の仮整理・確認会アジェンダ作成<small>当日開示／上映のみ／NDA後／不可</small></span></li>
+      <li><span class="k">7/14</span><span class="a">構成確認会 10:00<small>開示可否・登壇範囲・NG表現・100万人の裏付けを確定</small></span></li>
+      <li><span class="k">7/16</span><span class="a">スライド初稿(28枚)・営業カテゴリーシート確定</span></li>
+      <li><span class="k">7/17</span><span class="a">商談予約QR・企画相談導線・配布資料の制作着手</span></li>
+      <li><span class="k">7/21</span><span class="a">全体通しリハーサル(尺実測)</span></li>
+    </ul>
+  </section>
+
+  <footer>
+    <span>円谷プロダクション ライセンシー・プレゼンテーション運営ブリーフ</span>
+    <span>詳細:<a class="doclink" href="README.md">docs/events/2026-07-23-licensee-presentation/</a></span>
+  </footer>
+</div>
