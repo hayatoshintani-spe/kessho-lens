@@ -1,0 +1,527 @@
+<title>ULTRAMAN LICENSEE PRESENTATION — スライドデッキ(ドラフト)</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  /* Stage deck — deliberately single dark theme (projection) */
+  :root {
+    --bg:        #0a0f21;
+    --bg-2:      #101731;
+    --panel:     #17203f;
+    --line:      #2a3660;
+    --ink:       #f0f3fc;
+    --sub:       #aab4d0;
+    --dim:       #7580a0;
+    --red:       #ff3b34;
+    --red-2:     #ff6a52;
+    --cyan:      #37c6ec;
+    --gold:      #f4c04e;
+    --font-jp: "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Yu Gothic", "YuGothic", "Noto Sans JP", "Meiryo", sans-serif;
+    --font-mono: ui-monospace, "SF Mono", "Cascadia Mono", "Roboto Mono", Menlo, Consolas, monospace;
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    margin: 0; font-family: var(--font-jp); color: var(--ink);
+    background:
+      radial-gradient(1100px 600px at 80% -10%, rgba(55,198,236,.10), transparent 60%),
+      radial-gradient(800px 550px at 2% 0%, rgba(255,59,52,.10), transparent 55%),
+      linear-gradient(180deg, var(--bg), var(--bg-2));
+    overflow: hidden; line-height: 1.62;
+  }
+
+  .deck { position: fixed; inset: 0; }
+  section.slide {
+    position: absolute; inset: 0; display: none;
+    padding: clamp(28px, 6vh, 64px) clamp(28px, 7vw, 110px);
+    flex-direction: column; justify-content: center;
+  }
+  section.slide.active { display: flex; }
+
+  .eyebrow {
+    font-family: var(--font-mono); font-size: clamp(.62rem, 1.4vw, .8rem);
+    letter-spacing: .3em; text-transform: uppercase; color: var(--cyan); margin: 0 0 1.2em;
+  }
+  h1 { font-size: clamp(2rem, 6.2vw, 4.6rem); line-height: 1.06; margin: 0; font-weight: 800; letter-spacing: -.01em; text-wrap: balance; }
+  h2 { font-size: clamp(1.5rem, 4.2vw, 2.9rem); line-height: 1.14; margin: 0 0 .55em; font-weight: 760; letter-spacing: -.01em; text-wrap: balance; }
+  .sub { color: var(--sub); font-size: clamp(.95rem, 2vw, 1.25rem); max-width: 62ch; }
+  .big-quote {
+    font-size: clamp(1.15rem, 2.9vw, 1.85rem); font-weight: 650; line-height: 1.5;
+    border-left: 5px solid var(--red); padding-left: .9em; max-width: 34em; text-wrap: balance;
+  }
+  .big-quote em { color: var(--red-2); font-style: normal; }
+
+  ul.points { margin: .2em 0 0; padding: 0; list-style: none; display: grid; gap: .55em; max-width: 46em; }
+  ul.points li { padding-left: 1.35em; position: relative; font-size: clamp(.95rem, 2.2vw, 1.35rem); }
+  ul.points li::before { content: ""; position: absolute; left: 0; top: .62em; width: .5em; height: .5em; border-radius: 50%; background: var(--red); }
+  ul.points li.cy::before { background: var(--cyan); }
+  ul.points li b { color: var(--gold); }
+
+  .grid { display: grid; gap: clamp(10px, 1.6vw, 18px); margin-top: 1em; }
+  .g2 { grid-template-columns: repeat(2, 1fr); }
+  .g3 { grid-template-columns: repeat(3, 1fr); }
+  .cell {
+    background: var(--panel); border: 1px solid var(--line); border-radius: 12px;
+    padding: clamp(12px, 1.8vw, 22px);
+  }
+  .cell h3 { margin: 0 0 .35em; font-size: clamp(.95rem, 2vw, 1.25rem); color: var(--ink); }
+  .cell p { margin: 0; color: var(--sub); font-size: clamp(.8rem, 1.6vw, 1rem); }
+  .cell .k { font-family: var(--font-mono); font-size: clamp(.6rem, 1.2vw, .72rem); letter-spacing: .18em; color: var(--cyan); text-transform: uppercase; display: block; margin-bottom: .5em; }
+
+  table.tbl { border-collapse: collapse; width: 100%; max-width: 56em; margin-top: 1em; font-size: clamp(.82rem, 1.9vw, 1.12rem); }
+  table.tbl th, table.tbl td { text-align: left; padding: .5em .9em; border-bottom: 1px solid var(--line); }
+  table.tbl th { color: var(--cyan); font-weight: 600; font-size: .85em; }
+  table.tbl td:first-child { color: var(--gold); font-weight: 650; white-space: nowrap; }
+  table.tbl td { color: var(--sub); }
+
+  .placeholder {
+    border: 2px dashed var(--line); border-radius: 12px; color: var(--dim);
+    padding: clamp(12px, 2vw, 22px); font-size: clamp(.8rem, 1.7vw, 1rem);
+    margin-top: 1.1em; max-width: 46em; background: rgba(255,255,255,.02);
+  }
+  .placeholder b { color: var(--gold); }
+
+  .cat-msg {
+    margin-top: 1em; font-size: clamp(1.05rem, 2.6vw, 1.7rem); font-weight: 700;
+    color: var(--ink); border-left: 5px solid var(--cyan); padding-left: .8em; max-width: 32em; text-wrap: balance;
+  }
+  .cat-meta { margin-top: 1.1em; display: grid; gap: .5em; max-width: 46em; }
+  .cat-meta .row { display: grid; grid-template-columns: 6.5em 1fr; gap: 1em; font-size: clamp(.88rem, 2vw, 1.15rem); }
+  .cat-meta .lbl { color: var(--cyan); font-weight: 650; }
+  .cat-meta .val { color: var(--sub); }
+
+  /* timer lamp */
+  .lamp { width: clamp(30px, 4vw, 46px); height: clamp(30px, 4vw, 46px); border-radius: 50%;
+    background: radial-gradient(circle at 38% 35%, var(--red-2), var(--red) 55%, #8f120c 100%);
+    box-shadow: 0 0 26px 5px rgba(255,59,52,.5); animation: blink 1.15s ease-in-out infinite; margin-bottom: 1.4em; }
+  @keyframes blink { 0%,100%{opacity:1;} 50%{opacity:.5;} }
+  @media (prefers-reduced-motion: reduce) { .lamp { animation: none; } }
+
+  /* chrome */
+  .hud {
+    position: fixed; left: 0; right: 0; bottom: 0; display: flex; align-items: center;
+    justify-content: space-between; padding: 10px 18px; font-family: var(--font-mono);
+    font-size: .72rem; color: var(--dim); z-index: 5; pointer-events: none;
+  }
+  .hud .part { color: var(--cyan); letter-spacing: .12em; text-transform: uppercase; }
+  .progress { position: fixed; top: 0; left: 0; height: 3px; background: linear-gradient(90deg, var(--red), var(--red-2)); width: 0; z-index: 6; transition: width .25s ease; }
+  .notes {
+    position: fixed; left: 0; right: 0; bottom: 0; max-height: 42vh; overflow-y: auto;
+    background: rgba(8,12,26,.96); border-top: 2px solid var(--cyan);
+    padding: 18px clamp(24px, 6vw, 90px) 30px; display: none; z-index: 8;
+    font-size: .95rem; color: var(--sub); line-height: 1.8;
+  }
+  .notes.show { display: block; }
+  .notes .nlabel { font-family: var(--font-mono); font-size: .66rem; letter-spacing: .24em; color: var(--cyan); text-transform: uppercase; display: block; margin-bottom: .6em; }
+  .notes .warn { color: var(--red-2); font-weight: 650; }
+  .hint { position: fixed; top: 12px; right: 16px; font-family: var(--font-mono); font-size: .66rem; color: var(--dim); z-index: 5; }
+  .nav-zone { position: fixed; top: 0; bottom: 0; width: 18%; z-index: 4; cursor: pointer; }
+  .nav-zone.prev { left: 0; } .nav-zone.next { right: 0; }
+  .nav-zone:focus-visible { outline: 2px solid var(--cyan); outline-offset: -4px; }
+
+  @media (max-width: 720px) {
+    .g2, .g3 { grid-template-columns: 1fr; }
+    section.slide { justify-content: flex-start; padding-top: 60px; overflow-y: auto; }
+  }
+</style>
+
+<div class="progress" id="bar"></div>
+<div class="hint">← → 送り / N ノート / F 全画面</div>
+<div class="deck" id="deck">
+
+<!-- 1 -->
+<section class="slide" data-part="Opening">
+  <div class="lamp" aria-hidden="true"></div>
+  <p class="eyebrow">Tsuburaya Productions · 60th Anniversary</p>
+  <h1>ULTRAMAN<br>LICENSEE PRESENTATION</h1>
+  <p class="sub" style="font-size:clamp(1.1rem,2.6vw,1.7rem); color:var(--ink); font-weight:650; margin-top:1em;">2027年度以降の商機を、いま一緒につくる。</p>
+  <aside class="notes-src" hidden>(タイトル表示のみ。MCオープニングへ)</aside>
+</section>
+
+<!-- 2 -->
+<section class="slide" data-part="Opening">
+  <p class="eyebrow">Purpose</p>
+  <h2>本日は「作品発表会」ではありません</h2>
+  <ul class="points">
+    <li>2027年度以降のウルトラマン展開を、パートナーの皆さまに共有する場</li>
+    <li>商品化・販促・広告タイアップ・流通施策の<b>商機を持ち帰っていただく場</b></li>
+    <li class="cy">本日の終わりに:個別商談のご予約・企画のご相談を受け付けます</li>
+  </ul>
+  <aside class="notes-src" hidden>本日は、単なる作品紹介ではありません。2027年度以降、ウルトラマンを皆さまの商品・売場・キャンペーンにどう活用いただけるか、その商機を共有する場です。最後に個別商談のご案内もありますので、ぜひ「自社ならこう使える」という視点でお聞きください。</aside>
+</section>
+
+<!-- 3 -->
+<section class="slide" data-part="Opening">
+  <p class="eyebrow">From the Stage</p>
+  <h2>いまの熱量が、商品と売場に変わる</h2>
+  <p class="big-quote">ステージの熱量 → 商品 → 売場 → キャンペーン → <em>生活者との毎日の接点へ</em></p>
+  <aside class="notes-src" hidden>いまご覧いただいた熱量は、ステージの中だけで終わるものではありません。商品に、売場に、キャンペーンに、そして生活者との毎日の接点に変わっていきます。</aside>
+</section>
+
+<!-- 4 -->
+<section class="slide" data-part="Now">
+  <p class="eyebrow">60th Anniversary</p>
+  <h2>60周年は、もう始まっている</h2>
+  <div class="grid g2">
+    <div class="cell"><span class="k">Events</span><h3>国内外イベント</h3><p>ウルサマ/ライブ/展覧会/ヒーローショー/グリーティング</p></div>
+    <div class="cell"><span class="k">Products</span><h3>商品化</h3><p>食品・アパレル・雑貨・玩具・文具・コレクション</p></div>
+    <div class="cell"><span class="k">Collabs</span><h3>IPコラボ</h3><p>モフサンド、ベイブレード ほか</p></div>
+    <div class="cell"><span class="k">Retail</span><h3>流通</h3><p>ウルトラマート、POPUP、量販・専門店</p></div>
+  </div>
+  <div class="placeholder">📷 <b>【素材8待ち】</b>実績写真グリッド(8〜12点)に差し替え。数字より「動いている感」重視。</div>
+  <aside class="notes-src" hidden>60周年はすでに動き出しています。イベント、商品化、コラボ、流通。この盛り上がりは今年で終わるものではなく、2027年度以降につながっていきます。</aside>
+</section>
+
+<!-- 5 -->
+<section class="slide" data-part="Now">
+  <p class="eyebrow">Why Ultraman, Why Now</p>
+  <h2>熱量あるリアル接点を持つIP</h2>
+  <table class="tbl">
+    <tr><th>レイヤー</th><th>役割</th><th>例</th></tr>
+    <tr><td>マス接点</td><td>認知を広げる</td><td>テレビ、映画、YouTube、SNS、PR</td></tr>
+    <tr><td>熱量接点</td><td>ファン化する</td><td>ウルサマ、ライブ、ショー、グリーティング</td></tr>
+    <tr><td>購買接点</td><td>商品化につなげる</td><td>店頭、POPUP、ウルトラマート、EC</td></tr>
+    <tr><td>継続接点</td><td>次の商品・作品へ戻す</td><td>新シリーズ、映画、イベント、限定商品</td></tr>
+  </table>
+  <div class="placeholder">📊 <b>【補強データ待ち】</b>年間約70万〜100万人規模のリアル接点 — 満席率・稼働率確定後に表現調整(06参照)</div>
+  <aside class="notes-src" hidden>ウルトラマンの強みは、単なるリーチの広さではありません。年間約70万〜100万人規模のリアル接点を通じて、“直接会いに来るファン”との濃い関係を持っていることです。<span class="warn">※「100万人に届きます」という単独リーチ表現は使わない。</span></aside>
+</section>
+
+<!-- 6 -->
+<section class="slide" data-part="Content Strategy">
+  <p class="eyebrow">Strategy 2027+</p>
+  <h2>単発の作品展開から、“面の展開”へ</h2>
+  <p class="big-quote">テレビ × 映画 × イベント × YouTube × 流通 × IPコラボが<em>連動して動く「年間型IP」へ</em></p>
+  <aside class="notes-src" hidden>2027年度以降、ウルトラマンは単発の作品展開ではなく、テレビ、映画、イベント、YouTube、流通、IPコラボを連動させた“面の展開”に入ります。</aside>
+</section>
+
+<!-- 7 -->
+<section class="slide" data-part="Content Strategy">
+  <p class="eyebrow">Content Pillars</p>
+  <h2>3つの柱</h2>
+  <div class="grid g3">
+    <div class="cell"><span class="k">Pillar 1</span><h3>新テレビシリーズ</h3><p>継続性を重視した世界観・キャラクター展開</p></div>
+    <div class="cell"><span class="k">Pillar 2</span><h3>映画・特別編・ゼロ関連</h3><p>公開タイミング=販促・店頭の商機</p></div>
+    <div class="cell"><span class="k">Pillar 3</span><h3>YouTube/ギャラファイ</h3><p>歴代ヒーロー・怪獣を横断活用</p></div>
+  </div>
+  <div class="placeholder">🎬 <b>【素材1待ち — 本編の核】</b>2027年以降のコンテンツ全体像。7/14までに必ず回収。</div>
+  <aside class="notes-src" hidden>ここからは、2027年度以降のコンテンツ展開を3つの柱でご説明します。</aside>
+</section>
+
+<!-- 8 -->
+<section class="slide" data-part="Content Strategy">
+  <p class="eyebrow">Pillar 1 — TV Series</p>
+  <h2>追い続けたくなる構造へ</h2>
+  <ul class="points">
+    <li>キャラクターや世界観の<b>継続性をより重視</b></li>
+    <li>ファンが次の展開を追い続けたくなる構造を強化</li>
+  </ul>
+  <div class="placeholder">🖼 <b>【素材2・3・13待ち/開示確認】</b>制作部の開示可能コピー・世界観イメージ・シルエット等で差し替え</div>
+  <aside class="notes-src" hidden>2027年度以降のテレビシリーズでは、キャラクターや世界観の継続性をより重視し、ファンが次の展開を追い続けたくなる構造を強化していきます。<span class="warn">NG:「3年連続で同じ世界線」「テレビ局が変わるかも」には一切触れない。</span></aside>
+</section>
+
+<!-- 9 -->
+<section class="slide" data-part="Content Strategy">
+  <p class="eyebrow">Pillar 2 — Films</p>
+  <h2>映画の熱量を、売場とキャンペーンへ</h2>
+  <ul class="points">
+    <li>ゼロ関連映画・特別編・スピンオフ(開示可能範囲で)</li>
+    <li>映画館 × 配信 × イベント × 商品化の連動</li>
+    <li class="cy"><b>公開タイミング=販促・店頭キャンペーンの商機</b></li>
+  </ul>
+  <div class="placeholder">🎬 <b>【素材4・5待ち/開示確認】</b>ゼロ映画・特別編の開示可能情報</div>
+  <aside class="notes-src" hidden>映画館、配信、イベント、商品化を連動させ、作品接点を売場・キャンペーンに接続していきます。特に食品、外食、流通、アパレル、広告の皆さまには、映画のタイミングでご一緒できる企画をご用意していきます。</aside>
+</section>
+
+<!-- 10 -->
+<section class="slide" data-part="Content Strategy">
+  <p class="eyebrow">Pillar 3 — YouTube / Galaxy Fight</p>
+  <h2>歴代ヒーロー・怪獣を横断的に使える領域</h2>
+  <ul class="points">
+    <li>YouTube・配信で、コアファンにも新規層にも届く接点を再強化</li>
+    <li>単独ヒーローに限らず、<b>歴代ヒーロー・怪獣・人気キャラを横断活用</b></li>
+    <li>コレクション系・大人向け・怪獣デザイン商品との相性</li>
+  </ul>
+  <div class="placeholder">📺 <b>【素材6待ち/開示確認】</b>ギャラファイ/YouTube系の開示可能情報</div>
+  <aside class="notes-src" hidden>YouTube・配信領域では、幅広いヒーローとキャラクターを活用し、コアファンにも新規層にも届く接点を再強化します。ライセンシーの皆さまにとっては、歴代ヒーローや怪獣まで横断的に使える、企画自由度の高い領域です。</aside>
+</section>
+
+<!-- 11 -->
+<section class="slide" data-part="Content Strategy">
+  <p class="eyebrow">Real Touchpoints</p>
+  <h2>会いに来るファンがいる</h2>
+  <ul class="points">
+    <li>ウルサマ、ライブ、展覧会、ヒーローショー、グリーティング</li>
+    <li>リアル接点 → 物販・店舗送客・キャンペーン参加への転換実績</li>
+  </ul>
+  <div class="placeholder">📊 <b>【補強データ待ち】</b>満席率・稼働率・リピート率が強ければ「キャパ上限に近い」ことを示す(06のリスト)</div>
+  <aside class="notes-src" hidden>ウルトラマンには“直接会いに来るファン”がいます。この熱量あるリアル接点が、商品購買や店舗送客に直結します。</aside>
+</section>
+
+<!-- 12 -->
+<section class="slide" data-part="Content Strategy">
+  <p class="eyebrow">Marketing Calendar</p>
+  <h2>2027年度以降の商機カレンダー</h2>
+  <ul class="points">
+    <li>年間の山場(テレビ・映画・イベント・流通施策)を時系列で提示</li>
+    <li><b>「いつ盛り上がるか」「いつ企画に入れば間に合うか」</b>が読み取れることが絶対条件</li>
+    <li class="cy">商品開発リードタイムから逆算した「企画開始の目安」を明記</li>
+  </ul>
+  <div class="placeholder">📅 <b>【素材7待ち】</b>60周年マーケティングカレンダー+2027年以降版のビジュアルに差し替え</div>
+  <aside class="notes-src" hidden>ご覧の通り、2027年度以降は年間を通じて山場が続きます。商品開発のリードタイムを考えると、2027年度の山場に間に合わせるには、今から企画に入っていただくのがベストタイミングです。</aside>
+</section>
+
+<!-- 13 -->
+<section class="slide" data-part="Sales">
+  <div class="lamp" aria-hidden="true"></div>
+  <p class="eyebrow">Business Opportunities</p>
+  <h2>ここからは「皆さまの企画」の話です</h2>
+  <ul class="points">
+    <li>過去実績のご紹介ではなく、<b>今後ご一緒したい企画の募集</b>です</li>
+    <li>7カテゴリー別に、商機と企画例をご提案します</li>
+  </ul>
+  <aside class="notes-src" hidden>ここからは、各カテゴリーの皆さまと一緒に、具体的な商品化・販促企画を作っていきたいと考えています。「うちならこう作れる」という目線でご覧ください。</aside>
+</section>
+
+<!-- 14 -->
+<section class="slide" data-part="Sales">
+  <p class="eyebrow">Category 1 / 7 — 食品・飲料</p>
+  <h2>夏のウルトラマン接点を、親子向けキャンペーンに</h2>
+  <div class="cat-meta">
+    <div class="row"><span class="lbl">商機</span><span class="val">夏映画、ウルサマ、親子需要、店頭キャンペーン</span></div>
+    <div class="row"><span class="lbl">企画例</span><span class="val">限定パッケージ/購入特典/親子キャンペーン/映画半券連動/夏休み販促</span></div>
+  </div>
+  <p class="cat-msg">夏のウルトラマン接点を、親子向け食品・飲料キャンペーンに変えられます。</p>
+  <aside class="notes-src" hidden>映画・イベントの山場と店頭を連動させる企画を、ぜひご一緒させてください。</aside>
+</section>
+
+<!-- 15 -->
+<section class="slide" data-part="Sales">
+  <p class="eyebrow">Category 2 / 7 — 外食・カフェ</p>
+  <h2>来場・視聴の熱量を、店舗送客に</h2>
+  <div class="cat-meta">
+    <div class="row"><span class="lbl">商機</span><span class="val">イベント来場前後、映画公開期、ファミリー来店</span></div>
+    <div class="row"><span class="lbl">企画例</span><span class="val">コラボメニュー/ノベルティ/来店特典/ヒーローグリーティング連動</span></div>
+  </div>
+  <p class="cat-msg">来場・視聴の熱量を、店舗送客に接続できます。</p>
+  <aside class="notes-src" hidden>イベント会場の周辺送客や、映画公開期のファミリー需要の取り込みにご活用いただけます。</aside>
+</section>
+
+<!-- 16 -->
+<section class="slide" data-part="Sales">
+  <p class="eyebrow">Category 3 / 7 — アパレル</p>
+  <h2>大人が着られるデザインIP</h2>
+  <div class="cat-meta">
+    <div class="row"><span class="lbl">商機</span><span class="val">大人ファン、親子リンク、女性向け、ストリート、怪獣デザイン</span></div>
+    <div class="row"><span class="lbl">企画例</span><span class="val">Tシャツ/スウェット/バッグ/キャップ/親子コーデ/限定コレクション</span></div>
+  </div>
+  <p class="cat-msg">ウルトラマンは子ども向けだけでなく、大人が着られるデザインIPとして展開できます。</p>
+  <aside class="notes-src" hidden>怪獣デザインやストリート系まで展開できます。</aside>
+</section>
+
+<!-- 17 -->
+<section class="slide" data-part="Sales">
+  <p class="eyebrow">Category 4 / 7 — 雑貨・生活用品</p>
+  <h2>“毎日使う商品”に落とし込む</h2>
+  <div class="cat-meta">
+    <div class="row"><span class="lbl">商機</span><span class="val">日常接点、ギフト、オフィス、家庭用品</span></div>
+    <div class="row"><span class="lbl">企画例</span><span class="val">タンブラー/タオル/ステーショナリー/インテリア/ガジェット小物</span></div>
+  </div>
+  <p class="cat-msg">ウルトラマンを“毎日使う商品”に落とし込めます。</p>
+  <aside class="notes-src" hidden>ファンの日常に入り込む雑貨・生活用品は、継続的な売上を作れる領域です。</aside>
+</section>
+
+<!-- 18 -->
+<section class="slide" data-part="Sales">
+  <p class="eyebrow">Category 5 / 7 — 文具・教育・出版</p>
+  <h2>勇気・成長・仲間・正義を、学びの領域へ</h2>
+  <div class="cat-meta">
+    <div class="row"><span class="lbl">商機</span><span class="val">キッズ、親子、学習、読書、夏休み</span></div>
+    <div class="row"><span class="lbl">企画例</span><span class="val">学習帳/絵本/図鑑/ワークブック/読書キャンペーン</span></div>
+  </div>
+  <p class="cat-msg">勇気、成長、仲間、正義というテーマを教育・文具領域に広げられます。</p>
+  <aside class="notes-src" hidden>ウルトラマンのテーマは、教育・文具領域と本質的に相性が良いものです。</aside>
+</section>
+
+<!-- 19 -->
+<section class="slide" data-part="Sales">
+  <p class="eyebrow">Category 6 / 7 — 流通・小売</p>
+  <h2>商品だけでなく、売場をつくる</h2>
+  <div class="cat-meta">
+    <div class="row"><span class="lbl">商機</span><span class="val">ウルトラマート、POPUP、量販店、専門店、売場ジャック</span></div>
+    <div class="row"><span class="lbl">企画例</span><span class="val">専用棚/期間限定売場/購入特典/スタンプラリー/限定商品</span></div>
+  </div>
+  <p class="cat-msg">商品を作るだけでなく、売場を作る準備があります。</p>
+  <aside class="notes-src" hidden>ウルトラマートやPOPUPと連動した売場企画を、流通・小売の皆さまとご一緒したいと考えています。</aside>
+</section>
+
+<!-- 20 -->
+<section class="slide" data-part="Sales">
+  <p class="eyebrow">Category 7 / 7 — 広告代理店・SP</p>
+  <h2>ウルトラマンを、広告・販促装置として</h2>
+  <div class="cat-meta">
+    <div class="row"><span class="lbl">商機</span><span class="val">企業キャンペーン、地域創生、ファミリー向け販促、周年施策</span></div>
+    <div class="row"><span class="lbl">企画例</span><span class="val">企業タイアップ/店頭キャンペーン/交通広告/SNSキャンペーン/イベント協賛</span></div>
+  </div>
+  <p class="cat-msg">クライアント課題に合わせて、ウルトラマンを広告・販促装置として活用できます。</p>
+  <aside class="notes-src" hidden>ファミリー、地域、周年など、課題起点でのご相談を歓迎します。</aside>
+</section>
+
+<!-- 21 -->
+<section class="slide" data-part="Collabs & Retail">
+  <p class="eyebrow">IP Collaborations — Now</p>
+  <h2>60周年、多様なコラボがすでに動いている</h2>
+  <div class="grid g3">
+    <div class="cell"><h3>モフサンド</h3><p>【素材8待ち】実績ビジュアル</p></div>
+    <div class="cell"><h3>ベイブレード</h3><p>【素材8待ち】実績ビジュアル</p></div>
+    <div class="cell"><h3>その他既存コラボ</h3><p>商品化・イベント・流通施策</p></div>
+  </div>
+  <aside class="notes-src" hidden>60周年では、異なるファン層・異なる売場に向けて、すでに多様なコラボが動いています。<span class="warn">※実績(このスライド)と今後の機会(次)を必ず分ける。</span></aside>
+</section>
+
+<!-- 22 -->
+<section class="slide" data-part="Collabs & Retail">
+  <p class="eyebrow">IP Collaborations — Next</p>
+  <h2>ここからは、一緒に商品化・売場化したい領域</h2>
+  <ul class="points">
+    <li>サンリオコラボ <b>【開示確認後に表現確定】</b></li>
+    <li>ゼロ映画連動/新テレビシリーズ連動</li>
+    <li>YouTube・ギャラファイ系</li>
+    <li class="cy">ウルトラマート・流通展開</li>
+  </ul>
+  <aside class="notes-src" hidden>ここからは、皆さまと一緒に商品化・売場化していきたい領域です。(サンリオ開示可の場合)サンリオコラボ実現時には、両IPの魅力を活かした商品化・売場展開をライセンシーの皆さまと広げていきます。</aside>
+</section>
+
+<!-- 23 -->
+<section class="slide" data-part="Collabs & Retail">
+  <p class="eyebrow">Ultra Mart & Retail</p>
+  <h2>売る場所は、円谷側でも増やしていく</h2>
+  <ul class="points">
+    <li>ウルトラマートの方向性/POPUP展開</li>
+    <li>量販店・専門店での売場展開/映画・イベント期の店頭施策</li>
+    <li>既存商品の売場事例/今後募集したい商品カテゴリー</li>
+  </ul>
+  <div class="placeholder">🏬 <b>【素材10待ち】</b>ウルトラマート素材・売場事例写真</div>
+  <aside class="notes-src" hidden>ウルトラマンの商品を売る場所を、円谷側でも増やしていきます。だから、商品化したものを展開できる場が広がっています。「作っても売る場所があるのか」という不安には、売場ごとお応えします。</aside>
+</section>
+
+<!-- 24 -->
+<section class="slide" data-part="Style Guide">
+  <p class="eyebrow">Style Guide Strategy</p>
+  <h2>「作りたい」を「作れる」に</h2>
+  <table class="tbl">
+    <tr><th>ガイド</th><th>内容</th></tr>
+    <tr><td>ブランドガイド</td><td>ロゴ、世界観、コピー、NG表現</td></tr>
+    <tr><td>キャラクターガイド</td><td>ヒーロー、怪獣、歴代キャラ、新作関連キャラ</td></tr>
+    <tr><td>カテゴリー別ガイド</td><td>食品、アパレル、雑貨、文具、広告、流通</td></tr>
+    <tr><td>シーズン別ガイド</td><td>映画期、夏休み、年末年始、周年施策</td></tr>
+  </table>
+  <aside class="notes-src" hidden>今回のコンテンツ展開に合わせて、ライセンシーの皆さまがすぐ企画化できるよう、カテゴリー別のスタイルガイドと素材提供体制を整えていきます。「素材がある」ではなく「企画しやすいように、カテゴリー別に使える形にしてある」——ここを目指しています。</aside>
+</section>
+
+<!-- 25 -->
+<section class="slide" data-part="Style Guide">
+  <p class="eyebrow">Materials & Approval Flow</p>
+  <h2>企画から承認まで、迷わない</h2>
+  <ul class="points">
+    <li>商品化テンプレート:パッケージ例/POP例/販促例/SNS例</li>
+    <li>監修フロー:<b>企画提出 → 初稿確認 → 修正 → 承認</b>(標準リードタイム明記)</li>
+    <li class="cy">開示区分:当日開示/NDA後開示/個別商談時開示</li>
+  </ul>
+  <div class="placeholder">📄 <b>【素材11・12待ち】</b>スタイルガイド進捗・監修フロー資料</div>
+  <aside class="notes-src" hidden>企画提出から承認までの流れを標準化しています。個別商談では、NDAのうえでさらに詳細な素材をご覧いただけます。</aside>
+</section>
+
+<!-- 26 -->
+<section class="slide" data-part="Closing">
+  <p class="eyebrow">Open Call</p>
+  <h2>いま、募集しています</h2>
+  <div class="grid g2" style="font-size:.92em;">
+    <div class="cell"><h3>食品・飲料</h3><p>夏の親子キャンペーン/映画連動販促</p></div>
+    <div class="cell"><h3>外食・カフェ</h3><p>コラボメニュー/送客連動企画</p></div>
+    <div class="cell"><h3>アパレル</h3><p>大人向け・親子リンクコレクション</p></div>
+    <div class="cell"><h3>雑貨・生活用品</h3><p>日常使いの定番商品</p></div>
+    <div class="cell"><h3>文具・教育・出版</h3><p>学び×ウルトラマン企画</p></div>
+    <div class="cell"><h3>流通・小売/広告・SP</h3><p>売場ジャック/企業タイアップ/地域・周年施策</p></div>
+  </div>
+  <aside class="notes-src" hidden>以上のテーマで、いま企画を募集しています。「この枠に自社が入れるか」という段階からのご相談で構いません。</aside>
+</section>
+
+<!-- 27 -->
+<section class="slide" data-part="Closing">
+  <p class="eyebrow">Next Step</p>
+  <h2>今日から動けます</h2>
+  <div class="grid g2">
+    <div class="cell" style="display:flex;align-items:center;justify-content:center;min-height:180px;">
+      <div style="text-align:center;color:var(--dim);"><div style="font-size:3em;">⬛</div>【QRコード】個別商談予約<br>(希望カテゴリー選択式)</div>
+    </div>
+    <div class="cell">
+      <ul class="points" style="font-size:.9em;">
+        <li>配布資料に相談窓口・連絡先を記載</li>
+        <li>NDA締結後、開示可能な詳細素材あり</li>
+        <li class="cy">カテゴリーごとに担当がついてご相談を承ります</li>
+      </ul>
+    </div>
+  </div>
+  <aside class="notes-src" hidden>お手元の資料とこちらのQRコードから、個別商談をご予約いただけます。<span class="warn">運営:QRは後方からも読めるサイズで最低30秒表示。次スライドでも画面隅に残す。</span></aside>
+</section>
+
+<!-- 28 -->
+<section class="slide" data-part="Closing">
+  <div class="lamp" aria-hidden="true"></div>
+  <p class="eyebrow">Closing</p>
+  <h2 style="max-width:20em;">今、企画に入る企業が、<br>2027年度以降のウルトラマンの<br>売場とキャンペーンを先に作る。</h2>
+  <p class="sub" style="font-size:clamp(1.1rem,2.6vw,1.6rem); color:var(--ink); font-weight:650; margin-top:1.2em;">次の売場を、いま一緒につくる。</p>
+  <aside class="notes-src" hidden>今、企画に入る企業が、2027年度以降のウルトラマンの売場とキャンペーンを先に作ることができます。ぜひ本日を起点に、個別にご相談ください。本日はありがとうございました。</aside>
+</section>
+
+</div>
+
+<div class="nav-zone prev" role="button" tabindex="0" aria-label="前のスライド"></div>
+<div class="nav-zone next" role="button" tabindex="0" aria-label="次のスライド"></div>
+
+<div class="hud">
+  <span class="part" id="hudPart">Opening</span>
+  <span id="hudCount">1 / 28</span>
+</div>
+<div class="notes" id="notes"><span class="nlabel">Speaker Notes — N で閉じる</span><div id="notesBody"></div></div>
+
+<script>
+(function () {
+  var slides = Array.prototype.slice.call(document.querySelectorAll('section.slide'));
+  var bar = document.getElementById('bar');
+  var hudCount = document.getElementById('hudCount');
+  var hudPart = document.getElementById('hudPart');
+  var notes = document.getElementById('notes');
+  var notesBody = document.getElementById('notesBody');
+  var i = Math.min(Math.max(parseInt(location.hash.slice(1), 10) || 1, 1), slides.length) - 1;
+
+  function show(n) {
+    i = Math.min(Math.max(n, 0), slides.length - 1);
+    slides.forEach(function (s, j) { s.classList.toggle('active', j === i); });
+    bar.style.width = ((i + 1) / slides.length * 100) + '%';
+    hudCount.textContent = (i + 1) + ' / ' + slides.length;
+    hudPart.textContent = slides[i].getAttribute('data-part') || '';
+    var src = slides[i].querySelector('.notes-src');
+    notesBody.innerHTML = src ? src.innerHTML : '(ノートなし)';
+    history.replaceState(null, '', '#' + (i + 1));
+  }
+  function next() { show(i + 1); }
+  function prev() { show(i - 1); }
+
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') { e.preventDefault(); next(); }
+    else if (e.key === 'ArrowLeft' || e.key === 'PageUp') { e.preventDefault(); prev(); }
+    else if (e.key === 'Home') { show(0); }
+    else if (e.key === 'End') { show(slides.length - 1); }
+    else if (e.key.toLowerCase() === 'n') { notes.classList.toggle('show'); }
+    else if (e.key.toLowerCase() === 'f') {
+      if (document.fullscreenElement) { document.exitFullscreen(); }
+      else { document.documentElement.requestFullscreen && document.documentElement.requestFullscreen(); }
+    }
+  });
+  document.querySelector('.nav-zone.next').addEventListener('click', next);
+  document.querySelector('.nav-zone.prev').addEventListener('click', prev);
+  document.querySelector('.nav-zone.next').addEventListener('keydown', function (e) { if (e.key === 'Enter') next(); });
+  document.querySelector('.nav-zone.prev').addEventListener('keydown', function (e) { if (e.key === 'Enter') prev(); });
+  show(i);
+})();
+</script>
