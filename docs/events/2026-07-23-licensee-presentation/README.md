@@ -61,6 +61,7 @@
 | [05-material-request-email.md](05-material-request-email.md) | 制作部・関係部署への素材依頼メール(送信可能版) | 主担当 |
 | [06-metrics-and-styleguide.md](06-metrics-and-styleguide.md) | “100万人”の再定義・スタイルガイド/監修フローの見せ方 | 資料作成/登壇者 |
 | [07-task-schedule.md](07-task-schedule.md) | 7/8→7/23 日次逆算タスク表・リスク管理表 | 主担当/PM |
+| [08-slide-draft.md](08-slide-draft.md) | スライドドラフト全28枚(コピー・スピーカーノート・素材依存表) | 資料作成チーム/登壇者 |
 
 ---
 
