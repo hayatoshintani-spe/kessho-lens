@@ -62,6 +62,10 @@
 | [06-metrics-and-styleguide.md](06-metrics-and-styleguide.md) | “100万人”の再定義・スタイルガイド/監修フローの見せ方 | 資料作成/登壇者 |
 | [07-task-schedule.md](07-task-schedule.md) | 7/8→7/23 日次逆算タスク表・リスク管理表 | 主担当/PM |
 | [08-slide-draft.md](08-slide-draft.md) | スライドドラフト全28枚(コピー・スピーカーノート・素材依存表) | 資料作成チーム/登壇者 |
+| [09-materials-master-list.md](09-materials-master-list.md) | 必要資料マスターリスト(依頼先別・全40項目・期限付き) | 主担当/PM |
+| [deck.html](deck.html) | 投影確認用スライドデッキ(←→送り/Nノート/F全画面) | 登壇者/確認会 |
+| [event-brief.html](event-brief.html) | 1枚もの運営ブリーフ(社内合意形成用) | 全員 |
+| [materials-checklist.html](materials-checklist.html) | 資料回収チェックリスト(進捗保存機能付き) | 主担当/PM |
 
 ---
 

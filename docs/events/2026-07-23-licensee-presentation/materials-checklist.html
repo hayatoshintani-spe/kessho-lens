@@ -1,0 +1,227 @@
+<title>7/23プレゼン 必要資料チェックリスト</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  :root {
+    --bg: #0c1226; --bg2: #121a35; --panel: #17203fcc; --line: #29355e;
+    --ink: #eef2fb; --sub: #a9b3cf; --dim: #77829f;
+    --red: #ff3b34; --red2: #ff6a52; --cyan: #37c6ec; --gold: #f4c04e; --good: #43c9a0;
+    --shadow: 0 16px 44px -20px rgba(0,0,0,.65);
+    --font-jp: "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Yu Gothic", "YuGothic", "Noto Sans JP", "Meiryo", sans-serif;
+    --font-mono: ui-monospace, "SF Mono", "Cascadia Mono", "Roboto Mono", Menlo, Consolas, monospace;
+  }
+  @media (prefers-color-scheme: light) {
+    :root { --bg:#eef1f8; --bg2:#e3e8f4; --panel:#ffffffd9; --line:#d2d9e8;
+      --ink:#141b30; --sub:#3d4767; --dim:#6b7590; --shadow:0 14px 36px -22px rgba(30,45,90,.3); }
+  }
+  :root[data-theme="dark"] { --bg:#0c1226; --bg2:#121a35; --panel:#17203fcc; --line:#29355e;
+    --ink:#eef2fb; --sub:#a9b3cf; --dim:#77829f; --shadow:0 16px 44px -20px rgba(0,0,0,.65); }
+  :root[data-theme="light"] { --bg:#eef1f8; --bg2:#e3e8f4; --panel:#ffffffd9; --line:#d2d9e8;
+    --ink:#141b30; --sub:#3d4767; --dim:#6b7590; --shadow:0 14px 36px -22px rgba(30,45,90,.3); }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; font-family: var(--font-jp); color: var(--ink); line-height: 1.7;
+    background:
+      radial-gradient(1000px 600px at 82% -8%, rgba(55,198,236,.09), transparent 60%),
+      radial-gradient(800px 520px at 2% 2%, rgba(255,59,52,.09), transparent 55%),
+      linear-gradient(180deg, var(--bg), var(--bg2));
+    background-attachment: fixed;
+  }
+  .wrap { max-width: 880px; margin: 0 auto; padding: 44px 20px 90px; }
+
+  .eyebrow { font-family: var(--font-mono); font-size: .7rem; letter-spacing: .32em;
+    text-transform: uppercase; color: var(--cyan); margin: 0 0 14px; }
+  h1 { font-size: clamp(1.5rem, 4.4vw, 2.3rem); margin: 0 0 8px; font-weight: 800; letter-spacing: -.01em; text-wrap: balance; }
+  .lede { color: var(--sub); margin: 0; max-width: 60ch; font-size: .95rem; }
+
+  .overall {
+    margin-top: 24px; padding: 18px 20px; border: 1px solid var(--line); border-radius: 14px;
+    background: var(--panel); backdrop-filter: blur(8px); box-shadow: var(--shadow);
+    display: flex; align-items: center; gap: 18px; flex-wrap: wrap;
+  }
+  .overall .pct { font-family: var(--font-mono); font-variant-numeric: tabular-nums;
+    font-size: 1.9rem; font-weight: 700; color: var(--red2); min-width: 4.2ch; }
+  .obar { flex: 1 1 200px; height: 10px; border-radius: 99px; background: color-mix(in srgb, var(--line) 60%, transparent); overflow: hidden; }
+  .obar i { display: block; height: 100%; width: 0; border-radius: 99px;
+    background: linear-gradient(90deg, var(--red), var(--gold), var(--good)); transition: width .3s ease; }
+  .overall .meta { font-size: .78rem; color: var(--dim); font-family: var(--font-mono); }
+
+  section { margin-top: 34px; }
+  .sec-head { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; margin-bottom: 12px; }
+  .sec-head h2 { font-size: 1.12rem; margin: 0; font-weight: 720; }
+  .badge { font-family: var(--font-mono); font-size: .64rem; letter-spacing: .1em;
+    padding: 2px 9px; border-radius: 999px; border: 1px solid var(--line); color: var(--dim); }
+  .badge.due { color: var(--red2); border-color: var(--red2); }
+  .badge.due17 { color: var(--gold); border-color: var(--gold); }
+  .sec-count { margin-left: auto; font-family: var(--font-mono); font-size: .74rem; color: var(--dim); font-variant-numeric: tabular-nums; }
+  .sec-note { font-size: .8rem; color: var(--dim); margin: 0 0 10px; }
+
+  ul.list { list-style: none; margin: 0; padding: 0; border: 1px solid var(--line);
+    border-radius: 14px; overflow: hidden; background: var(--panel); box-shadow: var(--shadow); }
+  ul.list li { border-top: 1px solid var(--line); }
+  ul.list li:first-child { border-top: 0; }
+  label.item { display: flex; gap: 14px; align-items: flex-start; padding: 13px 16px; cursor: pointer; }
+  label.item:hover { background: color-mix(in srgb, var(--cyan) 6%, transparent); }
+  .cb { flex: none; width: 21px; height: 21px; margin-top: 3px; border-radius: 6px;
+    border: 2px solid var(--dim); display: grid; place-items: center; transition: all .15s ease; }
+  input[type=checkbox] { position: absolute; opacity: 0; width: 1px; height: 1px; }
+  input[type=checkbox]:focus-visible + .cb { outline: 2px solid var(--cyan); outline-offset: 2px; }
+  input[type=checkbox]:checked + .cb { background: var(--good); border-color: var(--good); }
+  input[type=checkbox]:checked + .cb::after { content: "✓"; color: #06251c; font-weight: 800; font-size: .8rem; }
+  .item .tx { flex: 1; }
+  .item .t { font-size: .92rem; font-weight: 600; }
+  .item .t .star { color: var(--red2); font-size: .8em; letter-spacing: .1em; margin-left: 6px; }
+  .item .d { font-size: .76rem; color: var(--dim); }
+  input[type=checkbox]:checked ~ .tx .t { text-decoration: line-through; color: var(--dim); font-weight: 500; }
+  .item .who { flex: none; font-family: var(--font-mono); font-size: .64rem; color: var(--cyan);
+    border: 1px solid var(--line); border-radius: 999px; padding: 2px 8px; margin-top: 4px; white-space: nowrap; }
+
+  .fallback { margin-top: 40px; padding: 16px 20px; border-left: 4px solid var(--gold);
+    background: var(--panel); border-radius: 0 12px 12px 0; font-size: .88rem; color: var(--sub); }
+  .fallback b { color: var(--ink); }
+  footer { margin-top: 40px; color: var(--dim); font-size: .76rem; border-top: 1px solid var(--line); padding-top: 16px; }
+  .reset { background: none; border: 1px solid var(--line); color: var(--dim); font-family: var(--font-mono);
+    font-size: .7rem; border-radius: 8px; padding: 5px 12px; cursor: pointer; }
+  .reset:hover { color: var(--red2); border-color: var(--red2); }
+  .reset:focus-visible { outline: 2px solid var(--cyan); outline-offset: 2px; }
+</style>
+
+<div class="wrap">
+  <p class="eyebrow">7/23 Ultraman Licensee Presentation</p>
+  <h1>必要資料チェックリスト</h1>
+  <p class="lede">集める資料17点+補強データ11点+制作物7点+決定事項5点=<b>計40項目</b>。チェック状態はこのブラウザに自動保存されます。原本は kessho-lens リポジトリの 09-materials-master-list.md。</p>
+
+  <div class="overall">
+    <span class="pct" id="pct">0%</span>
+    <div class="obar"><i id="obar"></i></div>
+    <span class="meta" id="ocount">0 / 40 完了</span>
+  </div>
+
+  <section data-sec="A">
+    <div class="sec-head"><h2>A. 制作部/IP戦略</h2><span class="badge due">期限 7/14 10:00</span><span class="sec-count"></span></div>
+    <p class="sec-note">最重要ブロック。★★★はスライドの核。回収時に開示区分(当日/上映のみ/NDA後/不可)も必ず確認。</p>
+    <ul class="list">
+      <li><label class="item"><input type="checkbox" id="a1"><span class="cb"></span><span class="tx"><span class="t">2027年以降のコンテンツ全体像<span class="star">★★★</span></span><span class="d">スライド7(本編の核)・動画</span></span><span class="who">制作部/IP</span></label></li>
+      <li><label class="item"><input type="checkbox" id="a2"><span class="cb"></span><span class="tx"><span class="t">新テレビシリーズの社外開示可能情報<span class="star">★★★</span></span><span class="d">スライド8</span></span><span class="who">制作部</span></label></li>
+      <li><label class="item"><input type="checkbox" id="a3"><span class="cb"></span><span class="tx"><span class="t">世界観・キャラクター方針の開示可能コピー<span class="star">★★★</span></span><span class="d">スライド8「継続性ある展開」の説明</span></span><span class="who">制作部</span></label></li>
+      <li><label class="item"><input type="checkbox" id="a4"><span class="cb"></span><span class="tx"><span class="t">ゼロ映画関連の開示可能情報<span class="star">★★★</span></span><span class="d">スライド9 商品化・販促タイミング提示</span></span><span class="who">制作部</span></label></li>
+      <li><label class="item"><input type="checkbox" id="a5"><span class="cb"></span><span class="tx"><span class="t">特別編・スピンオフ系の開示可能情報</span><span class="d">スライド9 映画以外の接点</span></span><span class="who">制作部</span></label></li>
+      <li><label class="item"><input type="checkbox" id="a6"><span class="cb"></span><span class="tx"><span class="t">ギャラファイ/YouTube系の開示可能情報</span><span class="d">スライド10 コアファン向け商品化機会</span></span><span class="who">制作部</span></label></li>
+      <li><label class="item"><input type="checkbox" id="a7"><span class="cb"></span><span class="tx"><span class="t">(推奨)新作ラフスケッチ・シルエット・世界観イメージ</span><span class="d">スライド8・期待感の演出</span></span><span class="who">制作部</span></label></li>
+      <li><label class="item"><input type="checkbox" id="a8"><span class="cb"></span><span class="tx"><span class="t">(推奨)AI動画・コンセプトムービー</span><span class="d">動画・新作世界観の視覚化</span></span><span class="who">制作部</span></label></li>
+    </ul>
+  </section>
+
+  <section data-sec="B">
+    <div class="sec-head"><h2>B. マーケ/営業</h2><span class="badge due">期限 7/14 10:00</span><span class="sec-count"></span></div>
+    <ul class="list">
+      <li><label class="item"><input type="checkbox" id="b1"><span class="cb"></span><span class="tx"><span class="t">60周年マーケティングカレンダー<span class="star">★★★</span></span><span class="d">動画の軸・スライド12</span></span><span class="who">マーケ/営業</span></label></li>
+      <li><label class="item"><input type="checkbox" id="b2"><span class="cb"></span><span class="tx"><span class="t">既存コラボ実績素材(モフサンド、ベイブレード等)<span class="star">★★★</span></span><span class="d">スライド4・21・動画</span></span><span class="who">営業</span></label></li>
+      <li><label class="item"><input type="checkbox" id="b3"><span class="cb"></span><span class="tx"><span class="t">(推奨)映画・イベント連動販促案</span><span class="d">スライド9・20 広告代理店・流通向け</span></span><span class="who">マーケ</span></label></li>
+      <li><label class="item"><input type="checkbox" id="b4"><span class="cb"></span><span class="tx"><span class="t">(推奨)海外展開素材</span><span class="d">動画のグローバル感</span></span><span class="who">営業</span></label></li>
+    </ul>
+  </section>
+
+  <section data-sec="C">
+    <div class="sec-head"><h2>C. IP/法務/営業</h2><span class="badge due">期限 7/14 10:00</span><span class="sec-count"></span></div>
+    <ul class="list">
+      <li><label class="item"><input type="checkbox" id="c1"><span class="cb"></span><span class="tx"><span class="t">サンリオコラボの発表可能範囲<span class="star">★★★</span></span><span class="d">スライド22 目玉候補。「決定」ではなく参加余地を見せる表現で</span></span><span class="who">IP/法務</span></label></li>
+    </ul>
+  </section>
+
+  <section data-sec="D">
+    <div class="sec-head"><h2>D. 流通/営業</h2><span class="badge due">期限 7/14 10:00</span><span class="sec-count"></span></div>
+    <ul class="list">
+      <li><label class="item"><input type="checkbox" id="d1"><span class="cb"></span><span class="tx"><span class="t">ウルトラマート素材(方向性・売場事例写真)</span><span class="d">スライド23・動画</span></span><span class="who">流通/営業</span></label></li>
+    </ul>
+  </section>
+
+  <section data-sec="E">
+    <div class="sec-head"><h2>E. スタイルガイド関連</h2><span class="badge due17">期限 7/17</span><span class="sec-count"></span></div>
+    <ul class="list">
+      <li><label class="item"><input type="checkbox" id="e1"><span class="cb"></span><span class="tx"><span class="t">スタイルガイド進捗(項目一覧でも可)<span class="star">★★★</span></span><span class="d">スライド24 商品化の実行可能性</span></span><span class="who">井上さん側</span></label></li>
+      <li><label class="item"><input type="checkbox" id="e2"><span class="cb"></span><span class="tx"><span class="t">監修フロー資料(企画提出→承認+標準リードタイム)<span class="star">★★★</span></span><span class="d">スライド25 商談導線の安心材料</span></span><span class="who">ライセンス管理</span></label></li>
+      <li><label class="item"><input type="checkbox" id="e3"><span class="cb"></span><span class="tx"><span class="t">(推奨)店頭モック・カテゴリー別商品モック</span><span class="d">会場展示・商談化の促進</span></span><span class="who">営業/制作管理</span></label></li>
+    </ul>
+  </section>
+
+  <section data-sec="F">
+    <div class="sec-head"><h2>F. “100万人”補強データ</h2><span class="badge due">期限 7/14 10:00</span><span class="sec-count"></span></div>
+    <p class="sec-note">スライド5・11の裏付け。揃った項目だけで語り方を決める。満席率・稼働率が強ければ「キャパ上限に近い」表現へ。</p>
+    <ul class="list">
+      <li><label class="item"><input type="checkbox" id="f1"><span class="cb"></span><span class="tx"><span class="t">有料イベント来場者数</span></span><span class="who">イベント運営</span></label></li>
+      <li><label class="item"><input type="checkbox" id="f2"><span class="cb"></span><span class="tx"><span class="t">フリーショー来場推計</span></span><span class="who">イベント運営</span></label></li>
+      <li><label class="item"><input type="checkbox" id="f3"><span class="cb"></span><span class="tx"><span class="t">グリーティング・撮影会参加数</span></span><span class="who">イベント運営</span></label></li>
+      <li><label class="item"><input type="checkbox" id="f4"><span class="cb"></span><span class="tx"><span class="t">会場稼働率</span></span><span class="who">イベント運営</span></label></li>
+      <li><label class="item"><input type="checkbox" id="f5"><span class="cb"></span><span class="tx"><span class="t">満席率</span></span><span class="who">イベント運営</span></label></li>
+      <li><label class="item"><input type="checkbox" id="f6"><span class="cb"></span><span class="tx"><span class="t">物販購買率</span></span><span class="who">物販</span></label></li>
+      <li><label class="item"><input type="checkbox" id="f7"><span class="cb"></span><span class="tx"><span class="t">客単価</span></span><span class="who">物販</span></label></li>
+      <li><label class="item"><input type="checkbox" id="f8"><span class="cb"></span><span class="tx"><span class="t">リピート率</span></span><span class="who">イベント運営</span></label></li>
+      <li><label class="item"><input type="checkbox" id="f9"><span class="cb"></span><span class="tx"><span class="t">抽選倍率・満席による機会損失</span></span><span class="who">イベント運営</span></label></li>
+      <li><label class="item"><input type="checkbox" id="f10"><span class="cb"></span><span class="tx"><span class="t">地域展開数</span></span><span class="who">イベント運営</span></label></li>
+      <li><label class="item"><input type="checkbox" id="f11"><span class="cb"></span><span class="tx"><span class="t">年間実施回数</span></span><span class="who">イベント運営</span></label></li>
+    </ul>
+  </section>
+
+  <section data-sec="G">
+    <div class="sec-head"><h2>G. 自チームで制作するもの</h2><span class="badge">各期限</span><span class="sec-count"></span></div>
+    <ul class="list">
+      <li><label class="item"><input type="checkbox" id="g1"><span class="cb"></span><span class="tx"><span class="t">修正版オープニング動画(マーケティングカレンダー型)</span><span class="d">〜7/21リハ。依存:A-1、B-1、B-2、D-1。発注ブリーフは04</span></span><span class="who">動画会社</span></label></li>
+      <li><label class="item"><input type="checkbox" id="g2"><span class="cb"></span><span class="tx"><span class="t">スライド本体28枚(初稿)</span><span class="d">〜7/16。ドラフト済(08/deck.html)。確認会の決定を反映</span></span><span class="who">自チーム</span></label></li>
+      <li><label class="item"><input type="checkbox" id="g3"><span class="cb"></span><span class="tx"><span class="t">商談予約QR+予約フォーム(希望カテゴリー選択式)</span><span class="d">〜7/17。スライド27・配布資料に掲載</span></span><span class="who">自チーム</span></label></li>
+      <li><label class="item"><input type="checkbox" id="g4"><span class="cb"></span><span class="tx"><span class="t">配布資料(持ち帰って社内説明に使える体裁)</span><span class="d">〜7/18入稿。依存:スライド確定</span></span><span class="who">自チーム</span></label></li>
+      <li><label class="item"><input type="checkbox" id="g5"><span class="cb"></span><span class="tx"><span class="t">企画募集テーマ一覧(配布用)</span><span class="d">〜7/16。03のカテゴリーシートから作成</span></span><span class="who">自チーム</span></label></li>
+      <li><label class="item"><input type="checkbox" id="g6"><span class="cb"></span><span class="tx"><span class="t">MC台本・接続台本の確定版</span><span class="d">〜7/21リハ。ドラフト済(01)。登壇者確定後に固定</span></span><span class="who">自チーム/MC</span></label></li>
+      <li><label class="item"><input type="checkbox" id="g7"><span class="cb"></span><span class="tx"><span class="t">来場者フォローメール文面(当日夜送信用)</span><span class="d">〜7/22。資料+商談導線の再掲</span></span><span class="who">自チーム</span></label></li>
+    </ul>
+  </section>
+
+  <section data-sec="H">
+    <div class="sec-head"><h2>H. 決めること(7/14 確認会)</h2><span class="badge due">期限 7/14 10:00</span><span class="sec-count"></span></div>
+    <ul class="list">
+      <li><label class="item"><input type="checkbox" id="h1"><span class="cb"></span><span class="tx"><span class="t">全素材の開示区分の確定</span><span class="d">当日開示/上映のみ/NDA後/個別商談時/不可</span></span><span class="who">確認会</span></label></li>
+      <li><label class="item"><input type="checkbox" id="h2"><span class="cb"></span><span class="tx"><span class="t">登壇者の確定と、各登壇者が話してよい範囲</span><span class="d">主催挨拶/コンテンツ戦略/営業戦略/実務導線/スタイルガイド</span></span><span class="who">確認会</span></label></li>
+      <li><label class="item"><input type="checkbox" id="h3"><span class="cb"></span><span class="tx"><span class="t">NG表現の最終確認</span><span class="d">02のNG表現集(「3年連続同世界線」「テレビ局変更」等)</span></span><span class="who">確認会</span></label></li>
+      <li><label class="item"><input type="checkbox" id="h4"><span class="cb"></span><span class="tx"><span class="t">委員会・放送局・配信・権利元確認が必要な項目の洗い出し</span></span><span class="who">確認会</span></label></li>
+      <li><label class="item"><input type="checkbox" id="h5"><span class="cb"></span><span class="tx"><span class="t">サンリオの言及レベル(触れない/示唆/発表)</span></span><span class="who">確認会</span></label></li>
+    </ul>
+  </section>
+
+  <div class="fallback"><b>退避策:</b>7/14までに揃わないスライドは、安全で強い定型表現+実績ビジュアルで構成し、詳細は「個別商談時にご案内」へ誘導。450人の前で空約束をするより、商談導線に落とす方が安全。</div>
+
+  <footer>
+    <button class="reset" id="reset" type="button">チェックをすべてリセット</button>
+    <span style="float:right">円谷プロダクション 7/23 ライセンシー・プレゼンテーション</span>
+  </footer>
+</div>
+
+<script>
+(function () {
+  var KEY = 'ultraman-723-materials-v1';
+  var boxes = Array.prototype.slice.call(document.querySelectorAll('input[type=checkbox]'));
+  var saved = {};
+  try { saved = JSON.parse(localStorage.getItem(KEY) || '{}'); } catch (e) { saved = {}; }
+  boxes.forEach(function (b) { b.checked = !!saved[b.id]; b.addEventListener('change', update); });
+
+  function update() {
+    var state = {}, done = 0;
+    boxes.forEach(function (b) { state[b.id] = b.checked; if (b.checked) done++; });
+    try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {}
+    var pct = Math.round(done / boxes.length * 100);
+    document.getElementById('pct').textContent = pct + '%';
+    document.getElementById('obar').style.width = pct + '%';
+    document.getElementById('ocount').textContent = done + ' / ' + boxes.length + ' 完了';
+    document.querySelectorAll('section[data-sec]').forEach(function (sec) {
+      var bs = sec.querySelectorAll('input[type=checkbox]');
+      var d = sec.querySelectorAll('input[type=checkbox]:checked').length;
+      sec.querySelector('.sec-count').textContent = d + ' / ' + bs.length;
+    });
+  }
+  document.getElementById('reset').addEventListener('click', function () {
+    if (!confirm('すべてのチェックをリセットしますか?')) return;
+    boxes.forEach(function (b) { b.checked = false; });
+    update();
+  });
+  update();
+})();
+</script>
