@@ -1,12 +1,14 @@
 #!/usr/bin/env python3
-"""7/23 ULTRAMAN LICENSEE PRESENTATION — デッキ(.pptx)生成スクリプト v4.
+"""ULTRAMAN BUSINESS PARTNERS MEETING 2026 — デッキ生成スクリプト v5.
 
-コンセプト:「発表会」ではなく「2027商機の募集開始イベント」。
-聞かせる会ではなく、手を挙げさせる会。全27枚+カテゴリー別企画10本。
-社内標準フォーマット(白背景・ネイビー基調・ステートメント型タイトル)準拠。
+公式テンプレート(template_PARTNERS_MEETING2026.pptx:濃紺黒背景・
+右上ULTRAMAN 60thロゴ・右下ページ番号)を土台に、21枚構成で生成する。
+設計書は 11-presentation-spec.md。コンセプト:商談起点イベント。
+1スライド1メッセージ/ビジュアル中心/全スライド下部に強いコピー。
 
     python3 generate_pptx.py
 """
+import copy
 from pptx import Presentation
 from pptx.util import Inches, Pt, Emu
 from pptx.dml.color import RGBColor
@@ -15,32 +17,36 @@ from pptx.enum.shapes import MSO_SHAPE
 from pptx.enum.lang import MSO_LANGUAGE_ID
 from pptx.oxml.ns import qn
 
-# ---- design tokens(ネイビー基調)----
-WHITE  = RGBColor(0xFF, 0xFF, 0xFF)
-INK    = RGBColor(0x28, 0x2D, 0x38)
-BODY   = RGBColor(0x49, 0x51, 0x60)
-MUTED  = RGBColor(0x97, 0x9E, 0xAC)
-ACCENT = RGBColor(0x1F, 0x4E, 0x96)   # ロイヤルネイビー
-DK     = RGBColor(0x12, 0x24, 0x4B)   # 濃紺
-PALE   = RGBColor(0xEB, 0xF0, 0xF8)   # 薄青
-GRAYF  = RGBColor(0xF4, 0xF5, 0xF7)
-LINEC  = RGBColor(0xE0, 0xE5, 0xEE)
+# ---- design tokens(公式テンプレートのダーク基調)----
+BG    = RGBColor(0x00, 0x07, 0x14)   # テンプレート背景色
+WHITE = RGBColor(0xF4, 0xF7, 0xFD)   # タイトル・強調
+SUB   = RGBColor(0xA9, 0xB6, 0xD2)   # 本文
+DIM   = RGBColor(0x6A, 0x77, 0x94)   # 注記
+RED   = RGBColor(0xE8, 0x38, 0x2F)   # アクセント(ウルトラマンレッド)
+REDDK = RGBColor(0xA8, 0x1C, 0x18)   # 濃赤(表ヘッダー・強カード)
+PANEL = RGBColor(0x0C, 0x17, 0x30)   # パネル
+PANEL2= RGBColor(0x11, 0x1F, 0x3E)   # パネル(明)
+LINE  = RGBColor(0x25, 0x36, 0x5E)   # 罫線
+BLUE  = RGBColor(0x7F, 0xA8, 0xE0)   # 淡青(リード・サブ強調)
 
 JP_FONT = "Yu Gothic"
 SLIDE_W = Inches(13.333)
 SLIDE_H = Inches(7.5)
 ML = Inches(0.55)
 CW = Inches(12.23)
+TITLE_W = Inches(9.55)   # 右上ロゴを避けるタイトル幅
 
-prs = Presentation()
-prs.slide_width = SLIDE_W
-prs.slide_height = SLIDE_H
-BLANK = prs.slide_layouts[6]
+TEMPLATE = "template_PARTNERS_MEETING2026.pptx"
+prs = Presentation(TEMPLATE)
+BLANK = prs.slide_layouts[6]   # 白紙(ロゴはマスターから継承)
 
-FOOTER_DOC = "円谷プロダクション|ULTRAMAN LICENSEE PRESENTATION 2026(ドラフト)"
+# テンプレート同梱のサンプル2枚を削除
+for sldId in list(prs.slides._sldIdLst):
+    prs.part.drop_rel(sldId.rId)
+    prs.slides._sldIdLst.remove(sldId)
 
 
-def style_run(run, size, color=BODY, bold=False, spacing=None):
+def style_run(run, size, color=SUB, bold=False, spacing=None):
     f = run.font
     f.size = Pt(size)
     f.bold = bold
@@ -104,115 +110,83 @@ def rect(slide, x, y, w, h, fill, line_color=None, line_w=None, dash=False,
     return shp
 
 
-def new_slide(section, eyebrow_txt, notes=""):
+def new_slide(eyebrow_txt, notes=""):
     slide = prs.slides.add_slide(BLANK)
     slide.background.fill.solid()
-    slide.background.fill.fore_color.rgb = WHITE
-    n = len(prs.slides._sldIdLst)
-    add_text(slide, ML, Inches(0.28), CW, Inches(0.3),
-             [(eyebrow_txt, 11, ACCENT, True, {"spc": 60})])
-    rect(slide, ML, Inches(7.14), CW, Pt(0.8), LINEC)
-    add_text(slide, ML, Inches(7.2), Inches(10.5), Inches(0.25),
-             [(f"{FOOTER_DOC}|{section}", 7.5, MUTED, False)])
-    add_text(slide, Inches(12.3), Inches(7.2), Inches(0.48), Inches(0.25),
-             [(str(n), 8, MUTED, False, {"align": PP_ALIGN.RIGHT})])
+    slide.background.fill.fore_color.rgb = BG
+    if eyebrow_txt:
+        add_text(slide, ML, Inches(0.32), TITLE_W, Inches(0.3),
+                 [(eyebrow_txt, 11, RED, True, {"spc": 80})])
     if notes:
         slide.notes_slide.notes_text_frame.text = notes
     return slide
 
 
-def title(slide, text, size=21):
-    add_text(slide, ML, Inches(0.58), CW, Inches(0.95),
-             [(text, size, INK, True, {"line": 1.2})])
+def title(slide, text, size=24):
+    add_text(slide, ML, Inches(0.62), TITLE_W, Inches(0.95),
+             [(text, size, WHITE, True, {"line": 1.18})])
 
 
-def rule(slide, y=1.52):
-    rect(slide, ML, Inches(y), Inches(1.2), Pt(3.2), ACCENT)
+def rule(slide, y=1.5):
+    rect(slide, ML, Inches(y), Inches(1.2), Pt(3.2), RED)
 
 
-def lead(slide, text, y=1.72):
-    add_text(slide, ML, Inches(y), CW, Inches(0.4),
-             [(text, 12.5, DK, True)])
+def lead(slide, text, y=1.7, size=14):
+    add_text(slide, ML, Inches(y), CW, Inches(0.45),
+             [(text, size, BLUE, True)])
 
 
-def sections(slide, blocks, y=2.25, x=ML, w=CW, size=11.5):
-    box = slide.shapes.add_textbox(x, Inches(y), w, Inches(3.9))
-    tf = box.text_frame
-    tf.word_wrap = True
-    tf.margin_left = 0; tf.margin_right = 0; tf.margin_top = 0
-    first = True
-    for subhead, items in blocks:
-        if subhead:
-            p = tf.paragraphs[0] if first else tf.add_paragraph()
-            p.space_before = Pt(0 if first else 8)
-            p.space_after = Pt(2)
-            first = False
-            r = p.add_run(); r.text = subhead
-            style_run(r, size + 0.5, ACCENT, bold=True)
-        for it in items:
-            p = tf.paragraphs[0] if first else tf.add_paragraph()
-            first = False
-            p.space_after = Pt(2); p.line_spacing = 1.3
-            r = p.add_run(); r.text = "■ " + it
-            style_run(r, size, BODY)
-    return box
-
-
-def callout(slide, label, text, y=6.42):
-    band_h = Inches(0.52)
-    rect(slide, ML, Inches(y), CW, band_h, PALE)
-    rect(slide, ML, Inches(y), Pt(3.2), band_h, ACCENT)
-    box = slide.shapes.add_textbox(ML + Inches(0.2), Inches(y), CW - Inches(0.4), band_h)
-    tf = box.text_frame; tf.word_wrap = True
-    tf.vertical_anchor = MSO_ANCHOR.MIDDLE
-    tf.margin_left = 0; tf.margin_right = 0
-    p = tf.paragraphs[0]
-    r1 = p.add_run(); r1.text = label + "　"
-    style_run(r1, 11, ACCENT, bold=True)
-    r2 = p.add_run(); r2.text = text
-    style_run(r2, 11, INK, bold=True)
-
-
-def note(slide, text, y=5.9):
-    add_text(slide, ML, Inches(y), CW, Inches(0.4),
-             [("※ " + text, 9, MUTED, False)])
-
-
-def placeholder(slide, text, y, w=CW, h=Inches(0.5)):
-    rect(slide, ML, Inches(y), w, h, PALE, ACCENT, Pt(1), dash=True,
-         shape=MSO_SHAPE.ROUNDED_RECTANGLE, radius=0.18)
-    box = slide.shapes.add_textbox(ML + Inches(0.2), Inches(y), w - Inches(0.4), h)
+def bottom_copy(slide, text, y=6.42):
+    """全スライド共通:下部の強いコピー帯."""
+    band_h = Inches(0.56)
+    rect(slide, ML, Inches(y), CW, band_h, PANEL)
+    rect(slide, ML, Inches(y), Pt(4), band_h, RED)
+    box = slide.shapes.add_textbox(ML + Inches(0.24), Inches(y), CW - Inches(0.48), band_h)
     tf = box.text_frame; tf.word_wrap = True
     tf.vertical_anchor = MSO_ANCHOR.MIDDLE
     tf.margin_left = 0; tf.margin_right = 0
     p = tf.paragraphs[0]
     r = p.add_run(); r.text = text
-    style_run(r, 10, ACCENT, bold=True)
+    style_run(r, 14, WHITE, bold=True)
 
 
-def cards(slide, items, y, h=1.55, n_cols=None, title_size=13, body_size=10,
-          gap_in=0.22):
+def photo_zone(slide, x, y, w, h, label, items, size=9.5):
+    """写真・モック差し込みゾーン(点線枠+必要素材リスト)."""
+    rect(slide, x, y, w, h, PANEL, LINE, Pt(1.2), dash=True,
+         shape=MSO_SHAPE.ROUNDED_RECTANGLE, radius=0.05)
+    box = slide.shapes.add_textbox(x + Inches(0.22), y + Inches(0.16),
+                                   w - Inches(0.44), h - Inches(0.32))
+    tf = box.text_frame; tf.word_wrap = True
+    p = tf.paragraphs[0]; p.space_after = Pt(5)
+    r = p.add_run(); r.text = "📷 " + label
+    style_run(r, 10.5, RED, bold=True)
+    p2 = tf.add_paragraph(); p2.line_spacing = 1.35
+    r2 = p2.add_run(); r2.text = items
+    style_run(r2, size, DIM)
+
+
+def cards(slide, items, y, h=1.5, n_cols=None, title_size=13.5, body_size=10,
+          gap_in=0.22, x=ML, total_w=None):
     n = n_cols or len(items)
     gap = Inches(gap_in)
-    w = Emu(int((CW - gap * (n - 1)) / n))
+    tw = total_w or CW
+    w = Emu(int((tw - gap * (n - 1)) / n))
     for i, (t, b, variant) in enumerate(items):
         col = i % n
         row = i // n
-        x = ML + Emu(int((w + gap) * col))
+        xx = x + Emu(int((w + gap) * col))
         yy = Inches(y) + Emu(int((Inches(h) + gap) * row))
-        if variant == "dark":
-            fill, border, tc, bc = DK, None, WHITE, RGBColor(0xC6, 0xD4, 0xEA)
-        elif variant == "gray":
-            fill, border, tc, bc = GRAYF, LINEC, INK, BODY
+        if variant == "red":
+            fill, border, tc, bc = REDDK, None, WHITE, RGBColor(0xF3, 0xC9, 0xC5)
         else:
-            fill, border, tc, bc = PALE, ACCENT, DK, BODY
-        shp = rect(slide, x, yy, w, Inches(h), fill, border,
-                   Pt(1.1) if border else None,
+            fill, border, tc, bc = PANEL2, LINE, WHITE, SUB
+        shp = rect(slide, xx, yy, w, Inches(h), fill, border,
+                   Pt(1) if border else None,
                    shape=MSO_SHAPE.ROUNDED_RECTANGLE, radius=0.10)
         tf = shp.text_frame
         tf.word_wrap = True
         tf.vertical_anchor = MSO_ANCHOR.MIDDLE
-        tf.margin_left = Inches(0.15); tf.margin_right = Inches(0.15)
+        tf.margin_left = Inches(0.14); tf.margin_right = Inches(0.14)
         p = tf.paragraphs[0]; p.alignment = PP_ALIGN.CENTER; p.space_after = Pt(3)
         r = p.add_run(); r.text = t
         style_run(r, title_size, tc, bold=True)
@@ -222,8 +196,7 @@ def cards(slide, items, y, h=1.55, n_cols=None, title_size=13, body_size=10,
             style_run(r2, body_size, bc)
 
 
-def table_block(slide, headers, rows, y, col_w, size=10.5, row_h=0.42,
-                header_size=None):
+def table_block(slide, headers, rows, y, col_w, size=11, row_h=0.44):
     n_rows, n_cols = len(rows) + 1, len(headers)
     total_w = Emu(sum(int(c) for c in col_w))
     gfx = slide.shapes.add_table(n_rows, n_cols, ML, Inches(y), total_w,
@@ -234,495 +207,431 @@ def table_block(slide, headers, rows, y, col_w, size=10.5, row_h=0.42,
         tbl.columns[i].width = Emu(int(w))
     for c, htxt in enumerate(headers):
         cell = tbl.cell(0, c)
-        cell.fill.solid(); cell.fill.fore_color.rgb = DK
+        cell.fill.solid(); cell.fill.fore_color.rgb = REDDK
         cell.vertical_anchor = MSO_ANCHOR.MIDDLE
         p = cell.text_frame.paragraphs[0]
         r = p.add_run(); r.text = htxt
-        style_run(r, header_size or size, WHITE, bold=True)
+        style_run(r, size, WHITE, bold=True)
     for ri, row in enumerate(rows, start=1):
         for c, val in enumerate(row):
             cell = tbl.cell(ri, c)
             cell.fill.solid()
-            cell.fill.fore_color.rgb = WHITE if ri % 2 else GRAYF
+            cell.fill.fore_color.rgb = PANEL if ri % 2 else PANEL2
             cell.vertical_anchor = MSO_ANCHOR.MIDDLE
             p = cell.text_frame.paragraphs[0]
             p.line_spacing = 1.1
             r = p.add_run(); r.text = val
-            style_run(r, size, DK if c == 0 else BODY, bold=(c == 0))
+            style_run(r, size, WHITE if c == 0 else SUB, bold=(c == 0))
 
 
-def statement(slide, lines, y=2.5, size=19):
-    box = slide.shapes.add_textbox(ML + Inches(0.3), Inches(y), Inches(11.4), Inches(3.6))
-    tf = box.text_frame; tf.word_wrap = True
-    tf.margin_left = 0; tf.margin_right = 0
-    for i, (text, st) in enumerate(lines):
-        p = tf.paragraphs[0] if i == 0 else tf.add_paragraph()
-        p.space_after = Pt(24); p.line_spacing = 1.3
-        color, bold = {"gray": (BODY, False), "ink": (DK, True),
-                       "accent": (ACCENT, True)}[st]
-        r = p.add_run(); r.text = text
-        style_run(r, size, color, bold)
-
-
-def numbered_rows(slide, items, y=2.1, row_h=0.5, gap=0.11, size=11.5):
-    for i, (num, text, sub) in enumerate(items):
+def plan_rows(slide, items, y, row_h=0.5, gap=0.12, size=12.5, w=Inches(6.2)):
+    """カテゴリースライド左側:企画リスト(赤丸番号+白文字)."""
+    for i, text in enumerate(items):
         yy = Inches(y) + Emu(int((Inches(row_h) + Inches(gap)) * i))
-        rect(slide, ML, yy, CW, Inches(row_h), GRAYF, LINEC, Pt(0.8),
-             shape=MSO_SHAPE.ROUNDED_RECTANGLE, radius=0.22)
-        d = min(0.32, row_h - 0.08)
-        circ = rect(slide, ML + Inches(0.13), yy + Inches((row_h - d) / 2),
-                    Inches(d), Inches(d), DK, shape=MSO_SHAPE.OVAL)
+        d = 0.3
+        circ = rect(slide, ML, yy + Inches((row_h - d) / 2), Inches(d), Inches(d),
+                    RED, shape=MSO_SHAPE.OVAL)
         tfc = circ.text_frame
         tfc.margin_left = 0; tfc.margin_right = 0
         tfc.vertical_anchor = MSO_ANCHOR.MIDDLE
         pc = tfc.paragraphs[0]; pc.alignment = PP_ALIGN.CENTER
-        rc = pc.add_run(); rc.text = num
-        style_run(rc, 10, WHITE, bold=True)
-        box = slide.shapes.add_textbox(ML + Inches(0.58), yy, CW - Inches(0.75), Inches(row_h))
+        rc = pc.add_run(); rc.text = str(i + 1)
+        style_run(rc, 10.5, WHITE, bold=True)
+        box = slide.shapes.add_textbox(ML + Inches(0.45), yy, w - Inches(0.45), Inches(row_h))
         tf = box.text_frame; tf.word_wrap = True
         tf.vertical_anchor = MSO_ANCHOR.MIDDLE
         tf.margin_left = 0; tf.margin_right = 0
         p = tf.paragraphs[0]
         r = p.add_run(); r.text = text
-        style_run(r, size, INK, bold=True)
-        if sub:
-            r2 = p.add_run(); r2.text = "　" + sub
-            style_run(r2, size - 1.5, BODY)
+        style_run(r, size, WHITE, bold=True)
 
 
-def category_slide(no, idx, cat, plan_name, headline, yobikake,
-                   left_blocks, right_blocks, notes):
-    s = new_slide("カテゴリー別企画募集",
-                  f"SLIDE {no:02d}|カテゴリー別企画募集|企画 {idx} / 10", notes)
-    title(s, f"{cat}|{plan_name}――{headline}", size=20)
+def category_slide(no, audience, package, main_copy, plans, materials,
+                   bottom, notes):
+    s = new_slide(f"{no:02d}|FOR {audience}", notes)
+    title(s, f"{audience}向け|{package}", size=22)
     rule(s)
-    lead(s, yobikake)
-    sections(s, left_blocks, y=2.3, x=ML, w=Inches(5.9))
-    sections(s, right_blocks, y=2.3, x=Inches(6.85), w=Inches(5.9))
-    callout(s, "ご相談の入口",
-            "このカテゴリーの企業様は、本日ぜひ個別相談にお申し込みください")
+    lead(s, main_copy)
+    plan_rows(s, plans, 2.4)
+    photo_zone(s, Inches(7.1), Inches(2.3), Inches(5.68), Inches(3.85),
+               "ビジュアルゾーン(モック・写真)", materials)
+    bottom_copy(s, bottom)
     return s
 
 
+NOTE_QR = "(QRは以降のスライドでも画面隅に残す)"
+
 # =====================================================================
-# 1. タイトル
-s = prs.slides.add_slide(BLANK)
-s.background.fill.solid(); s.background.fill.fore_color.rgb = WHITE
-rect(s, 0, 0, Inches(0.28), SLIDE_H, ACCENT)
-rect(s, Inches(0.9), Inches(1.12), Inches(2.2), Pt(3.2), ACCENT)
-add_text(s, Inches(0.9), Inches(1.38), Inches(11.5), Inches(0.35),
-         [("ライセンシー・パートナー企業の皆さまへ", 13, BODY, True)])
-add_text(s, Inches(0.9), Inches(1.95), Inches(11.9), Inches(1.7),
-         [("ULTRAMAN LICENSEE", 40, INK, True, {"line": 1.08, "after": 0}),
-          ("PRESENTATION 2026", 40, INK, True, {"line": 1.08})])
-add_text(s, Inches(0.9), Inches(3.62), Inches(11.9), Inches(0.55),
-         [("2027年度以降の商機を、いま一緒につくる。", 20, ACCENT, True)])
-add_text(s, Inches(0.9), Inches(4.2), Inches(11.9), Inches(0.4),
-         [("― 商品化・売場・販促・広告タイアップ・IPコラボに参加する企業を、今日から募集します ―",
-           13, DK, True)])
-add_text(s, Inches(0.9), Inches(5.0), Inches(11.9), Inches(0.35),
-         [("円谷プロダクション", 12, INK, True)])
-add_text(s, Inches(0.9), Inches(5.32), Inches(11.9), Inches(0.3),
-         [("2026年7月23日|ウルサマ イベントステージ", 10.5, MUTED, False)])
-add_text(s, Inches(0.9), Inches(5.62), Inches(11.6), Inches(0.7),
-         [("本資料は当日投影用ドラフトです。2027年度以降の展開に関する記述は、開示可能範囲の確定(7/14構成確認会)後に最終化します。未確定情報・NDA対象情報は含みません。",
-           8.5, MUTED, False, {"line": 1.4})])
-s.notes_slide.notes_text_frame.text = (
-    "(タイトル表示のみ)本日の位置づけ:聞かせる会ではなく、手を挙げさせる会。"
-    "参加者に持ち帰らせる感情は「盛り上がってるね」ではなく"
-    "「うちのカテゴリーでも企画できる」「今動けば2027年の売場・キャンペーンに間に合う」「早く個別相談したい」。")
+# Slide 1|タイトル
+s = new_slide(None,
+              "皆さま、本日はお集まりいただきありがとうございます。最初に申し上げます。本日は、作品の"
+              "発表会ではありません。2027年度以降のウルトラマンの商機を、皆さまと一緒につくり始める"
+              "1時間です。")
+rect(s, 0, 0, Inches(0.28), SLIDE_H, RED)
+add_text(s, Inches(0.9), Inches(1.5), Inches(11.3), Inches(0.4),
+         [("TSUBURAYA PRODUCTIONS", 13, BLUE, True, {"spc": 300})])
+add_text(s, Inches(0.9), Inches(2.05), Inches(11.6), Inches(1.7),
+         [("ULTRAMAN BUSINESS", 42, WHITE, True, {"line": 1.08, "after": 0}),
+          ("PARTNERS MEETING 2026", 42, WHITE, True, {"line": 1.08})])
+add_text(s, Inches(0.9), Inches(3.85), Inches(11.6), Inches(0.6),
+         [("2027年度以降の商機を、いま一緒につくる", 22, RED, True)])
+add_text(s, Inches(0.9), Inches(5.35), Inches(11.3), Inches(0.35),
+         [("2026年7月23日(木)16:00-17:00|ウルサマ イベントステージ", 12, SUB, False)])
+add_text(s, Inches(0.9), Inches(5.7), Inches(11.3), Inches(0.35),
+         [("円谷プロダクション", 12, SUB, True)])
+photo_zone(s, Inches(9.0), Inches(4.9), Inches(3.75), Inches(1.9),
+           "背景コラージュ",
+           "キービジュアル/ヒーロー集合/60周年ロゴ/イベント・物販・売場・映画館・商品・親子ファン")
+bottom_copy(s, "2027年度以降の売場は、今日ここから始まる。")
 
-# 2. 本日の目的
-s = new_slide("オープニング", "SLIDE 02|オープニング",
-              "本日は、単なる作品紹介ではありません。2027年度以降のウルトラマン展開を、皆さまの商品・"
-              "売場・キャンペーンにどう接続できるかをご説明する場です。")
-title(s, "本日は「発表会」ではない――2027年度以降の商機に参加する企業を、今日から募集する")
+# Slide 2|本日の目的
+s = new_slide("02|PURPOSE",
+              "本日の目的は3つです。2027年度以降の展開を共有すること。皆さまの商品化・販促・売場展開の"
+              "可能性をご提示すること。そして、本日から個別商談と企画相談を開始することです。"
+              "ぜひ「自社なら何ができるか」という目線でお聞きください。")
+title(s, "本日は、2027年度以降の商機を共有する場です")
 rule(s)
-lead(s, "聞いていただく会ではなく、手を挙げていただく会")
-sections(s, [
-    ("本日の位置づけ", [
-        "2027年度以降のウルトラマン展開に向けて、商品化・売場・販促・広告タイアップ・IPコラボに参加する企業を募集する場",
-        "各カテゴリーの具体企画案と、参加方法・相談導線までご案内する",
-    ]),
-    ("持ち帰っていただきたいこと", [
-        "「うちのカテゴリーでも企画できる」という具体的なイメージ",
-        "「今動けば、2027年の売場・キャンペーンに間に合う」というタイミング感",
-    ]),
-])
-callout(s, "本日の背骨",
-        "ウルトラマンは年間を通じて生活者との接点を作り続ける――その接点を、皆さまの商品・売場・キャンペーンに変えていく")
-
-# 3. 今日お伝えしたいこと
-s = new_slide("オープニング", "SLIDE 03|オープニング",
-              "本日お伝えしたいことは5つです。この順番でご説明します。")
-title(s, "今日お伝えしたいこと――5つ")
-rule(s)
-numbered_rows(s, [
-    ("1", "60周年の熱量は、2027年度以降の商機につながっている", ""),
-    ("2", "ウルトラマンは、年間を通じて生活者接点を作るIPになる", ""),
-    ("3", "各カテゴリーで、具体的な商品化・販促機会がある", "本日、企画案を10本ご提案します"),
-    ("4", "スタイルガイドと監修体制を整え、企画化を進めやすくする", ""),
-    ("5", "本日から、個別商談・企画相談を開始する", ""),
-], y=1.95, row_h=0.62, gap=0.16, size=12.5)
-callout(s, "キーメッセージ", "本日は、そのための商機と参加方法をご説明します")
-
-# 4. 60周年は、もう始まっている
-s = new_slide("60周年の現在地", "SLIDE 04|60周年の現在地",
-              "60周年はすでに動き出しています。イベント、商品化、コラボ、流通。"
-              "(直前の動画と連動して、一枚で「動いている感」を見せる)")
-title(s, "60周年は、もう始まっている――イベント・商品・広告・流通・コラボが動いている")
-rule(s)
-lead(s, "異なるファン層・異なる売場に向けた展開が、同時並行で進行中")
+lead(s, "「作品を聞く」のではなく、「自社の商談機会」として")
 cards(s, [
-    ("国内外イベント", "ウルサマ/ライブ/展覧会/ヒーローショー/グリーティング", "pale"),
-    ("商品化", "食品・アパレル・雑貨・玩具・文具・コレクション", "pale"),
-    ("IPコラボ", "モフサンド、ベイブレード ほか", "gray"),
-    ("流通", "ウルトラマート、POPUP、量販・専門店", "dark"),
-], y=2.35, h=1.5, n_cols=2)
-note(s, "【素材8待ち】実績写真グリッド(8〜12点)に差し替え予定。数字より「動いている感」を重視", y=5.75)
-callout(s, "キーメッセージ", "この熱量は、一過性の盛り上がりでは終わらない")
+    ("① 展開を共有する", "2027年度以降のウルトラマン展開", "panel"),
+    ("② 可能性を提示する", "商品化・販促・売場展開の具体案", "panel"),
+    ("③ 商談を開始する", "本日から個別商談・企画相談を受付", "red"),
+], y=2.6, h=1.9, title_size=15, body_size=11)
+bottom_copy(s, "作品を聞く1時間ではなく、商談が始まる1時間です。")
 
-# 5. でも、商機はここからが本番
-s = new_slide("60周年の現在地", "SLIDE 05|60周年の現在地",
-              "60周年は一過性の盛り上がりではありません。2027年度以降の映像・映画・配信・イベント・"
-              "流通施策に接続していきます。")
-title(s, "でも、商機はここからが本番")
+# Slide 3|人を動かすIP
+s = new_slide("03|WHY ULTRAMAN",
+              "いまご覧いただいた熱量が、ウルトラマンの原点です。ファンは会場に来て、写真を撮り、商品を"
+              "手に取り、誰かに共有します。この「人が動く力」を、皆さまの商品・売場・キャンペーンに接続"
+              "するのが、本日のテーマです。")
+title(s, "ウルトラマンは、“人を動かすIP”")
 rule(s)
-statement(s, [
-    ("60周年は、一過性の盛り上がりではありません。", "gray"),
-    ("2027年度以降の映像・映画・配信・イベント・流通施策に、接続していきます。", "ink"),
-    ("――2027年のウルトラマン売場は、今日ここから始まります。", "accent"),
-])
+lead(s, "ファンの行動が、そのまま売上への動線になる")
+chain = ["会場に来る", "写真を撮る", "商品を手に取る", "誰かに共有する"]
+for i, t in enumerate(chain):
+    x = ML + Inches(i * 3.12)
+    shp = rect(s, x, Inches(2.5), Inches(2.7), Inches(1.05), PANEL2, LINE, Pt(1),
+               shape=MSO_SHAPE.ROUNDED_RECTANGLE, radius=0.14)
+    tf = shp.text_frame; tf.vertical_anchor = MSO_ANCHOR.MIDDLE
+    p = tf.paragraphs[0]; p.alignment = PP_ALIGN.CENTER
+    r = p.add_run(); r.text = t
+    style_run(r, 15, WHITE, bold=True)
+    if i < 3:
+        add_text(s, x + Inches(2.72), Inches(2.62), Inches(0.4), Inches(0.7),
+                 [("→", 20, RED, True, {"align": PP_ALIGN.CENTER})])
+photo_zone(s, ML, Inches(3.95), CW, Inches(2.2),
+           "熱量ビジュアル(横並び4-5点)",
+           "親子がヒーローを見ている写真/グリーティング/物販列/商品購入シーン/SNS投稿イメージ")
+bottom_copy(s, "この熱量を、商品・売場・キャンペーンへ。")
 
-# 6. 2027年度以降の全体像
-s = new_slide("2027年度以降の全体像", "SLIDE 06|2027年度以降の全体像",
-              "2027年度以降、ウルトラマンは単発の作品展開ではなく、年間を通じて接点を作る設計に"
-              "変わります。点ではなく、面で展開します。")
-title(s, "2027年度以降の全体像――点ではなく、面で展開する")
+# Slide 4|60周年は、もう動き出している
+s = new_slide("04|MOMENTUM",
+              "60周年は、すでに動き出しています。イベント、商品化、コラボ、流通、広告、海外。ご覧いただき"
+              "たいのは商品そのものではなく、そこに集まっている「人」です。この勢いは実績として証明されて"
+              "います。")
+title(s, "60周年は、もう動き出している")
 rule(s)
-lead(s, "9つの展開が連動して動く「年間型IP」へ")
-cards(s, [
-    ("テレビシリーズ", "継続接点", "pale"),
-    ("映画", "大型話題化", "pale"),
-    ("配信・YouTube", "コアファン接点", "pale"),
-    ("ウルサマ・ライブイベント", "熱量づくり", "pale"),
-    ("IPコラボ", "新ファン層開拓", "pale"),
-    ("ウルトラマート", "売場づくり", "pale"),
-    ("流通展開", "販路拡大", "pale"),
-    ("商品化", "購買接点", "dark"),
-    ("広告キャンペーン", "企業活用", "pale"),
-], y=2.3, h=1.05, n_cols=3, title_size=12, body_size=9.5, gap_in=0.18)
-callout(s, "キーメッセージ", "それぞれの接点を、皆さまの商品・売場・キャンペーンに変えていく")
+lead(s, "勢いは、証明済み。")
+moves = ["ウルサマ", "ヒーローショー", "商品化", "IPコラボ",
+         "ウルトラマート", "流通展開", "広告タイアップ", "海外展開"]
+cards(s, [(m, "", "panel") for m in moves], y=2.35, h=0.72, n_cols=4,
+      title_size=13, gap_in=0.18)
+photo_zone(s, ML, Inches(4.25), CW, Inches(1.95),
+           "熱量ビジュアル(人・売場中心)",
+           "人が集まっている写真/売場の熱量がある写真を使用(商品単体写真は使わない)— ウルサマ会場・物販列・コラボ棚・海外イベント")
+bottom_copy(s, "この勢いは、2027年度以降につながっていく。")
 
-# 7. 映像展開が、商品化の理由を作る
-s = new_slide("2027年度以降の全体像", "SLIDE 07|2027年度以降の全体像",
-              "テレビで継続接点を作り、映画で大型の話題化を作り、配信でコアファン接点を広げ、"
-              "イベントで熱量を高め、流通・商品化で購買につなげます。"
-              "TVの安全表現:「キャラクターや世界観の継続性をより重視し、ファンが次の展開を追い続けたく"
-              "なる構造を強化」。【NG】3年連続・同一世界線・テレビ局変更には触れない。")
-title(s, "映像展開が、商品化の理由を作る――テレビは継続、映画は話題化、配信は横断")
+# Slide 5|商機カレンダー
+s = new_slide("05|BUSINESS CALENDAR",
+              "ライセンシーの皆さまが一番知りたいのは「いつ仕込めばいいか」だと思います。答えはこの"
+              "カレンダーです。2027年夏の映画・イベント・大型キャンペーンが最大の山です。商品開発の"
+              "リードタイムから逆算すると——2026年冬には企画と監修が始まっている必要があります。"
+              "つまり、商談開始は今です。")
+title(s, "2027年の売場は、今日から仕込む")
 rule(s)
-lead(s, "作品の羅列ではなく、「商品をいつ・なぜ出すか」の設計としてお伝えする")
-cards(s, [
-    ("商機① テレビシリーズ", "継続接点:世界観の継続性を重視し、商品もシリーズ展開・第2弾・第3弾を設計しやすくなる", "pale"),
-    ("商機② 映画・ゼロ関連", "大型話題化:商品化・販促・流通施策を集中させる最大の山。生活者が「買う理由」を作れるタイミング", "pale"),
-    ("商機③ 配信・ギャラファイ", "キャラ横断:歴代ヒーロー・怪獣を横断活用でき、コレクション性の高い商品・ファン向けMDと相性が良い", "pale"),
-], y=2.35, h=2.0, title_size=12.5, body_size=10)
-placeholder(s, "【素材1・2・4・6待ち/開示確認】2027年以降のコンテンツ全体像・各柱の開示可能情報", 4.7)
-callout(s, "キーメッセージ", "単発の商品化で終わらせない――年間の接点設計が、商品の売れるタイミングを作る")
-
-# 8. イベントが、熱量を作る
-s = new_slide("2027年度以降の全体像", "SLIDE 08|2027年度以降の全体像",
-              "広い認知はテレビ、映画、配信、SNS、PRで作ります。一方で、ウルトラマンには、イベント、"
-              "ショー、グリーティングを通じて、実際に会いに来るファンとの濃い接点があります。"
-              "このリアルな熱量を、商品・売場・キャンペーンに接続できることが、ウルトラマンの強みです。"
-              "※「100万人に届きます」という単独リーチ表現は使わない。")
-title(s, "イベントが、熱量を作る――広い認知と深いリアル接点の両方を持つIP")
-rule(s)
-lead(s, "「広さ」は映像・SNSで、「濃さ」はイベントで、「購買」は売場・商品化で語る")
+lead(s, "2026-2027 ULTRAMAN 商機カレンダー")
 table_block(s,
-            ["指標", "役割", "例"],
-            [["テレビ・映画・配信・SNS", "広く知ってもらう", "認知・話題化・PR"],
-             ["イベント・ショー・グリーティング", "熱量を高める", "年間約70万〜100万人規模のリアル接点"],
-             ["物販・POPUP・流通", "買う場所を作る", "店頭・ウルトラマート・EC"],
-             ["商品化・キャンペーン", "企業の売上につなげる", "皆さまの商品・売場・販促"]],
-            2.25, [Inches(3.6), Inches(2.7), Inches(5.9)])
-note(s, "単なる広告リーチではなく、実際に足を運び、体験し、購買に近い場所にいるファンとの接点(補強データ確定後に表現最終化)", y=4.6)
-callout(s, "キーメッセージ", "“会いに来るファン”の熱量を、皆さまの商品・売場・キャンペーンに接続できる")
+            ["時期", "商機"],
+            [["2026夏", "ウルサマ・イベント連動"],
+             ["2026秋", "IPコラボ・年末商戦"],
+             ["2026冬", "2027商品の企画・監修開始"],
+             ["2027春", "新生活・文具・雑貨・アパレル"],
+             ["2027夏", "映画・イベント・大型キャンペーン"],
+             ["2027秋冬", "ホビー・EC・プレミアム・年末商戦"]],
+            2.3, [Inches(2.2), Inches(10.0)], size=12, row_h=0.52)
+bottom_copy(s, "“発売タイミング”から逆算すると、商談開始は今です。")
 
-# 9. 流通が、売る場所を作る
-s = new_slide("2027年度以降の全体像", "SLIDE 09|2027年度以降の全体像",
-              "商品を作って終わりではなく、売場・POPUP・EC・イベント物販に接続していきます。"
-              "ライセンシーの最大の不安「作った商品はどこで売れるのか?」に応えるパートです。")
-title(s, "流通が、売る場所を作る――「作っても売る場所があるのか」に応える")
-rule(s)
-lead(s, "商品化だけでなく、売場化・販促化まで一緒に設計できることが、今後のライセンス戦略のポイント")
-sections(s, [
-    ("円谷側でも「売る場所・見せる場所・出会う場所」を増やしていく", [
-        "ウルトラマートのコンセプト/売場・商品展開イメージ",
-        "POPUP展開/限定商品枠/先行販売枠",
-        "映画連動棚/ウルサマ連動棚/IPコラボ棚/EC連動",
-    ]),
-])
-placeholder(s, "【素材10待ち】ウルトラマート素材・売場写真・商品展開イメージ", 4.35)
-callout(s, "キーメッセージ", "商品を作っていただくだけでなく、どこで・どう見せ・どう売るかまで一緒に設計していく")
-
-# 10. 商機カレンダー
-s = new_slide("商機カレンダー", "SLIDE 10|商機カレンダー",
-              "ライセンシーの皆さまが一番知りたいのは「いつ何を仕込めばいいか」。作品スケジュールでは"
-              "なく、商品化タイミングとしてお見せします。商品開発リードタイムから逆算すると、2027年の"
-              "山場に間に合わせるには今から企画に入るのがベストタイミングです。")
-title(s, "2026-2027 ULTRAMAN BUSINESS CALENDAR――いつ仕込めば、間に合うか")
-rule(s)
-lead(s, "作品スケジュールではなく、「商品化タイミング」としてお見せする")
-table_block(s,
-            ["時期", "円谷側の動き", "ライセンシーの商機", "作るべき商品・企画"],
-            [["2026年夏", "ウルサマ、60周年施策", "熱量の可視化", "イベント連動商品、先行企画相談"],
-             ["2026年秋", "IPコラボ、流通施策", "年末商戦・話題化", "雑貨、アパレル、ギフト商材"],
-             ["2026年冬", "2027展開の仕込み", "来期商品企画", "スタイルガイド確認、企画提出"],
-             ["2027年春", "新展開ティザー", "新生活・入学・春販促", "文具、アパレル、生活雑貨"],
-             ["2027年夏", "映画・イベント・大型露出", "最大商戦期", "食品、外食、流通、キャンペーン"],
-             ["2027年秋", "配信・YouTube・コアファン施策", "継続購買", "コレクション、EC限定、プレミアム商品"],
-             ["2027年冬", "年末商戦", "ギフト・限定品", "高単価商品、福袋、限定コラボ"]],
-            2.2, [Inches(1.5), Inches(3.3), Inches(2.5), Inches(4.9)],
-            size=10, row_h=0.44)
-callout(s, "キーメッセージ", "2027年夏の最大商戦に間に合わせるなら、企画開始は「いま」")
-
-# 11. 募集カテゴリー一覧
-s = new_slide("カテゴリー別企画募集", "SLIDE 11|カテゴリー別企画募集",
-              "ここからが本日の中心です。2027年度以降の展開に向けて、10のカテゴリーで商品化・販促企画を"
-              "募集します。それぞれ具体的な企画案をご用意しました。「うちならこう作れる」という目線で"
+# Slide 6|7カテゴリーのハブ図
+s = new_slide("06|FOR ALL PARTNERS",
+              "ここからは、本日お越しの皆さま一人ひとりに関わる話です。7つのカテゴリーで、具体的な企画を"
+              "ご提案します。ご自身のカテゴリーが出てきたら、「この枠にうちが入れるか」という目線で"
               "ご覧ください。")
-title(s, "ライセンシーの皆さまにお願いしたいこと――10カテゴリーで企画を募集します")
+title(s, "本日ご参加の皆さまと、作りたいこと")
 rule(s)
-numbered_rows(s, [
-    ("1", "食品・飲料", "ULTRA ENERGY PACK"),
-    ("2", "外食・カフェ", "親子ヒーローメニュー"),
-    ("3", "アパレル", "ULTRA STREET / ULTRA FAMILY"),
-    ("4", "生活雑貨", "毎日のウルトラマン"),
-    ("5", "文具・教育", "ウルトラヒーローズ新学期"),
-    ("6", "玩具・ホビー", "ULTRA CROSS COLLECTION"),
-    ("7", "流通・小売", "ULTRA MARKET IN STORE"),
-    ("8", "広告代理店・SP", "ULTRAMAN BRAND CAMPAIGN PACKAGE"),
-    ("9", "プレミアム商品", "ULTRA PREMIUM LINE"),
-    ("10", "女性・ライト層", "ULTRA KAWAII / CHARACTER MIX"),
-], y=1.82, row_h=0.38, gap=0.075, size=10.5)
-callout(s, "キーメッセージ", "過去実績のご紹介ではなく、これからご一緒したい企画のご提案です")
+lead(s, "7つのカテゴリーで、企画を募集します")
+center = rect(s, Inches(5.42), Inches(3.35), Inches(2.5), Inches(1.35), REDDK,
+              shape=MSO_SHAPE.ROUNDED_RECTANGLE, radius=0.2)
+tfc = center.text_frame; tfc.vertical_anchor = MSO_ANCHOR.MIDDLE
+pc = tfc.paragraphs[0]; pc.alignment = PP_ALIGN.CENTER
+rc = pc.add_run(); rc.text = "ULTRAMAN"
+style_run(rc, 17, WHITE, bold=True)
+pc2 = tfc.add_paragraph(); pc2.alignment = PP_ALIGN.CENTER
+rc2 = pc2.add_run(); rc2.text = "円谷プロダクション"
+style_run(rc2, 10.5, RGBColor(0xF3, 0xC9, 0xC5), bold=False)
+hub = [
+    ("MD・グッズ・玩具・アパレル", Inches(0.7),  Inches(2.35)),
+    ("食品・飲料・外食",           Inches(5.02), Inches(2.2)),
+    ("流通・EC・商業施設",         Inches(9.35), Inches(2.35)),
+    ("広告代理店・SP",            Inches(0.7),  Inches(4.0)),
+    ("デジタル・ゲーム",           Inches(9.35), Inches(4.0)),
+    ("イベント・施設・観光",        Inches(2.6),  Inches(5.35)),
+    ("IPコラボ",                 Inches(7.45), Inches(5.35)),
+]
+for t, x, y in hub:
+    shp = rect(s, x, y, Inches(3.3), Inches(0.8), PANEL2, LINE, Pt(1),
+               shape=MSO_SHAPE.ROUNDED_RECTANGLE, radius=0.16)
+    tf = shp.text_frame; tf.word_wrap = True
+    tf.vertical_anchor = MSO_ANCHOR.MIDDLE
+    p = tf.paragraphs[0]; p.alignment = PP_ALIGN.CENTER
+    r = p.add_run(); r.text = t
+    style_run(r, 12.5, WHITE, bold=True)
+bottom_copy(s, "この中に、貴社の席があります。")
 
-# 12-21. カテゴリー別企画(10本)
-category_slide(12, 1, "企画① 食品・飲料", "ULTRA ENERGY PACK",
-               "映画・イベント期の親子キャンペーンを募集",
-               "食品・飲料の皆さまとは、映画・イベント期に合わせた親子向けキャンペーンを作りたい",
-               [("ターゲット", ["親子、キッズ、夏休み需要"]),
-                ("商品例", ["菓子/飲料/ゼリー/アイス/レトルト食品/シリアル/弁当商材"])],
-               [("企画内容", ["「光」「エネルギー」「変身」をテーマにした限定パッケージ展開",
-                          "購入特典:ステッカー、カード、映画・イベント連動キャンペーン"]),
-                ("連動先", ["映画/ウルサマ/店頭キャンペーン/親子向け販促/夏休み企画"])],
-               "食品・飲料カテゴリーの皆さまとは、映画・イベント期に合わせた親子向けキャンペーンを作りたいと考えています。")
-category_slide(13, 2, "企画② 外食・カフェ", "親子ヒーローメニュー",
-               "熱量を店舗送客につなげる企画を募集",
-               "外食・カフェ業態の皆さまとは、ウルトラマンの熱量を店舗送客につなげる企画を作りたい",
-               [("ターゲット", ["ファミリー、映画来場者、イベント来場者"]),
-                ("商品例", ["キッズメニュー/コラボドリンク/デザート/テイクアウト商品/ノベルティ付きセット"])],
-               [("企画内容", ["映画・ウルサマのタイミングに合わせた親子コラボメニュー",
-                          "来店特典:限定コースター、ステッカー、ランチョンマット、撮影用カード"]),
-                ("連動先", ["映画公開/イベント会場周辺/商業施設/SNS投稿キャンペーン"])],
-               "外食・カフェ業態の皆さまとは、ウルトラマンの熱量を店舗送客につなげる企画を作りたいです。")
-category_slide(14, 3, "企画③ アパレル", "ULTRA STREET / ULTRA FAMILY",
-               "大人・女性・親子リンクまで広げる",
-               "子ども向けだけでなく、大人・女性・親子リンクまで広げていきたい",
-               [("ターゲット", ["大人ファン、若年層、親子"]),
-                ("商品例", ["Tシャツ/スウェット/キャップ/トートバッグ/親子リンクウェア/靴下/ルームウェア"])],
-               [("デザイン方向性", ["キッズ向け:ヒーロービジュアル中心",
-                             "大人向け:ロゴ、シンボル、怪獣、タイポグラフィ",
-                             "女性向け:柔らかい色、キャラクターコラボ、雑貨寄り",
-                             "プレミアム:ブラック、シルバー、刺繍、限定感"])],
-               "アパレルカテゴリーでは、子ども向けだけでなく、大人・女性・親子リンクまで広げていきたいと考えています。")
-category_slide(15, 4, "企画④ 生活雑貨", "毎日のウルトラマン",
-               "ファンが毎日使える商品を増やす",
-               "生活雑貨カテゴリーでは、ファンが毎日使える商品を増やしていきたい",
-               [("ターゲット", ["ファミリー、大人ファン、ギフト需要"]),
-                ("商品例", ["タオル/マグカップ/タンブラー/ランチボックス/ポーチ/ルーム雑貨/インテリア小物/スマホアクセサリー"])],
-               [("企画内容", ["ウルトラマンを日常生活の中に置く",
-                          "「変身」「光」「防衛隊」「怪獣」を生活雑貨に落とし込む"]),
-                ("連動先", ["ギフト商戦/ウルトラマート/POPUP/EC"])],
-               "生活雑貨カテゴリーでは、ファンが毎日使える商品を増やしていきたいです。")
-category_slide(16, 5, "企画⑤ 文具・教育", "ウルトラヒーローズ新学期",
-               "物語性を子どもの成長文脈に接続する",
-               "ウルトラマンの物語性を、子どもの成長文脈に接続した商品を作りたい",
-               [("ターゲット", ["小学生、親、入学・新学期需要"]),
-                ("商品例", ["ノート/鉛筆/ペンケース/下敷き/シール/学習帳/図鑑/ワークブック/絵本"])],
-               [("企画内容", ["「勇気」「仲間」「成長」「正義」をテーマに文具・教育商材へ展開",
-                          "春の新生活、夏休み、自由研究と相性が良い"]),
-                ("連動先", ["新学期商戦/夏休み/読書キャンペーン"])],
-               "文具・教育カテゴリーでは、ウルトラマンの物語性を子どもの成長文脈に接続した商品を作りたいです。")
-category_slide(17, 6, "企画⑥ 玩具・ホビー", "ULTRA CROSS COLLECTION",
-               "キャラクター資産を横断するコレクション展開",
-               "単独作品ではなく、ウルトラマン全体のキャラクター資産を活かしたコレクション展開を強化したい",
-               [("ターゲット", ["キッズ、コアファン、コレクター"]),
-                ("商品例", ["フィギュア/カード/アクリルスタンド/カプセルトイ/食玩/ブラインド商品/ジオラマ商材"])],
-               [("企画内容", ["ギャラファイ、ゼロ、歴代ヒーロー、怪獣を横断したコレクション企画",
-                          "ランダム性、シークレット、シリーズ継続で購買を作る"]),
-                ("連動先", ["配信・YouTube展開/EC限定/イベント物販"])],
-               "ホビー領域では、ウルトラマン全体のキャラクター資産を活かしたコレクション展開を強化していきたいです。")
-category_slide(18, 7, "企画⑦ 流通・小売", "ULTRA MARKET IN STORE",
-               "商品を「売場」として見せる",
-               "ウルトラマン商品を“売る場所”そのものから一緒に作っていきたい",
-               [("ターゲット", ["量販店、専門店、商業施設、EC"]),
-                ("売場例", ["映画公開記念棚/ウルサマ連動棚/親子向け夏休み棚/怪獣特集棚/ゼロ特集棚/大人ファン向けプレミアム棚"])],
-               [("企画内容", ["商品を単品で置くのではなく、売場として見せる",
-                          "映画、イベント、60周年、IPコラボに合わせた期間限定棚・POPUP・店頭キャンペーン"]),
-                ("連動先", ["ウルトラマート/映画・イベント期の店頭施策"])],
-               "流通・小売の皆さまとは、ウルトラマン商品を“売る場所”そのものから一緒に作っていきたいです。"
-               "(サンリオコラボ棚は開示可能なら言及)")
-category_slide(19, 8, "企画⑧ 広告代理店・SP会社", "ULTRAMAN BRAND CAMPAIGN PACKAGE",
-               "クライアント課題に合わせた活用メニュー",
-               "クライアント課題に合わせた、ウルトラマン活用メニューを作っていきたい",
-               [("ターゲット", ["企業広告、販促、地域施策、ファミリー向けキャンペーン"]),
-                ("活用テーマ", ["親子集客/夏休み販促/防災/交通安全/環境/地域創生/スポーツ/未来・テクノロジー/勇気・挑戦"])],
-               [("企画内容", ["ウルトラマンを企業キャンペーンの装置として活用",
-                          "単なるキャラクター使用ではなく、企業の課題に合わせて文脈を作る"]),
-                ("連動先", ["映画・イベント期のタイアップ/交通広告/SNSキャンペーン"])],
-               "広告代理店・SP会社の皆さまとは、クライアント課題に合わせたウルトラマン活用メニューを作っていきたいです。")
-category_slide(20, 9, "企画⑨ プレミアム商品", "ULTRA PREMIUM LINE",
-               "大人が所有したくなる高付加価値商品",
-               "キャラクターをそのまま載せるのではなく、世界観やシンボルを活かした高付加価値商品を広げたい",
-               [("ターゲット", ["大人ファン、ギフト、高単価商材"]),
-                ("商品例", ["時計/革小物/アート/フィギュア/インテリア/ジュエリー/ゴルフ用品/高級アパレル"])],
-               [("企画内容", ["ゼロ、セブン、怪獣、ロゴ、メカ、世界観を使い、大人が所有したくなる商品を作る"]),
-                ("連動先", ["ゼロ映画/周年施策/ギフト商戦/EC限定"])],
-               "大人ファン向けには、世界観やシンボルを活かした高付加価値商品を広げたいです。")
-category_slide(21, 10, "企画⑩ 女性・ライト層", "ULTRA KAWAII / CHARACTER MIX",
-               "従来のヒーロー商品とは違う入口を作る",
-               "これまでウルトラマンに触れてこなかった層にも、雑貨・キャラクター文脈で接点を広げたい",
-               [("ターゲット", ["女性、ライトファン、キャラクター雑貨層"]),
-                ("商品例", ["ポーチ/キーホルダー/ぬいぐるみ/コスメ雑貨/ステーショナリー/バッグ/ルーム雑貨"])],
-               [("企画内容", ["IPコラボやデフォルメ表現を活用し、従来のヒーロー商品とは違う入口を作る",
-                          "サンリオ等のコラボが出せる場合は、ここで強く見せる【開示確認】"]),
-                ("連動先", ["IPコラボ/キャラクター雑貨売場/ギフト"])],
-               "これまでウルトラマンに触れてこなかった層にも、雑貨・キャラクター文脈で接点を広げたいです。")
+# Slide 7-13|カテゴリー別
+category_slide(7, "MD・グッズ・玩具・アパレル", "2027新展開 商品化パッケージ",
+               "2027年の初速を、一緒に作る5つの企画",
+               ["新作連動キッズMD", "映画・ゼロ関連商品", "歴代ヒーロー/怪獣コレクション",
+                "大人ファン向けプレミアム商品", "女性ライト層向け雑貨"],
+               "Tシャツ/スウェット/キャップ/アクスタ/フィギュア/カード/文具/雑貨/プレミアムフィギュア/怪獣柄パターン/ゼロ関連素材/スタイルガイド抜粋/売場イメージ",
+               "2027年の初速商品は、今日から仕込みが始まります。",
+               "まず、最大のカテゴリーであるMD・グッズの皆さまへ。2027年の新展開に向けて、5つの商品化"
+               "パッケージをご用意しました。キッズMDから、大人向けプレミアム、女性ライト層向けまで。"
+               "新作の初速商品は、発売日から逆算すると今日から仕込みが始まります。")
+category_slide(8, "食品・飲料・外食", "親子キャンペーンパッケージ",
+               "親子需要 × 映画・イベントの山",
+               ["限定パッケージ", "購入特典カード", "映画半券キャンペーン",
+                "親子ペア応募", "外食コラボメニュー", "ウルサマ来場者特典"],
+               "菓子・飲料・アイス・ゼリー・パンのパッケージモック/キッズプレート/コラボドリンク/ノベルティ/親子写真",
+               "親子の熱量を、購入・来店・応募につなげる。",
+               "食品・飲料・外食の皆さまには、親子キャンペーンパッケージをご提案します。映画やイベントの"
+               "山に合わせて、限定パッケージ、半券キャンペーン、コラボメニュー。ウルトラマンの親子熱量を、"
+               "購入・来店・応募という行動に変える企画です。")
+category_slide(9, "流通・EC・商業施設", "ULTRA MART / 売場連動パッケージ",
+               "「商品を置く」ではなく「売場を作る」",
+               ["映画公開記念棚/ウルサマ連動棚", "ゼロ特集棚/怪獣特集棚",
+                "IPコラボ棚", "POPUP/EC限定販売", "購入特典"],
+               "棚モック/POPUPイメージ/ECページモック/店頭POP/棚帯/購入特典告知/館内装飾/スタンプラリー",
+               "商品を作るだけでなく、売場まで一緒に設計する。",
+               "流通・EC・商業施設の皆さまには、「商品を置く」のではなく「売場を作る」提案です。映画棚、"
+               "ウルサマ棚、怪獣棚、IPコラボ棚。期間限定の売場ジャックからPOPUP、EC限定まで、売場その"
+               "ものを一緒に設計させてください。")
+category_slide(10, "広告代理店・SP", "企業キャンペーン活用パッケージ",
+               "クライアント提案に、そのまま使える",
+               ["親子集客/夏休み販促", "防災/交通安全", "地域創生",
+                "未来・テクノロジー/CSR", "商業施設回遊"],
+               "店頭キャンペーン事例/交通広告モック/SNS投稿施策/ヒーローグリーティング写真/スタンプラリー台紙/企業タイアップ動画イメージ",
+               "ウルトラマンは、企業課題を解決するキャンペーン装置になる。",
+               "広告代理店・SPの皆さまには、クライアント提案にそのまま使えるパッケージをご用意します。"
+               "親子集客、防災、交通安全、地域創生。ウルトラマンは「正義」「勇気」「未来」という文脈を"
+               "持っているので、企業課題と接続しやすいIPです。")
+category_slide(11, "デジタル・ゲーム", "デジタル・ゲーム連動パッケージ",
+               "リアルIPの熱量を、デジタルへ",
+               ["ゲーム内コラボ/限定アバター", "デジタルスタンプ", "SNSキャンペーン",
+                "配信連動/EC限定デジタル特典", "ファンコミュニティ施策"],
+               "ゲーム画面風モック/ガチャ画面/限定キャラクター/デジタルアイテム/SNS投稿テンプレート/YouTubeサムネイル風/ライブ配信画面",
+               "リアル商品だけでなく、デジタル接点でもファンを広げる。",
+               "デジタル・ゲームの皆さまへ。ウルトラマンはリアルだけのIPではありません。ゲーム内コラボ、"
+               "限定アバター、配信連動。歴代ヒーローと怪獣というキャラクター資産は、デジタル施策と非常に"
+               "相性が良い領域です。")
+category_slide(12, "イベント・施設・観光", "会いに来るIP 集客パッケージ",
+               "ウルトラマンは、来場理由になる",
+               ["ヒーローショー/グリーティング", "撮影会", "館内スタンプラリー/地域回遊",
+                "商業施設イベント/観光地コラボ", "物販連動"],
+               "ヒーローショー写真/親子観覧写真/決めポーズ写真/グリーティング写真/館内マップ/スタンプラリー台紙/地域イベント写真",
+               "来場理由を作り、購買理由につなげる。",
+               "イベント・施設・観光の皆さまへ。ウルトラマンの最大の特長は「会いに来てもらえる」ことです。"
+               "ヒーローショー、グリーティング、スタンプラリー。来場理由を作り、そのまま館内の回遊と購買に"
+               "つなげる集客パッケージをご提案します。")
 
-# 22. IPコラボ
-s = new_slide("IPコラボ・流通", "SLIDE 22|IPコラボ・流通",
-              "ウルトラマンは、IPコラボによって新しいファン層・新しい売場・新しい商品カテゴリーに"
-              "広がっています。今後は、コラボIPを起点に、ライセンシーの皆さまと共同で商品化・売場化"
-              "していきたいと考えています。※「やりました」の実績紹介ではなく、役割と商品化機会で見せる。")
-title(s, "IPコラボで、新しいファン層へ――コラボを起点に、共同で商品化・売場化する")
+# Slide 13|IPコラボ
+s = new_slide("13|FOR IP COLLABORATION",
+              "IPコラボは、ウルトラマンの入口を広げる装置です。かわいい文脈で女性・ライト層へ。ホビー文脈で"
+              "コレクターへ。すでにモフサンド、ベイブレードで実証されています。コラボを起点に、新しい売場と"
+              "新しいファン層を一緒に開拓しませんか。")
+title(s, "IPコラボで、新しいファン層へ")
 rule(s)
-lead(s, "コラボごとに「役割・狙う層・商品化機会」が異なる――ここに皆さまの企画の入口がある")
+lead(s, "ウルトラマンは、男性・キッズ向けだけではない")
 table_block(s,
-            ["コラボ", "役割", "狙う層", "商品化機会"],
-            [["モフサンド", "かわいい文脈", "女性・ライト層", "雑貨、アパレル、小物"],
-             ["ベイブレード", "キッズ・ホビー文脈", "男児・玩具層", "玩具、ホビー、イベント"],
-             ["サンリオ【開示確認】", "キャラクター雑貨文脈", "女性、ファミリー、ギフト", "雑貨、文具、アパレル、流通棚"],
-             ["ゼロ関連", "ヒーロー・大人ファン文脈", "コアファン、親世代", "プレミアム、アパレル、ホビー"],
-             ["ギャラファイ系", "キャラ横断文脈", "コレクター", "ランダム、EC、限定商品"]],
-            2.25, [Inches(2.5), Inches(2.7), Inches(2.9), Inches(4.1)],
-            size=10, row_h=0.44)
-callout(s, "キーメッセージ", "コラボIPを起点に、新しいファン層・新しい売場をライセンシーの皆さまと共同で開拓していく")
+            ["方向性", "狙う層", "商品化機会"],
+            [["かわいい文脈", "女性・ライト層", "雑貨・文具"],
+             ["ホビー文脈", "キッズ・コレクター", "玩具・カード"],
+             ["キャラクター文脈", "ファミリー・ギフト", "流通棚・雑貨"],
+             ["ヒーロー文脈", "コアファン", "プレミアム・アパレル"]],
+            2.3, [Inches(3.2), Inches(3.6), Inches(5.4)], size=11.5, row_h=0.5)
+photo_zone(s, ML, Inches(5.0), CW, Inches(1.2),
+           "コラボ実績・イメージ",
+           "モフサンド/ベイブレード/サンリオ(開示可能なら)/コラボ商品写真/コラボ棚モック/新規ファン層マップ")
+bottom_copy(s, "ウルトラマンの入口を、もっと広げる。")
 
-# 23. ウルトラマートと流通展開
-s = new_slide("IPコラボ・流通", "SLIDE 23|IPコラボ・流通",
-              "円谷側でも、ウルトラマン商品を売る場所、見せる場所、出会う場所を増やしていきます。"
-              "商品化だけでなく、売場化・販促化まで一緒に設計できることが、今後のライセンス戦略の"
-              "大きなポイントです。")
-title(s, "ウルトラマートと流通展開――作った商品の「売場の出口」を用意する")
+# Slide 14|ULTRA MART
+s = new_slide("14|ULTRA MART",
+              "「作った商品はどこで売れるのか」。この不安にお応えするのがULTRA MARTです。売る場所であり、"
+              "見せる場所であり、話題化する場所。皆さまの商品の出口を、円谷側でも用意していきます。")
+title(s, "ULTRA MART|売場の出口")
 rule(s)
-lead(s, "円谷側でも「売る場所・見せる場所・出会う場所」を増やしていく")
-sections(s, [
-    ("見せるもの", [
-        "ウルトラマートのコンセプト/売場写真/商品展開イメージ",
-        "POPUP展開/限定商品枠/先行販売枠",
-        "映画連動棚/ウルサマ連動棚/IPコラボ棚/EC連動",
-    ]),
-])
-placeholder(s, "【素材10待ち】ウルトラマート売場写真・展開イメージに差し替え", 4.35)
-callout(s, "キーメッセージ", "商品を作っていただくだけでなく、どこで・どう見せ・どう売るかまで一緒に設計していく")
-
-# 24. スタイルガイド戦略
-s = new_slide("スタイルガイド・監修", "SLIDE 24|スタイルガイド・監修",
-              "2027年度以降の展開に向けて、ライセンシーの皆さまが企画しやすいよう、カテゴリー別・"
-              "ターゲット別に使える素材とデザインガイドを整備していきます。"
-              "完成感を無理に出すのではなく「使える形にする方針」を打ち出す。")
-title(s, "商品化を加速するスタイルガイド戦略――カテゴリー別・ターゲット別に「使える形」で")
-rule(s)
-lead(s, "“素材をお渡しします”ではなく、“商品化しやすい形にしてお渡しします”")
-table_block(s,
-            ["ガイド", "使う企業"],
-            [["キッズ向けガイド", "食品、玩具、文具、子ども服"],
-             ["大人ファン向けガイド", "アパレル、雑貨、プレミアム商品"],
-             ["女性・ライト層向けガイド", "雑貨、文具、キャラクターコラボ"],
-             ["怪獣・ヴィランガイド", "アパレル、ホビー、雑貨"],
-             ["映画連動ガイド", "食品、外食、流通、広告"],
-             ["流通販促ガイド", "小売、量販店、商業施設"],
-             ["広告キャンペーンガイド", "代理店、SP、企業タイアップ"]],
-            2.25, [Inches(3.6), Inches(8.6)], size=10, row_h=0.42)
-callout(s, "キーメッセージ", "これが今後のライセンス営業の大きな方針です")
-
-# 25. 監修・商品化フロー
-s = new_slide("スタイルガイド・監修", "SLIDE 25|スタイルガイド・監修",
-              "企画提出から商品化までの流れを標準化しています。個別商談では、NDAのうえでさらに詳細な"
-              "素材をご覧いただけます。")
-title(s, "監修・商品化フロー――企画提出から商品化まで、迷わない")
-rule(s)
-lead(s, "「作りたい」と思った後、すぐ動ける体制を用意する")
+lead(s, "ULTRA MARTの、3つの役割")
 cards(s, [
-    ("① 企画提出", "カテゴリー別ガイド・テンプレートを利用", "pale"),
-    ("② 初稿確認", "標準リードタイムを明記", "pale"),
-    ("③ 修正", "差し戻し理由を明確に共有", "pale"),
-    ("④ 承認・商品化", "売場・販促の設計まで並走", "dark"),
-], y=2.3, h=1.35, n_cols=4, title_size=12, body_size=9.5)
-sections(s, [
-    ("開示区分", ["当日開示/NDA後開示/個別商談時開示――商談の段階に応じて詳細素材をご覧いただけます"]),
-], y=4.0)
-placeholder(s, "【素材11・12待ち】スタイルガイド抜粋・監修フロー資料", 4.75)
-callout(s, "キーメッセージ", "企画のご相談から商品化まで、止まらない導線を用意しています")
+    ("① 売る場所", "商品の販売拠点・EC連動", "panel"),
+    ("② 見せる場所", "限定コーナー・POPUP展開", "panel"),
+    ("③ 話題化する場所", "映画・イベント連動の情報発信", "red"),
+], y=2.45, h=1.6, title_size=15, body_size=11)
+photo_zone(s, ML, Inches(4.45), CW, Inches(1.75),
+           "ULTRA MART ビジュアル",
+           "ウルトラマート外観/店内写真/商品棚/限定商品コーナー/POPUP展開イメージ/EC連動ページ/イベント物販との連動図")
+bottom_copy(s, "商品を、ファンと出会う場所へ。")
 
-# 26. 本日から受付開始
-s = new_slide("クロージング", "SLIDE 26|クロージング",
-              "本日ご紹介した各カテゴリー企画について、個別相談の受付を開始します。会場内のQRより、"
-              "関心カテゴリーとご希望の相談テーマをご登録ください。2027年度以降の展開に向けて、早期に"
-              "ご相談いただいた企業様から、優先的に企画検討を進めてまいります。"
-              "【運営】QRは後方からも読めるサイズで最低30秒表示。次スライドでも画面隅に残す。")
-title(s, "本日から受付開始――個別商談・企画相談・NDA説明会・スタイルガイド")
+# Slide 15|スタイルガイド戦略
+s = new_slide("15|STYLE GUIDE",
+              "「企画したいが、素材はあるのか」。あります。しかも、ただ渡すのではなく、カテゴリー別・"
+              "ターゲット別に商品化しやすい形に整備していきます。キッズ、大人、女性、怪獣、映画連動、流通、"
+              "広告。貴社の企画に合うガイドを用意します。")
+title(s, "スタイルガイド戦略")
 rule(s)
-lead(s, "会場内のQRから、関心カテゴリーとご希望の相談テーマをご登録ください")
-qr = rect(s, ML, Inches(2.3), Inches(2.7), Inches(2.7), PALE, ACCENT, Pt(1.2),
-          dash=True, shape=MSO_SHAPE.ROUNDED_RECTANGLE, radius=0.06)
+lead(s, "カテゴリー別・ターゲット別に、「使える形」で")
+guides = ["キッズ向け", "大人ファン向け", "女性・ライト層向け", "怪獣・ヴィラン向け",
+          "映画連動向け", "流通販促向け", "広告キャンペーン向け"]
+cards(s, [(g, "", "panel") for g in guides[:4]], y=2.4, h=0.75, n_cols=4, title_size=12.5, gap_in=0.18)
+cards(s, [(g, "", "panel") for g in guides[4:]], y=3.35, h=0.75, n_cols=3, title_size=12.5, gap_in=0.18)
+photo_zone(s, ML, Inches(4.4), CW, Inches(1.8),
+           "スタイルガイド抜粋(見開き風)",
+           "ロゴ使用例/キャラクター配置例/カラーパレット/背景パターン/OK・NG例/Tシャツ展開例/パッケージ展開例/POP展開例")
+bottom_copy(s, "素材を渡すだけでなく、商品化しやすい形にする。")
+
+# Slide 16|監修・素材提供フロー
+s = new_slide("16|PROCESS",
+              "進め方はシンプルです。個別相談から始まり、素材共有、企画提出、監修、商品化。各ステップの"
+              "標準期間も明示します。「作りたい」で終わらせず、「作れる」状態まで私たちが伴走します。")
+title(s, "監修・素材提供フロー")
+rule(s)
+lead(s, "相談から商品化まで、5ステップ")
+steps = [("① 個別相談", ""), ("② 素材・ガイド共有", ""), ("③ 企画提出", ""),
+         ("④ 監修・修正", ""), ("⑤ 商品化・販促展開", "")]
+cards(s, [(t, b, "red" if i == 4 else "panel") for i, (t, b) in enumerate(steps)],
+      y=2.55, h=1.15, n_cols=5, title_size=12, gap_in=0.16)
+add_text(s, ML, Inches(4.05), CW, Inches(0.4),
+         [("各ステップの標準期間・提出物チェックリスト・開示区分(当日/配布/NDA後)を個別商談時にご提示します",
+           11, DIM, False)])
+photo_zone(s, ML, Inches(4.6), CW, Inches(1.6),
+           "フロー補足素材",
+           "5ステップのフロー図/提出物チェックリスト/開示区分表/監修期間目安/商品化スケジュール例")
+bottom_copy(s, "作りたい、で終わらせず、作れる状態まで伴走する。")
+
+# Slide 17|本日から受付開始(QR)
+s = new_slide("17|START TODAY",
+              "ここで、本日一番大事なご案内です。いまこの瞬間から、個別商談の受付を開始します。お手元の"
+              "スマートフォンで、このQRからご登録ください。相談カテゴリを選ぶだけ。登録いただいた企業様には、"
+              "担当者から順にご連絡し、個別商談、素材共有、企画検討へ進みます。この後のコンテンツ紹介の間も、"
+              "QRは画面の隅に残しておきます。【運営】QRは最低60秒表示。以降のスライドでも画面隅に残す。")
+title(s, "本日から受付開始")
+rule(s)
+lead(s, "個別商談・企画相談、いま登録できます")
+qr = rect(s, ML, Inches(2.3), Inches(3.7), Inches(3.7), PANEL2, RED, Pt(1.6),
+          dash=True, shape=MSO_SHAPE.ROUNDED_RECTANGLE, radius=0.04)
 tfq = qr.text_frame; tfq.word_wrap = True
 tfq.vertical_anchor = MSO_ANCHOR.MIDDLE
-for qi, qline in enumerate(["【QRコード】", "個別商談・企画相談", "受付フォーム"]):
+for qi, qline in enumerate(["【QRコード】", "個別商談・企画相談", "登録は約3分"]):
     pq = tfq.paragraphs[0] if qi == 0 else tfq.add_paragraph()
     pq.alignment = PP_ALIGN.CENTER
     rq = pq.add_run(); rq.text = qline
-    style_run(rq, 13 if qi != 2 else 11, DK, bold=True)
-sections(s, [
-    ("フォームでご登録いただくこと", [
-        "検討したい領域(商品化/広告タイアップ/流通展開/イベント協賛/IPコラボ/海外展開)",
-        "検討カテゴリー(食品/飲料/外食/アパレル/雑貨/文具/玩具/ホビー/流通/広告 ほか)",
-        "関心のある展開(2027テレビ/映画/ゼロ関連/ギャラファイ/IPコラボ/ウルトラマート/イベント連動)",
-        "個別商談希望/NDA説明会希望/スタイルガイド資料希望/企画提出予定時期",
-    ]),
-], y=2.35, x=Inches(3.6), w=Inches(9.2), size=10.5)
-callout(s, "優先案内", "早期にご相談いただいた企業様から、優先的に企画検討を進めてまいります")
+    style_run(rq, 16 if qi != 2 else 11, WHITE if qi != 2 else BLUE, bold=(qi != 2))
+add_text(s, Inches(4.6), Inches(2.3), Inches(8.2), Inches(0.35),
+         [("相談カテゴリ(複数選択可)", 12, RED, True)])
+cats = ["商品化", "食品・外食", "流通・売場", "広告タイアップ", "イベント・施設",
+        "IPコラボ", "デジタル", "スタイルガイド請求", "NDA後説明会"]
+cards(s, [(c, "", "panel") for c in cats], y=2.75, h=0.55, n_cols=3,
+      title_size=11, gap_in=0.14, x=Inches(4.6), total_w=Inches(8.18))
+add_text(s, Inches(4.6), Inches(4.95), Inches(8.2), Inches(0.35),
+         [("登録後の流れ", 12, RED, True)])
+add_text(s, Inches(4.6), Inches(5.35), Inches(8.2), Inches(0.6),
+         [("QR登録 → 担当者連絡(1週間以内)→ 個別商談 → 素材共有 → 企画検討",
+           12.5, WHITE, True)])
+bottom_copy(s, "早期にご相談いただいた企業様から、具体的な企画検討を進めます。")
 
-# 27. クロージング
-s = new_slide("クロージング", "SLIDE 27|クロージング",
-              "本日ご紹介した2027年度以降の展開は、円谷プロだけで完結するものではありません。"
-              "映像で生まれる話題、イベントで生まれる熱量、流通で生まれる売場、そして皆さまの商品・"
-              "キャンペーンがつながることで、ウルトラマンの次の市場が作られていきます。"
-              "だからこそ、今日を起点に、ぜひ具体的なご相談を始めさせてください。食品、アパレル、雑貨、"
-              "文具、流通、広告、IPコラボ、プレミアム商品。それぞれのカテゴリーで、まだまだ一緒に作れる"
-              "余地があります。2027年度以降のウルトラマンの売場は、今日ここから始まります。"
-              "皆さまと一緒に、次の商機を作っていきたいと思います。")
-title(s, "2027年のウルトラマン売場は、今日ここから始まります。")
+# Slide 18|商機を支えるコンテンツ展開
+s = new_slide("18|CONTENT",
+              "最後に5分だけ、この商機を支えるコンテンツの話をします。ここまでの提案が「続けられる」理由です。")
+title(s, "最後に、商機を支えるコンテンツ展開")
 rule(s)
-statement(s, [
-    ("映像で生まれる話題。イベントで生まれる熱量。流通で生まれる売場。", "gray"),
-    ("そこに皆さまの商品・キャンペーンがつながることで、次の市場が作られる。", "ink"),
-    ("――今日を起点に、具体的なご相談を始めさせてください。", "accent"),
-], y=2.6)
+lead(s, "だから、商機は続く")
+photo_zone(s, ML, Inches(2.35), CW, Inches(3.85),
+           "コンテンツ接点ビジュアル(大)",
+           "TV・映画・配信・イベントのアイコン/2027年度以降のコンテンツ接点図/ヒーロー集合ビジュアル/"
+           "作品情報の開示可能素材/新作ビジュアル/ゼロ関連/配信系/映画館イメージ 【開示区分は7/14確認会で確定】")
+bottom_copy(s, "コンテンツが、商品化・販促・売場展開の理由を作る。")
 
-OUT = "ULTRAMAN_LICENSEE_PRESENTATION_draft_v4.pptx"
+# Slide 19|3つのコンテンツ接点
+s = new_slide("19|CONTENT",
+              "2027年度以降の接点は3つ。TVシリーズが継続接点を作り、映画が大型の話題化を作り、配信・"
+              "YouTubeがコアファン接点を広げます。この3つが年間を通じて連動するので、商品もキャンペーンも"
+              "単発で終わりません。")
+title(s, "2027年度以降の、3つのコンテンツ接点")
+rule(s)
+lead(s, "継続 × 話題化 × コアファン")
+cards(s, [
+    ("① TVシリーズ", "継続接点\nファンが追い続けたくなる世界観・キャラクター展開", "panel"),
+    ("② 映画・大型映像", "大型話題化\n商品化・販促・流通施策を集中させる最大の山", "panel"),
+    ("③ 配信・YouTube", "コアファン接点\n歴代ヒーロー・怪獣を横断活用できる領域", "panel"),
+], y=2.5, h=2.1, title_size=15, body_size=11)
+photo_zone(s, ML, Inches(4.95), CW, Inches(1.25),
+           "各接点のビジュアル",
+           "TVシリーズ素材/映画館・ポスター・ゼロ関連/配信サムネイル風/歴代ヒーロー/怪獣/コアファン向けビジュアル")
+bottom_copy(s, "接点が続くから、商品もキャンペーンも続けられる。")
+
+# Slide 20|コンテンツ×商機マトリクス
+s = new_slide("20|CONTENT × BUSINESS",
+              "この表が、本日のまとめです。コンテンツごとに、皆さまのカテゴリーの商品化機会が対応しています。"
+              "作品の話をしているようで、実はずっと、皆さまの事業機会の話をしてきました。")
+title(s, "コンテンツが、商品化の理由を作る")
+rule(s)
+lead(s, "コンテンツ × 商機マトリクス")
+table_block(s,
+            ["コンテンツ", "役割", "商品化機会"],
+            [["TVシリーズ", "継続接点", "キッズ、文具、玩具"],
+             ["映画", "大型話題化", "食品、流通、広告、ホビー"],
+             ["配信・YouTube", "コアファン接点", "コレクション、EC、プレミアム"],
+             ["イベント", "熱量化", "物販、限定商品、施設集客"],
+             ["流通", "購買接点", "売場、POPUP、EC"]],
+            2.3, [Inches(3.0), Inches(3.2), Inches(6.0)], size=11.5, row_h=0.5)
+bottom_copy(s, "作品の話ではなく、皆さまの事業機会の話です。")
+
+# Slide 21|クロージング
+s = new_slide("21|CLOSING",
+              "2027年度以降のウルトラマンの売場は、今日ここから始まります。映像の話題、イベントの熱量、"
+              "流通の売場——そこに皆さまの商品とキャンペーンがつながることで、次の市場が生まれます。"
+              "個別相談は、本日より受付開始です。会場を出る前に、ぜひQRのご登録を。皆さまと一緒に、"
+              "次のウルトラマン市場をつくれることを楽しみにしています。")
+title(s, "2027年度以降の売場は、今日ここから始まる", size=26)
+rule(s)
+add_text(s, ML, Inches(1.95), Inches(8.3), Inches(1.2),
+         [("次のウルトラマン市場を、", 24, WHITE, True, {"line": 1.3, "after": 0}),
+          ("皆さまと一緒につくりたい。", 24, WHITE, True, {"line": 1.3})])
+qr2 = rect(s, Inches(9.3), Inches(1.9), Inches(3.45), Inches(3.45), PANEL2, RED,
+           Pt(1.6), dash=True, shape=MSO_SHAPE.ROUNDED_RECTANGLE, radius=0.04)
+tfq = qr2.text_frame; tfq.word_wrap = True
+tfq.vertical_anchor = MSO_ANCHOR.MIDDLE
+for qi, qline in enumerate(["【QRコード再掲】", "個別商談・企画相談", "会場を出る前にご登録を"]):
+    pq = tfq.paragraphs[0] if qi == 0 else tfq.add_paragraph()
+    pq.alignment = PP_ALIGN.CENTER
+    rq = pq.add_run(); rq.text = qline
+    style_run(rq, 14 if qi != 2 else 10.5, WHITE if qi != 2 else BLUE, bold=(qi != 2))
+add_text(s, ML, Inches(3.35), Inches(8.3), Inches(0.4),
+         [("相談カテゴリ:商品化/食品・外食/流通・売場/広告/イベント・施設/IPコラボ/デジタル",
+           11, SUB, False)])
+photo_zone(s, ML, Inches(3.95), Inches(8.3), Inches(2.2),
+           "クロージングビジュアル",
+           "ヒーロー集合ビジュアル/商品・売場・イベント・広告のコラージュ/未来感のある背景")
+bottom_copy(s, "個別相談は、本日より受付開始。")
+
+OUT = "ULTRAMAN_BUSINESS_PARTNERS_MEETING_2026_draft_v5.pptx"
 prs.save(OUT)
 print(f"saved {OUT} with {len(prs.slides._sldIdLst)} slides")
