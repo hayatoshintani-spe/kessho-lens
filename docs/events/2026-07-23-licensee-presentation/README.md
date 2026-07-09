@@ -65,6 +65,7 @@
 | [09-materials-master-list.md](09-materials-master-list.md) | 必要資料マスターリスト(依頼先別・全40項目・期限付き) | 主担当/PM |
 | [10-recruitment-program.md](10-recruitment-program.md) | 募集プログラム設計(カテゴリー別企画10本・QRフォーム・KPI・退避策) | 営業/主担当 |
 | [11-presentation-spec.md](11-presentation-spec.md) | **プレゼン設計書(最新版)** — BUSINESS PARTNERS MEETING 2026・21枚構成・登壇トーク・デザイナー制作指示 | 全員 |
+| [12-asset-requirements.md](12-asset-requirements.md) | 写真・モック素材の要件定義(内容イメージ・点数・必要ピクセル数・納品ルール) | 撮影/デザイナー/モック制作 |
 | [deck.html](deck.html) | 投影確認用スライドデッキ(←→送り/Nノート/F全画面) | 登壇者/確認会 |
 | [event-brief.html](event-brief.html) | 1枚もの運営ブリーフ(社内合意形成用) | 全員 |
 | [materials-checklist.html](materials-checklist.html) | 資料回収チェックリスト(進捗保存機能付き) | 主担当/PM |
