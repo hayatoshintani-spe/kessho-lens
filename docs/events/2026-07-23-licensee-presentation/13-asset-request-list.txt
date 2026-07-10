@@ -112,7 +112,7 @@
  e  来場者が写る写真の肖像権(掲出許諾)確認
 
 ──────────────────────────────────
-納品先:■■■共有フォルダURL■■■
+納品先:https://drive.google.com/drive/folders/1Nk6C5s9mTxFCz0cYNK0Qap2HEdQQLSNW
  └ photo(実写)/mock(モック)/kv(キービジュアル)
 ファイル名:頭に用途を記載(例:ウルサマ物販列_01.jpg)
 質問窓口:(担当者名・連絡先)
