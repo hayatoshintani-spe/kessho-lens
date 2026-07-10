@@ -564,9 +564,7 @@ cards(s, [(t, b, "red" if i == 4 else "panel") for i, (t, b) in enumerate(steps)
 add_text(s, ML, Inches(4.05), CW, Inches(0.4),
          [("各ステップの標準期間・提出物チェックリスト・開示区分(当日/配布/NDA後)を個別商談時にご提示します",
            11, DIM, False)])
-photo_zone(s, ML, Inches(4.6), CW, Inches(1.6),
-           "フロー補足素材",
-           "5ステップのフロー図/提出物チェックリスト/開示区分表/監修期間目安/商品化スケジュール例")
+pic(s, "mock/s16_01_flow-strip_L.png", ML, Inches(4.6), CW, Inches(1.6))
 bottom_copy(s, "作りたい、で終わらせず、作れる状態まで伴走する。")
 
 # Slide 17|本日から受付開始(QR)
