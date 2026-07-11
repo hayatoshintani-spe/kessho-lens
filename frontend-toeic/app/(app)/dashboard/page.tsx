@@ -14,9 +14,13 @@ import { TodayTaskList } from "@/components/dashboard/TodayTaskList";
 import { SkillProgress } from "@/components/dashboard/SkillProgress";
 import { WeeklyChart } from "@/components/dashboard/WeeklyChart";
 import { GenerateTasksButton } from "@/components/dashboard/GenerateTasksButton";
+import { StudyHeatmap } from "@/components/dashboard/StudyHeatmap";
 import { SKILL_CODES, type DailyTask, type SkillCode } from "@/lib/types/db";
 import { addDays, formatISO, startOfDay, todayISO, weekRange } from "@/lib/utils/date";
+import { buildHeatmap } from "@/lib/stats/heatmap";
 import Link from "next/link";
+
+const HEATMAP_WEEKS = 17;
 
 export default async function DashboardPage() {
   const supabase = createSupabaseServerClient();
@@ -98,6 +102,23 @@ export default async function DashboardPage() {
 
   const streak = profile.streak_count ?? 0;
 
+  // Heatmap: sessions over the last HEATMAP_WEEKS weeks.
+  const heatmapStart = startOfDay(addDays(start, -(HEATMAP_WEEKS - 1) * 7));
+  const heatmapStartISO = formatISO(heatmapStart, { representation: "date" });
+  const { data: heatSessions } = await supabase
+    .from("learning_sessions")
+    .select("started_at, duration_seconds")
+    .eq("user_id", user.id)
+    .gte("started_at", `${heatmapStartISO}T00:00:00`);
+
+  const minutesByDate: Record<string, number> = {};
+  for (const s of heatSessions ?? []) {
+    const iso = s.started_at.slice(0, 10);
+    minutesByDate[iso] =
+      (minutesByDate[iso] ?? 0) + Math.round((s.duration_seconds ?? 0) / 60);
+  }
+  const heatmap = buildHeatmap(minutesByDate, new Date(), HEATMAP_WEEKS);
+
   return (
     <div className="mx-auto max-w-6xl space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -142,6 +163,7 @@ export default async function DashboardPage() {
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <div className="space-y-6 lg:col-span-2">
           <TodayTaskList tasks={tasks} />
+          <StudyHeatmap model={heatmap} />
           <WeeklyChart data={days} />
         </div>
         <div className="space-y-6">

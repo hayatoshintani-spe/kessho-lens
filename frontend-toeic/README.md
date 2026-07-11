@@ -123,8 +123,8 @@ vitest で検証しています。純粋ロジックは node 環境、React コ�
 
 | 種別 | 対象 |
 |---|---|
-| ロジック | `planDailyTasks` / `nextReview` (SM-2) / `format` |
-| コンポーネント | `SelfRatingStars` / `TodayTaskList` / `SessionTimer` |
+| ロジック | `planDailyTasks` / `nextReview` (SM-2) / `format` / `buildHeatmap` |
+| コンポーネント | `SelfRatingStars` / `TodayTaskList` / `SessionTimer` / `StudyHeatmap` |
 
 ```bash
 npm test          # 1回実行
@@ -139,6 +139,7 @@ CI (GitHub Actions) でも push / PR 時に自動実行されます。
    - Supabase の **Auth** で「Confirm email」をオフにすると即座にログインできます（推奨：MVP動作確認時のみ）。
 2. `/onboarding` で目標と1日の時間、苦手分野を入力。
 3. `/dashboard` で「今日のタスクを生成」を押す → 6 つの skill 別タスクが表示される。
+   学習ヒートマップ（直近17週の継続グリッド）とスキル別進捗もここに表示される。
 4. 各 `/study/*` でセッションを実施 → 終了で `learning_sessions` に記録 + 当日タスクが done に。
 5. `/logs` で履歴、`/review/weekly` で週次サマリ。
 6. `/admin` で教材を追加（`user_profiles.role = 'admin'` のユーザーのみ書き込み可）。
