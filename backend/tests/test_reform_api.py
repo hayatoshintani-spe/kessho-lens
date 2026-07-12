@@ -62,6 +62,45 @@ def test_action_empty_title_rejected(client):
     assert res.status_code == 422
 
 
+def test_action_blank_title_rejected_on_patch(client):
+    res = client.post("/api/intel/reform/actions", json={
+        "title": "x", "owner": "y", "deadline": "2026-08-01",
+    })
+    aid = res.json()["action"]["id"]
+    assert client.patch(f"/api/intel/reform/actions/{aid}",
+                        json={"title": "   "}).status_code == 422
+    assert client.patch(f"/api/intel/reform/actions/{aid}",
+                        json={"owner": ""}).status_code == 422
+
+
+def test_action_deadline_format_validated(client):
+    # 作成時: YYYY-MM-DD 以外は拒否 (フロントの文字列比較を壊さないため)
+    for bad in ("2026/08/01", "", "20260801", "2026-8-1"):
+        res = client.post("/api/intel/reform/actions", json={
+            "title": "x", "owner": "y", "deadline": bad,
+        })
+        assert res.status_code == 422, f"deadline={bad!r} が通ってしまった"
+
+    # 更新時も同様
+    res = client.post("/api/intel/reform/actions", json={
+        "title": "x", "owner": "y", "deadline": "2026-08-01",
+    })
+    aid = res.json()["action"]["id"]
+    assert client.patch(f"/api/intel/reform/actions/{aid}",
+                        json={"deadline": "2026/09/01"}).status_code == 422
+
+
+def test_action_patch_empty_string_clears_optional_field(client):
+    res = client.post("/api/intel/reform/actions", json={
+        "title": "x", "owner": "y", "deadline": "2026-08-01", "memo": "残すメモ",
+    })
+    aid = res.json()["action"]["id"]
+
+    res = client.patch(f"/api/intel/reform/actions/{aid}", json={"memo": ""})
+    assert res.status_code == 200
+    assert "memo" not in res.json()["action"]
+
+
 def test_kpi_upsert_and_list(client):
     res = client.put("/api/intel/reform/kpis/kpi_revenue", json={
         "value": 100, "target": 200, "period": "2026-Q2", "status": "at_risk",

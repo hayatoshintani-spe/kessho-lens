@@ -6,7 +6,7 @@ JSONファイルベースのストレージモジュール
 import json
 import aiofiles
 from pathlib import Path
-from typing import Any, List, Dict, Optional
+from typing import Any, Callable, List, Dict, Optional
 import threading
 
 # データディレクトリのパス（リポジトリルートの /data/）
@@ -48,30 +48,44 @@ def ensure_data_dir():
                 json.dump(initial_data, f, ensure_ascii=False, indent=2)
 
 
+def _read_json_unlocked(filepath: Path) -> Any:
+    if not filepath.exists():
+        return None
+    with open(filepath, "r", encoding="utf-8") as f:
+        return json.load(f)
+
+
+def _write_json_unlocked(filepath: Path, data: Any) -> None:
+    tmp_path = filepath.with_suffix(".tmp")
+    with open(tmp_path, "w", encoding="utf-8") as f:
+        json.dump(data, f, ensure_ascii=False, indent=2, default=str)
+    tmp_path.replace(filepath)
+
+
 def read_json(filename: str) -> Any:
     """JSONファイルを同期的に読み込む"""
     ensure_data_dir()
-    filepath = DATA_DIR / filename
-    lock = _get_file_lock(filename)
-
-    with lock:
-        if not filepath.exists():
-            return None
-        with open(filepath, "r", encoding="utf-8") as f:
-            return json.load(f)
+    with _get_file_lock(filename):
+        return _read_json_unlocked(DATA_DIR / filename)
 
 
 def write_json(filename: str, data: Any) -> None:
     """JSONファイルに同期的に書き込む（原子的書き込み）"""
     ensure_data_dir()
-    filepath = DATA_DIR / filename
-    lock = _get_file_lock(filename)
+    with _get_file_lock(filename):
+        _write_json_unlocked(DATA_DIR / filename, data)
 
-    with lock:
-        tmp_path = filepath.with_suffix(".tmp")
-        with open(tmp_path, "w", encoding="utf-8") as f:
-            json.dump(data, f, ensure_ascii=False, indent=2, default=str)
-        tmp_path.replace(filepath)
+
+def update_json(filename: str, mutate: Callable[[Any], Any]) -> None:
+    """ロックを保持したまま read → 変更 → write を行う。
+    read/write を別ロックで行うと read-modify-write が競合し得るため、
+    リスト更新系は必ずこちらを使う。
+    """
+    ensure_data_dir()
+    filepath = DATA_DIR / filename
+    with _get_file_lock(filename):
+        data = _read_json_unlocked(filepath)
+        _write_json_unlocked(filepath, mutate(data))
 
 
 async def read_json_async(filename: str) -> Any:
@@ -203,6 +217,18 @@ class Storage:
     def save_watchlists(watchlists: List[Dict]) -> None:
         write_json("intel_watchlist.json", watchlists)
 
+    # ─── Reform: 共通 upsert ────────────────────────────────────────────
+
+    @staticmethod
+    def _upsert_by_key(filename: str, key_field: str, item: Dict) -> None:
+        """key_field の一致する既存要素を置き換えて追記(ロック保持で原子的)"""
+        update_json(
+            filename,
+            lambda items: [
+                i for i in (items or []) if i.get(key_field) != item.get(key_field)
+            ] + [item],
+        )
+
     # ─── Reform: Actions ────────────────────────────────────────────────
 
     @staticmethod
@@ -220,19 +246,20 @@ class Storage:
 
     @staticmethod
     def save_reform_action(action: Dict) -> None:
-        actions = read_json("reform_actions.json") or []
-        actions = [a for a in actions if a.get("id") != action.get("id")]
-        actions.append(action)
-        write_json("reform_actions.json", actions)
+        Storage._upsert_by_key("reform_actions.json", "id", action)
 
     @staticmethod
     def delete_reform_action(action_id: str) -> bool:
-        actions = read_json("reform_actions.json") or []
-        remaining = [a for a in actions if a.get("id") != action_id]
-        if len(remaining) == len(actions):
-            return False
-        write_json("reform_actions.json", remaining)
-        return True
+        result = {"removed": False}
+
+        def mutate(items):
+            items = items or []
+            remaining = [a for a in items if a.get("id") != action_id]
+            result["removed"] = len(remaining) != len(items)
+            return remaining
+
+        update_json("reform_actions.json", mutate)
+        return result["removed"]
 
     # ─── Reform: KPI Snapshots ─────────────────────────────────────────
 
@@ -243,12 +270,7 @@ class Storage:
     @staticmethod
     def save_kpi_snapshot(snapshot: Dict) -> None:
         """kpi_id をキーに upsert(1 KPI = 最新スナップショット 1 件)"""
-        snapshots = read_json("reform_kpis.json") or []
-        snapshots = [
-            s for s in snapshots if s.get("kpi_id") != snapshot.get("kpi_id")
-        ]
-        snapshots.append(snapshot)
-        write_json("reform_kpis.json", snapshots)
+        Storage._upsert_by_key("reform_kpis.json", "kpi_id", snapshot)
 
     # ─── Reform: Weekly Agendas ────────────────────────────────────────
 
@@ -272,9 +294,4 @@ class Storage:
     @staticmethod
     def save_reform_agenda(agenda: Dict) -> None:
         """week_of をキーに upsert"""
-        agendas = read_json("reform_agendas.json") or []
-        agendas = [
-            a for a in agendas if a.get("week_of") != agenda.get("week_of")
-        ]
-        agendas.append(agenda)
-        write_json("reform_agendas.json", agendas)
+        Storage._upsert_by_key("reform_agendas.json", "week_of", agenda)

@@ -86,14 +86,17 @@ export default function ActionsPage() {
   }, [actions, statusFilter, priorityFilter]);
 
   async function updateStatus(id: string, status: ActionStatus) {
-    const prev = actions;
-    // 楽観更新 → 失敗時ロールバック
+    const prevStatus = actions.find(a => a.id === id)?.status;
+    // 楽観更新 → 失敗時は該当アクションだけロールバック
+    // (リスト全体を巻き戻すと、並行して成功した他アクションの更新まで消える)
     setActions(p => p.map(a => (a.id === id ? { ...a, status, updated_at: TODAY } : a)));
     try {
       const saved = await updateReformAction(id, { status });
       setActions(p => p.map(a => (a.id === id ? saved : a)));
     } catch (e) {
-      setActions(prev);
+      if (prevStatus) {
+        setActions(p => p.map(a => (a.id === id ? { ...a, status: prevStatus } : a)));
+      }
       setErrorMsg(`ステータス更新に失敗: ${(e as Error).message}`);
     }
   }
