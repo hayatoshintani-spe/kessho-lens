@@ -1,0 +1,115 @@
+[
+  {
+    "id": "act_001",
+    "title": "中国MD自社企画比率を 30→50% に引き上げる施策案を立案",
+    "owner": "商品企画部",
+    "deadline": "2026-07-10",
+    "status": "in_progress",
+    "priority": "urgent",
+    "memo": "抖音・小紅書での反応分析を踏まえてSKU構成案を作る",
+    "linked_kpi_ids": [
+      "kpi_sku_count",
+      "kpi_overseas_ratio"
+    ],
+    "next_review_date": "2026-07-12",
+    "created_at": "2026-06-28",
+    "updated_at": "2026-07-09"
+  },
+  {
+    "id": "act_002",
+    "title": "原宿店舗を D2C会員獲得拠点として再設計する素案作成",
+    "owner": "直営事業部",
+    "deadline": "2026-07-19",
+    "status": "in_progress",
+    "priority": "high",
+    "memo": "QRコード会員登録動線+店舗体験設計の両軸で",
+    "linked_kpi_ids": [
+      "kpi_member_count",
+      "kpi_store_visitors"
+    ],
+    "next_review_date": "2026-07-17",
+    "created_at": "2026-07-02",
+    "updated_at": "2026-07-11"
+  },
+  {
+    "id": "act_003",
+    "title": "海外ライセンス契約 最低保証条件の見直し方針を経営承認",
+    "owner": "ライセンス部",
+    "deadline": "2026-07-15",
+    "status": "awaiting_review",
+    "priority": "urgent",
+    "memo": "4契約について、現行最低保証 vs 想定実績の差分を可視化済み",
+    "linked_kpi_ids": [
+      "kpi_royalty_rate",
+      "kpi_contract_renewal"
+    ],
+    "created_at": "2026-07-05",
+    "updated_at": "2026-07-11"
+  },
+  {
+    "id": "act_004",
+    "title": "大人向け高単価商品ライン 第1弾コレクション企画",
+    "owner": "商品企画部",
+    "deadline": "2026-08-02",
+    "status": "in_progress",
+    "priority": "high",
+    "memo": "想定価格帯 ¥8,000-¥30,000、SKU 12点",
+    "linked_kpi_ids": [
+      "kpi_avg_basket",
+      "kpi_gross_margin"
+    ],
+    "created_at": "2026-07-07",
+    "updated_at": "2026-07-12"
+  },
+  {
+    "id": "act_005",
+    "title": "SNS起点の商品企画体制 立ち上げ案を提案",
+    "owner": "組織開発",
+    "deadline": "2026-07-26",
+    "status": "not_started",
+    "priority": "medium",
+    "memo": "TikTok/Instagram の月次トレンドを商品企画に直結させる組織",
+    "created_at": "2026-07-10",
+    "updated_at": "2026-07-10"
+  },
+  {
+    "id": "act_006",
+    "title": "模倣品流通対策の海外法務リソース確保",
+    "owner": "法務",
+    "deadline": "2026-07-07",
+    "status": "on_hold",
+    "priority": "high",
+    "memo": "対応国を絞り込み中。中国 + 東南アジア 3カ国を優先候補に",
+    "created_at": "2026-06-22",
+    "updated_at": "2026-07-02"
+  },
+  {
+    "id": "act_007",
+    "title": "IR向け中期成長ストーリー(IP収益化軸)のドラフト作成",
+    "owner": "IR/経営企画",
+    "deadline": "2026-07-22",
+    "status": "awaiting_review",
+    "priority": "medium",
+    "memo": "海外IP・D2C・ライセンス改善の3本柱で構成",
+    "linked_kpi_ids": [
+      "kpi_overseas_ratio",
+      "kpi_d2c_revenue"
+    ],
+    "created_at": "2026-06-27",
+    "updated_at": "2026-07-10"
+  },
+  {
+    "id": "act_008",
+    "title": "ファンコミュニティ運営 KPI と運営体制の定義",
+    "owner": "CRM/マーケ",
+    "deadline": "2026-08-09",
+    "status": "not_started",
+    "priority": "low",
+    "linked_kpi_ids": [
+      "kpi_member_count",
+      "kpi_purchase_rate"
+    ],
+    "created_at": "2026-07-09",
+    "updated_at": "2026-07-09"
+  }
+]

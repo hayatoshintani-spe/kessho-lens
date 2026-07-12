@@ -8,9 +8,11 @@ Tsuburaya Intelligence Brief API
 
 import os
 import asyncio
+import re
 import time
 from datetime import datetime, timezone
-from typing import List, Optional
+from typing import List, Literal, Optional
+from uuid import uuid4
 
 from fastapi import APIRouter, BackgroundTasks, HTTPException, Query, Request
 from pydantic import BaseModel
@@ -595,3 +597,201 @@ async def email_test(req: EmailTestRequest):
         brief, top_cards, recipients=req.recipients, dry_run=req.dry_run
     )
     return {"date": brief.get("date"), "result": result}
+
+
+# ─── Reform: アクション / KPI / 週次アジェンダ ──────────────────────────
+# フロントの改革ダッシュボード(旧モックデータ)の永続化バックエンド。
+# 型定義は frontend/lib/reform-types.ts と対応。
+
+ActionStatus = Literal["not_started", "in_progress", "awaiting_review", "done", "on_hold"]
+ActionPriority = Literal["urgent", "high", "medium", "low"]
+KPIStatus = Literal["on_track", "at_risk", "off_track", "no_data"]
+
+_DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
+
+
+def _now_date() -> str:
+    return datetime.now(timezone.utc).strftime("%Y-%m-%d")
+
+
+def _validate_date_format(value: str, field: str) -> None:
+    """フロントは deadline を文字列比較 (a.deadline < TODAY) するため、
+    YYYY-MM-DD 以外を通すと遅延判定・ソートが壊れる。"""
+    if not _DATE_RE.match(value):
+        raise HTTPException(
+            status_code=422, detail=f"{field} は YYYY-MM-DD 形式で指定してください"
+        )
+
+
+class ActionCreateRequest(BaseModel):
+    title: str
+    owner: str
+    deadline: str  # YYYY-MM-DD
+    priority: ActionPriority = "medium"
+    status: ActionStatus = "not_started"
+    memo: Optional[str] = None
+    card_id: Optional[str] = None
+    linked_kpi_ids: Optional[List[str]] = None
+    next_review_date: Optional[str] = None
+
+
+class ActionUpdateRequest(BaseModel):
+    title: Optional[str] = None
+    owner: Optional[str] = None
+    deadline: Optional[str] = None
+    priority: Optional[ActionPriority] = None
+    status: Optional[ActionStatus] = None
+    memo: Optional[str] = None
+    card_id: Optional[str] = None
+    linked_kpi_ids: Optional[List[str]] = None
+    next_review_date: Optional[str] = None
+
+
+# PATCH で空文字を送ると「フィールドをクリア」の意味になる任意項目
+_CLEARABLE_FIELDS = ("memo", "card_id", "next_review_date")
+
+
+@router.get("/intel/reform/actions")
+async def list_reform_actions():
+    actions = Storage.get_reform_actions()
+    return {"actions": actions, "count": len(actions)}
+
+
+@router.post("/intel/reform/actions")
+async def create_reform_action(req: ActionCreateRequest):
+    now = _now_date()
+    title = req.title.strip()
+    owner = req.owner.strip()
+    if not title:
+        raise HTTPException(status_code=422, detail="title は必須です")
+    if not owner:
+        raise HTTPException(status_code=422, detail="owner は必須です")
+    _validate_date_format(req.deadline, "deadline")
+    if req.next_review_date:
+        _validate_date_format(req.next_review_date, "next_review_date")
+
+    action = {
+        "id": f"act_{uuid4().hex[:10]}",
+        "title": title,
+        "owner": owner,
+        "deadline": req.deadline,
+        "status": req.status,
+        "priority": req.priority,
+        "created_at": now,
+        "updated_at": now,
+    }
+    for key in ("memo", "card_id", "linked_kpi_ids", "next_review_date"):
+        value = getattr(req, key)
+        if value:
+            action[key] = value
+    Storage.save_reform_action(action)
+    return {"action": action, "message": "アクションを作成しました"}
+
+
+@router.patch("/intel/reform/actions/{action_id}")
+async def update_reform_action(action_id: str, req: ActionUpdateRequest):
+    action = Storage.get_reform_action(action_id)
+    if not action:
+        raise HTTPException(status_code=404, detail=f"アクション '{action_id}' が見つかりません")
+    updates = req.model_dump(exclude_none=True)
+
+    for key in ("title", "owner"):
+        if key in updates:
+            updates[key] = updates[key].strip()
+            if not updates[key]:
+                raise HTTPException(status_code=422, detail=f"{key} は空にできません")
+    if "deadline" in updates:
+        _validate_date_format(updates["deadline"], "deadline")
+    if updates.get("next_review_date"):
+        _validate_date_format(updates["next_review_date"], "next_review_date")
+
+    # 空文字はフィールドのクリアとして扱う
+    cleared = [k for k in _CLEARABLE_FIELDS if updates.get(k) == ""]
+    for k in cleared:
+        updates.pop(k)
+
+    if not updates and not cleared:
+        return {"action": action, "message": "変更はありません"}
+
+    action.update(updates)
+    for k in cleared:
+        action.pop(k, None)
+    action["updated_at"] = _now_date()
+    Storage.save_reform_action(action)
+    return {"action": action, "message": "アクションを更新しました"}
+
+
+@router.delete("/intel/reform/actions/{action_id}")
+async def delete_reform_action(action_id: str):
+    if not Storage.delete_reform_action(action_id):
+        raise HTTPException(status_code=404, detail=f"アクション '{action_id}' が見つかりません")
+    return {"message": "アクションを削除しました"}
+
+
+class KPISnapshotUpsertRequest(BaseModel):
+    value: float
+    target: Optional[float] = None
+    period: str  # YYYY-MM / YYYY-Q1 など
+    delta_vs_prev: Optional[float] = None
+    status: KPIStatus = "no_data"
+
+
+@router.get("/intel/reform/kpis")
+async def list_kpi_snapshots():
+    snapshots = Storage.get_kpi_snapshots()
+    return {"snapshots": snapshots, "count": len(snapshots)}
+
+
+@router.put("/intel/reform/kpis/{kpi_id}")
+async def upsert_kpi_snapshot(kpi_id: str, req: KPISnapshotUpsertRequest):
+    snapshot = {
+        "kpi_id": kpi_id,
+        "value": req.value,
+        "period": req.period,
+        "status": req.status,
+        "updated_at": _now_date(),
+    }
+    if req.target is not None:
+        snapshot["target"] = req.target
+    if req.delta_vs_prev is not None:
+        snapshot["delta_vs_prev"] = req.delta_vs_prev
+    Storage.save_kpi_snapshot(snapshot)
+    return {"snapshot": snapshot, "message": "KPI スナップショットを保存しました"}
+
+
+class AgendaItemModel(BaseModel):
+    id: str
+    rank: int
+    topic: str
+    background: str = ""
+    why_now: str = ""
+    related_card_ids: List[str] = []
+    related_kpi_ids: List[str] = []
+    recommended_decision: str = ""
+    next_action: str = ""
+    week_of: str
+
+
+class AgendaSaveRequest(BaseModel):
+    week_of: str  # YYYY-MM-DD (週開始の月曜)
+    items: List[AgendaItemModel]
+    source: str = "manual"  # manual / signals / llm
+
+
+@router.get("/intel/reform/agenda")
+async def get_reform_agenda(week_of: Optional[str] = Query(None)):
+    """week_of 指定でその週の、未指定で最新のアジェンダを返す"""
+    agenda = Storage.get_reform_agenda(week_of)
+    return {"agenda": agenda}
+
+
+@router.post("/intel/reform/agenda")
+async def save_reform_agenda(req: AgendaSaveRequest):
+    agenda = {
+        "week_of": req.week_of,
+        "items": [i.model_dump() for i in req.items],
+        "source": req.source,
+        "saved_at": datetime.now(timezone.utc).isoformat(),
+    }
+    Storage.save_reform_agenda(agenda)
+    return {"agenda": agenda, "message": "週次アジェンダを保存しました"}

@@ -1,0 +1,128 @@
+[
+  {
+    "kpi_id": "kpi_revenue",
+    "value": 2180000000,
+    "target": 2400000000,
+    "period": "2026-Q1",
+    "delta_vs_prev": 0.07,
+    "status": "at_risk",
+    "updated_at": "2026-07-12"
+  },
+  {
+    "kpi_id": "kpi_overseas_ratio",
+    "value": 18.2,
+    "target": 30.0,
+    "period": "2026-Q1",
+    "delta_vs_prev": 0.03,
+    "status": "off_track",
+    "updated_at": "2026-07-12"
+  },
+  {
+    "kpi_id": "kpi_d2c_revenue",
+    "value": 320000000,
+    "target": 500000000,
+    "period": "2026-Q1",
+    "delta_vs_prev": 0.22,
+    "status": "at_risk",
+    "updated_at": "2026-07-12"
+  },
+  {
+    "kpi_id": "kpi_gross_margin",
+    "value": 42.5,
+    "target": 48.0,
+    "period": "2026-Q1",
+    "delta_vs_prev": 0.012,
+    "status": "at_risk",
+    "updated_at": "2026-07-12"
+  },
+  {
+    "kpi_id": "kpi_royalty_rate",
+    "value": 8.3,
+    "target": 10.0,
+    "period": "2026-Q1",
+    "delta_vs_prev": -0.005,
+    "status": "off_track",
+    "updated_at": "2026-07-12"
+  },
+  {
+    "kpi_id": "kpi_sku_count",
+    "value": 1240,
+    "target": 1500,
+    "period": "2026-Q1",
+    "delta_vs_prev": 0.05,
+    "status": "at_risk",
+    "updated_at": "2026-07-12"
+  },
+  {
+    "kpi_id": "kpi_ec_conversion",
+    "value": 2.8,
+    "target": 3.5,
+    "period": "2026-Q1",
+    "delta_vs_prev": 0.18,
+    "status": "at_risk",
+    "updated_at": "2026-07-12"
+  },
+  {
+    "kpi_id": "kpi_member_count",
+    "value": 84000,
+    "target": 120000,
+    "period": "2026-Q1",
+    "delta_vs_prev": 0.28,
+    "status": "on_track",
+    "updated_at": "2026-07-12"
+  },
+  {
+    "kpi_id": "kpi_store_visitors",
+    "value": 18500,
+    "target": 25000,
+    "period": "2026-06",
+    "delta_vs_prev": 0.12,
+    "status": "at_risk",
+    "updated_at": "2026-07-12"
+  },
+  {
+    "kpi_id": "kpi_avg_basket",
+    "value": 4200,
+    "target": 5500,
+    "period": "2026-Q1",
+    "delta_vs_prev": 0.08,
+    "status": "at_risk",
+    "updated_at": "2026-07-12"
+  },
+  {
+    "kpi_id": "kpi_purchase_rate",
+    "value": 12.4,
+    "target": 18.0,
+    "period": "2026-Q1",
+    "delta_vs_prev": 0.04,
+    "status": "off_track",
+    "updated_at": "2026-07-12"
+  },
+  {
+    "kpi_id": "kpi_sns_posts",
+    "value": 142,
+    "target": 180,
+    "period": "2026-06",
+    "delta_vs_prev": 0.15,
+    "status": "on_track",
+    "updated_at": "2026-07-12"
+  },
+  {
+    "kpi_id": "kpi_contract_renewal",
+    "value": 18,
+    "target": 22,
+    "period": "2026-Q1",
+    "delta_vs_prev": 0.0,
+    "status": "at_risk",
+    "updated_at": "2026-07-12"
+  },
+  {
+    "kpi_id": "kpi_new_licensee",
+    "value": 5,
+    "target": 8,
+    "period": "2026-Q1",
+    "delta_vs_prev": 0.25,
+    "status": "at_risk",
+    "updated_at": "2026-07-12"
+  }
+]
