@@ -12,7 +12,7 @@ import {
 import { fetchIntelCards } from '@/lib/intel-api';
 import { warmupBackend } from '@/lib/api';
 import { enrichCards } from '@/lib/impact-score';
-import { MOCK_WEEKLY_AGENDA } from '@/lib/reform-mock';
+import { fetchWeeklyAgenda, saveWeeklyAgenda } from '@/lib/reform-api';
 import { KPI_DEFS } from '@/lib/reform-taxonomies';
 import type { IntelCard } from '@/lib/intel-types';
 import type { WeeklyAgendaItem } from '@/lib/reform-types';
@@ -28,16 +28,27 @@ function thisMondayISO(): string {
 export default function AgendaPage() {
   const [cards, setCards] = useState<IntelCard[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [agenda, setAgenda] = useState<WeeklyAgendaItem[]>(MOCK_WEEKLY_AGENDA);
+  const [agenda, setAgenda] = useState<WeeklyAgendaItem[]>([]);
   const [generating, setGenerating] = useState(false);
+  const [statusMsg, setStatusMsg] = useState<string | null>(null);
 
   useEffect(() => {
     (async () => {
       const alive = await warmupBackend(60_000);
       if (!alive) { setIsLoading(false); return; }
       try {
-        const cs = await fetchIntelCards({ limit: 100 });
+        const [cs, saved] = await Promise.all([
+          fetchIntelCards({ limit: 100 }),
+          // 今週分がなければ最新の保存済みアジェンダを表示
+          fetchWeeklyAgenda(thisMondayISO())
+            .then(a => a ?? fetchWeeklyAgenda())
+            .catch(() => null),
+        ]);
         setCards(cs);
+        if (saved?.items?.length) {
+          setAgenda(saved.items);
+          setStatusMsg(`保存済みアジェンダ (週: ${saved.week_of})`);
+        }
       } finally {
         setIsLoading(false);
       }
@@ -50,10 +61,11 @@ export default function AgendaPage() {
     [enriched],
   );
 
-  // 実カードベースのアジェンダ提案を組み立てる(ルールベース)
-  function regenerateFromSignals() {
+  // 実カードベースのアジェンダ提案を組み立て、バックエンドに保存(ルールベース)
+  async function regenerateFromSignals() {
+    if (generating) return;
     setGenerating(true);
-    setTimeout(() => {
+    try {
       const monday = thisMondayISO();
       const generated: WeeklyAgendaItem[] = top5.map((s, i) => ({
         id: `agd_gen_${i}`,
@@ -74,15 +86,20 @@ export default function AgendaPage() {
             : '担当部門での1週間以内のアクション定義',
         week_of: monday,
       }));
-      // 既存モックと混在: シグナルが少ない場合はモックで補完
-      if (generated.length < 5) {
-        const supplement = MOCK_WEEKLY_AGENDA.slice(0, 5 - generated.length);
-        setAgenda([...generated, ...supplement]);
-      } else {
-        setAgenda(generated);
+      setAgenda(generated);
+      if (generated.length === 0) {
+        setStatusMsg('シグナル(カード)がまだないため生成できません');
+        return;
       }
+      try {
+        await saveWeeklyAgenda(monday, generated, 'signals');
+        setStatusMsg(`シグナルから生成し保存しました (週: ${monday})`);
+      } catch (e) {
+        setStatusMsg(`生成しましたが保存に失敗: ${(e as Error).message}`);
+      }
+    } finally {
       setGenerating(false);
-    }, 400);
+    }
   }
 
   function copyMarkdown() {
@@ -133,11 +150,24 @@ export default function AgendaPage() {
         <p className="text-text-muted text-sm">
           外部シグナル × 経営インパクトスコアから「今週議論すべき 5 つの論点」を自動編集
         </p>
+        {statusMsg && (
+          <div className="mt-2 text-xs text-text-muted">{statusMsg}</div>
+        )}
       </div>
 
-      {agenda.map(item => (
-        <AgendaCard key={item.id} item={item} cards={cards} />
-      ))}
+      {isLoading ? (
+        <div className="card p-6 text-center text-text-muted text-sm">
+          読み込み中...
+        </div>
+      ) : agenda.length === 0 ? (
+        <div className="card p-6 text-center text-text-muted text-sm">
+          今週のアジェンダはまだありません。「シグナルから再生成」で作成できます。
+        </div>
+      ) : (
+        agenda.map(item => (
+          <AgendaCard key={item.id} item={item} cards={cards} />
+        ))
+      )}
     </div>
   );
 }

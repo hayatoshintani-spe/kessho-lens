@@ -36,6 +36,9 @@ def ensure_data_dir():
         "intel_briefs.json": [],
         "intel_council.json": [],
         "intel_watchlist.json": [],
+        "reform_actions.json": [],
+        "reform_kpis.json": [],
+        "reform_agendas.json": [],
     }
 
     for filename, initial_data in initial_files.items():
@@ -199,3 +202,79 @@ class Storage:
     @staticmethod
     def save_watchlists(watchlists: List[Dict]) -> None:
         write_json("intel_watchlist.json", watchlists)
+
+    # ─── Reform: Actions ────────────────────────────────────────────────
+
+    @staticmethod
+    def get_reform_actions() -> List[Dict]:
+        actions = read_json("reform_actions.json") or []
+        actions.sort(key=lambda a: a.get("deadline", ""))
+        return actions
+
+    @staticmethod
+    def get_reform_action(action_id: str) -> Optional[Dict]:
+        for a in read_json("reform_actions.json") or []:
+            if a.get("id") == action_id:
+                return a
+        return None
+
+    @staticmethod
+    def save_reform_action(action: Dict) -> None:
+        actions = read_json("reform_actions.json") or []
+        actions = [a for a in actions if a.get("id") != action.get("id")]
+        actions.append(action)
+        write_json("reform_actions.json", actions)
+
+    @staticmethod
+    def delete_reform_action(action_id: str) -> bool:
+        actions = read_json("reform_actions.json") or []
+        remaining = [a for a in actions if a.get("id") != action_id]
+        if len(remaining) == len(actions):
+            return False
+        write_json("reform_actions.json", remaining)
+        return True
+
+    # ─── Reform: KPI Snapshots ─────────────────────────────────────────
+
+    @staticmethod
+    def get_kpi_snapshots() -> List[Dict]:
+        return read_json("reform_kpis.json") or []
+
+    @staticmethod
+    def save_kpi_snapshot(snapshot: Dict) -> None:
+        """kpi_id をキーに upsert(1 KPI = 最新スナップショット 1 件)"""
+        snapshots = read_json("reform_kpis.json") or []
+        snapshots = [
+            s for s in snapshots if s.get("kpi_id") != snapshot.get("kpi_id")
+        ]
+        snapshots.append(snapshot)
+        write_json("reform_kpis.json", snapshots)
+
+    # ─── Reform: Weekly Agendas ────────────────────────────────────────
+
+    @staticmethod
+    def get_reform_agendas() -> List[Dict]:
+        agendas = read_json("reform_agendas.json") or []
+        agendas.sort(key=lambda a: a.get("week_of", ""), reverse=True)
+        return agendas
+
+    @staticmethod
+    def get_reform_agenda(week_of: Optional[str] = None) -> Optional[Dict]:
+        """week_of 指定でその週の、未指定で最新のアジェンダを返す"""
+        agendas = Storage.get_reform_agendas()
+        if week_of:
+            for a in agendas:
+                if a.get("week_of") == week_of:
+                    return a
+            return None
+        return agendas[0] if agendas else None
+
+    @staticmethod
+    def save_reform_agenda(agenda: Dict) -> None:
+        """week_of をキーに upsert"""
+        agendas = read_json("reform_agendas.json") or []
+        agendas = [
+            a for a in agendas if a.get("week_of") != agenda.get("week_of")
+        ]
+        agendas.append(agenda)
+        write_json("reform_agendas.json", agendas)

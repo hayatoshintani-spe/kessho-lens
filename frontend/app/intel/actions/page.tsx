@@ -1,9 +1,14 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
-import { CheckSquare, Filter, ArrowRight, Plus } from 'lucide-react';
-import { MOCK_ACTIONS } from '@/lib/reform-mock';
+import { CheckSquare, Filter, ArrowRight, Plus, X } from 'lucide-react';
+import { warmupBackend } from '@/lib/api';
+import {
+  fetchReformActions,
+  createReformAction,
+  updateReformAction,
+} from '@/lib/reform-api';
 import {
   ACTION_STATUS_COLORS,
   ACTION_STATUS_LABELS,
@@ -26,7 +31,28 @@ export default function ActionsPage() {
   const [statusFilter, setStatusFilter] = useState<ActionStatus | 'all'>('all');
   const [priorityFilter, setPriorityFilter] =
     useState<ActionPriorityLevel | 'all'>('all');
-  const [actions, setActions] = useState<ReformAction[]>(MOCK_ACTIONS);
+  const [actions, setActions] = useState<ReformAction[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [showForm, setShowForm] = useState(false);
+
+  useEffect(() => {
+    (async () => {
+      const alive = await warmupBackend(60_000);
+      if (!alive) {
+        setErrorMsg('バックエンドに接続できません');
+        setIsLoading(false);
+        return;
+      }
+      try {
+        setActions(await fetchReformActions());
+      } catch (e) {
+        setErrorMsg((e as Error).message);
+      } finally {
+        setIsLoading(false);
+      }
+    })();
+  }, []);
 
   const counts = useMemo(() => {
     const c: Record<ActionStatus, number> = {
@@ -59,9 +85,26 @@ export default function ActionsPage() {
       });
   }, [actions, statusFilter, priorityFilter]);
 
-  function updateStatus(id: string, status: ActionStatus) {
-    setActions(prev => prev.map(a => (a.id === id ? { ...a, status,
-      updated_at: TODAY } : a)));
+  async function updateStatus(id: string, status: ActionStatus) {
+    const prev = actions;
+    // 楽観更新 → 失敗時ロールバック
+    setActions(p => p.map(a => (a.id === id ? { ...a, status, updated_at: TODAY } : a)));
+    try {
+      const saved = await updateReformAction(id, { status });
+      setActions(p => p.map(a => (a.id === id ? saved : a)));
+    } catch (e) {
+      setActions(prev);
+      setErrorMsg(`ステータス更新に失敗: ${(e as Error).message}`);
+    }
+  }
+
+  async function handleCreate(input: {
+    title: string; owner: string; deadline: string;
+    priority: ActionPriorityLevel; memo?: string;
+  }) {
+    const created = await createReformAction(input);
+    setActions(p => [created, ...p]);
+    setShowForm(false);
   }
 
   return (
@@ -74,18 +117,25 @@ export default function ActionsPage() {
           </div>
           <button
             type="button"
-            className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded border border-accent-gold/40 text-accent-gold hover:bg-accent-gold/10 transition opacity-60 cursor-not-allowed"
-            title="将来実装: 新規アクション追加"
-            disabled
+            onClick={() => setShowForm(v => !v)}
+            className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded border border-accent-gold/40 text-accent-gold hover:bg-accent-gold/10 transition"
           >
-            <Plus className="w-3.5 h-3.5" />
-            新規アクション
+            {showForm ? <X className="w-3.5 h-3.5" /> : <Plus className="w-3.5 h-3.5" />}
+            {showForm ? '閉じる' : '新規アクション'}
           </button>
         </div>
         <p className="text-text-muted text-sm">
           改革カードから生まれた打ち手を、担当者・期限・KPI とともに追跡
         </p>
       </div>
+
+      {errorMsg && (
+        <div className="card p-3 border-loss/40 bg-loss/5 text-loss text-xs">
+          {errorMsg}
+        </div>
+      )}
+
+      {showForm && <NewActionForm onCreate={handleCreate} />}
 
       {/* サマリ */}
       <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
@@ -118,14 +168,116 @@ export default function ActionsPage() {
 
       {/* アクション一覧 */}
       <div className="space-y-2">
-        {filtered.map(a => (
-          <ActionCard key={a.id} action={a} onUpdateStatus={updateStatus} />
-        ))}
-        {filtered.length === 0 && (
+        {isLoading ? (
           <div className="card p-6 text-center text-text-muted text-sm">
-            該当するアクションはありません
+            読み込み中...
           </div>
+        ) : (
+          <>
+            {filtered.map(a => (
+              <ActionCard key={a.id} action={a} onUpdateStatus={updateStatus} />
+            ))}
+            {filtered.length === 0 && (
+              <div className="card p-6 text-center text-text-muted text-sm">
+                該当するアクションはありません
+              </div>
+            )}
+          </>
         )}
+      </div>
+    </div>
+  );
+}
+
+function NewActionForm({
+  onCreate,
+}: {
+  onCreate: (input: {
+    title: string; owner: string; deadline: string;
+    priority: ActionPriorityLevel; memo?: string;
+  }) => Promise<void>;
+}) {
+  const [title, setTitle] = useState('');
+  const [owner, setOwner] = useState('');
+  const [deadline, setDeadline] = useState('');
+  const [priority, setPriority] = useState<ActionPriorityLevel>('medium');
+  const [memo, setMemo] = useState('');
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const valid = title.trim() && owner.trim() && deadline;
+
+  async function submit() {
+    if (!valid || saving) return;
+    setSaving(true);
+    setError(null);
+    try {
+      await onCreate({
+        title: title.trim(),
+        owner: owner.trim(),
+        deadline,
+        priority,
+        memo: memo.trim() || undefined,
+      });
+    } catch (e) {
+      setError((e as Error).message);
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  const inputCls =
+    'w-full bg-bg-elevated border border-border rounded px-2 py-1.5 text-xs text-text-primary placeholder:text-text-muted';
+
+  return (
+    <div className="card p-4 border-accent-gold/30 space-y-3">
+      <div className="text-text-primary text-sm font-semibold">新規アクション</div>
+      <input
+        className={inputCls}
+        placeholder="タイトル(例: 中国MD自社企画比率の引き上げ施策案を立案)"
+        value={title}
+        onChange={e => setTitle(e.target.value)}
+      />
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+        <input
+          className={inputCls}
+          placeholder="担当(例: 商品企画部)"
+          value={owner}
+          onChange={e => setOwner(e.target.value)}
+        />
+        <input
+          className={inputCls}
+          type="date"
+          value={deadline}
+          onChange={e => setDeadline(e.target.value)}
+        />
+        <select
+          className={inputCls}
+          value={priority}
+          onChange={e => setPriority(e.target.value as ActionPriorityLevel)}
+        >
+          {PRIORITIES.map(p => (
+            <option key={p} value={p}>{ACTION_PRIORITY_LABELS[p]}</option>
+          ))}
+        </select>
+      </div>
+      <textarea
+        className={inputCls}
+        rows={2}
+        placeholder="メモ(任意)"
+        value={memo}
+        onChange={e => setMemo(e.target.value)}
+      />
+      {error && <div className="text-loss text-xs">{error}</div>}
+      <div className="flex justify-end">
+        <button
+          type="button"
+          onClick={submit}
+          disabled={!valid || saving}
+          className="text-xs px-4 py-1.5 rounded bg-accent-gold/15 border border-accent-gold/40 text-accent-gold hover:bg-accent-gold/25 disabled:opacity-50 disabled:cursor-not-allowed transition"
+        >
+          {saving ? '保存中…' : '作成'}
+        </button>
       </div>
     </div>
   );

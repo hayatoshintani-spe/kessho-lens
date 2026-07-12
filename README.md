@@ -157,6 +157,14 @@ POST /api/intel/notion/setup             # Notion DB を新規作成
 GET  /api/intel/email/status             # メール配信設定の状況
 POST /api/intel/email/test               # Brief をテスト送信 (dry_run=true でプレビューのみ)
 POST /api/intel/cron/daily-brief         # 日次自動配信 (Bearer CRON_SECRET 認証)
+GET  /api/intel/reform/actions           # 改革アクション一覧
+POST /api/intel/reform/actions           # アクション作成
+PATCH /api/intel/reform/actions/{id}     # アクション更新 (ステータス等)
+DELETE /api/intel/reform/actions/{id}    # アクション削除
+GET  /api/intel/reform/kpis              # KPI スナップショット一覧
+PUT  /api/intel/reform/kpis/{kpi_id}     # KPI スナップショット upsert
+GET  /api/intel/reform/agenda            # 週次アジェンダ (?week_of=、未指定は最新)
+POST /api/intel/reform/agenda            # 週次アジェンダ保存 (week_of で upsert)
 ```
 
 OpenAPI 仕様: `http://localhost:8000/docs`
@@ -167,10 +175,13 @@ OpenAPI 仕様: `http://localhost:8000/docs`
 
 ```
 data/
-├── intel_cards.json     # IntelCard（記事カード）
-├── intel_briefs.json    # Daily / Weekly Brief
-├── intel_council.json   # AI 会議セッション
-└── intel_watchlist.json # カテゴリ別ウォッチリスト
+├── intel_cards.json      # IntelCard（記事カード）
+├── intel_briefs.json     # Daily / Weekly Brief
+├── intel_council.json    # AI 会議セッション
+├── intel_watchlist.json  # カテゴリ別ウォッチリスト
+├── reform_actions.json   # 改革アクション（担当・期限・ステータス）
+├── reform_kpis.json      # KPI スナップショット（kpi_id ごとに最新 1 件）
+└── reform_agendas.json   # 週次経営会議アジェンダ（week_of ごとに 1 件）
 ```
 
 JSON ファイルは原子的書き込み（temp → rename）で同時書き込みを防いでいます。

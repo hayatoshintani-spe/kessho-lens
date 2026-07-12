@@ -35,7 +35,7 @@ import type {
 import { enrichCards } from '@/lib/impact-score';
 import type { ReformAction, ThemeId } from '@/lib/reform-types';
 import { ACTION_STATUS_LABELS, ACTION_STATUS_COLORS } from '@/lib/reform-types';
-import { MOCK_ACTIONS } from '@/lib/reform-mock';
+import { fetchReformActions } from '@/lib/reform-api';
 import { THEMES, THEMES_BY_GROUP, THEME_GROUPS } from '@/lib/reform-taxonomies';
 
 const TODAY = new Date().toISOString().slice(0, 10);
@@ -50,7 +50,7 @@ export default function IntelIndexPage() {
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [refreshMsg, setRefreshMsg] = useState<string | null>(null);
-  const actions = MOCK_ACTIONS;
+  const [actions, setActions] = useState<ReformAction[]>([]);
 
   async function handleRefreshNow() {
     if (isRefreshing) return;
@@ -137,6 +137,10 @@ export default function IntelIndexPage() {
         }
         const allCards = await fetchIntelCards({ limit: 60 });
         setRecentCards(allCards);
+        // アクションは補助情報なので取得失敗してもダッシュボード全体は落とさない
+        try {
+          setActions(await fetchReformActions());
+        } catch {/* ignore */}
       } catch (e) {
         setErrorMsg((e as Error).message);
       } finally {

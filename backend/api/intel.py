@@ -11,6 +11,7 @@ import asyncio
 import time
 from datetime import datetime, timezone
 from typing import List, Optional
+from uuid import uuid4
 
 from fastapi import APIRouter, BackgroundTasks, HTTPException, Query, Request
 from pydantic import BaseModel
@@ -595,3 +596,170 @@ async def email_test(req: EmailTestRequest):
         brief, top_cards, recipients=req.recipients, dry_run=req.dry_run
     )
     return {"date": brief.get("date"), "result": result}
+
+
+# ─── Reform: アクション / KPI / 週次アジェンダ ──────────────────────────
+# フロントの改革ダッシュボード(旧モックデータ)の永続化バックエンド。
+# 型定義は frontend/lib/reform-types.ts と対応。
+
+ACTION_STATUSES = {"not_started", "in_progress", "awaiting_review", "done", "on_hold"}
+ACTION_PRIORITIES = {"urgent", "high", "medium", "low"}
+KPI_STATUSES = {"on_track", "at_risk", "off_track", "no_data"}
+
+
+def _now_date() -> str:
+    return datetime.now(timezone.utc).strftime("%Y-%m-%d")
+
+
+class ActionCreateRequest(BaseModel):
+    title: str
+    owner: str
+    deadline: str  # YYYY-MM-DD
+    priority: str = "medium"
+    status: str = "not_started"
+    memo: Optional[str] = None
+    card_id: Optional[str] = None
+    linked_kpi_ids: Optional[List[str]] = None
+    next_review_date: Optional[str] = None
+
+
+class ActionUpdateRequest(BaseModel):
+    title: Optional[str] = None
+    owner: Optional[str] = None
+    deadline: Optional[str] = None
+    priority: Optional[str] = None
+    status: Optional[str] = None
+    memo: Optional[str] = None
+    card_id: Optional[str] = None
+    linked_kpi_ids: Optional[List[str]] = None
+    next_review_date: Optional[str] = None
+
+
+def _validate_action_enums(status: Optional[str], priority: Optional[str]) -> None:
+    if status is not None and status not in ACTION_STATUSES:
+        raise HTTPException(status_code=422, detail=f"不正な status: {status}")
+    if priority is not None and priority not in ACTION_PRIORITIES:
+        raise HTTPException(status_code=422, detail=f"不正な priority: {priority}")
+
+
+@router.get("/intel/reform/actions")
+async def list_reform_actions():
+    actions = Storage.get_reform_actions()
+    return {"actions": actions, "count": len(actions)}
+
+
+@router.post("/intel/reform/actions")
+async def create_reform_action(req: ActionCreateRequest):
+    _validate_action_enums(req.status, req.priority)
+    now = _now_date()
+    action = {
+        "id": f"act_{uuid4().hex[:10]}",
+        "title": req.title.strip(),
+        "owner": req.owner.strip(),
+        "deadline": req.deadline,
+        "status": req.status,
+        "priority": req.priority,
+        "created_at": now,
+        "updated_at": now,
+    }
+    for key in ("memo", "card_id", "linked_kpi_ids", "next_review_date"):
+        value = getattr(req, key)
+        if value is not None:
+            action[key] = value
+    if not action["title"]:
+        raise HTTPException(status_code=422, detail="title は必須です")
+    Storage.save_reform_action(action)
+    return {"action": action, "message": "アクションを作成しました"}
+
+
+@router.patch("/intel/reform/actions/{action_id}")
+async def update_reform_action(action_id: str, req: ActionUpdateRequest):
+    _validate_action_enums(req.status, req.priority)
+    action = Storage.get_reform_action(action_id)
+    if not action:
+        raise HTTPException(status_code=404, detail=f"アクション '{action_id}' が見つかりません")
+    updates = req.model_dump(exclude_none=True)
+    if not updates:
+        return {"action": action, "message": "変更はありません"}
+    action.update(updates)
+    action["updated_at"] = _now_date()
+    Storage.save_reform_action(action)
+    return {"action": action, "message": "アクションを更新しました"}
+
+
+@router.delete("/intel/reform/actions/{action_id}")
+async def delete_reform_action(action_id: str):
+    if not Storage.delete_reform_action(action_id):
+        raise HTTPException(status_code=404, detail=f"アクション '{action_id}' が見つかりません")
+    return {"message": "アクションを削除しました"}
+
+
+class KPISnapshotUpsertRequest(BaseModel):
+    value: float
+    target: Optional[float] = None
+    period: str  # YYYY-MM / YYYY-Q1 など
+    delta_vs_prev: Optional[float] = None
+    status: str = "no_data"
+
+
+@router.get("/intel/reform/kpis")
+async def list_kpi_snapshots():
+    snapshots = Storage.get_kpi_snapshots()
+    return {"snapshots": snapshots, "count": len(snapshots)}
+
+
+@router.put("/intel/reform/kpis/{kpi_id}")
+async def upsert_kpi_snapshot(kpi_id: str, req: KPISnapshotUpsertRequest):
+    if req.status not in KPI_STATUSES:
+        raise HTTPException(status_code=422, detail=f"不正な status: {req.status}")
+    snapshot = {
+        "kpi_id": kpi_id,
+        "value": req.value,
+        "period": req.period,
+        "status": req.status,
+        "updated_at": _now_date(),
+    }
+    if req.target is not None:
+        snapshot["target"] = req.target
+    if req.delta_vs_prev is not None:
+        snapshot["delta_vs_prev"] = req.delta_vs_prev
+    Storage.save_kpi_snapshot(snapshot)
+    return {"snapshot": snapshot, "message": "KPI スナップショットを保存しました"}
+
+
+class AgendaItemModel(BaseModel):
+    id: str
+    rank: int
+    topic: str
+    background: str = ""
+    why_now: str = ""
+    related_card_ids: List[str] = []
+    related_kpi_ids: List[str] = []
+    recommended_decision: str = ""
+    next_action: str = ""
+    week_of: str
+
+
+class AgendaSaveRequest(BaseModel):
+    week_of: str  # YYYY-MM-DD (週開始の月曜)
+    items: List[AgendaItemModel]
+    source: str = "manual"  # manual / signals / llm
+
+
+@router.get("/intel/reform/agenda")
+async def get_reform_agenda(week_of: Optional[str] = Query(None)):
+    """week_of 指定でその週の、未指定で最新のアジェンダを返す"""
+    agenda = Storage.get_reform_agenda(week_of)
+    return {"agenda": agenda}
+
+
+@router.post("/intel/reform/agenda")
+async def save_reform_agenda(req: AgendaSaveRequest):
+    agenda = {
+        "week_of": req.week_of,
+        "items": [i.model_dump() for i in req.items],
+        "source": req.source,
+        "saved_at": datetime.now(timezone.utc).isoformat(),
+    }
+    Storage.save_reform_agenda(agenda)
+    return {"agenda": agenda, "message": "週次アジェンダを保存しました"}

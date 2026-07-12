@@ -1,9 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { BarChart3, TrendingUp, TrendingDown, Minus } from 'lucide-react';
 import { KPI_DEFS } from '@/lib/reform-taxonomies';
-import { MOCK_KPI_SNAPSHOTS } from '@/lib/reform-mock';
+import { fetchKpiSnapshots } from '@/lib/reform-api';
+import { warmupBackend } from '@/lib/api';
 import type { KPIDefinition, KPISnapshot, KPIUnit } from '@/lib/reform-types';
 
 const STATUS_COLOR: Record<KPISnapshot['status'], string> = {
@@ -48,6 +49,27 @@ function progressPct(value: number, target?: number): number {
 export default function KPIPage() {
   const [activeCategory, setActiveCategory] =
     useState<KPIDefinition['category'] | 'all'>('all');
+  const [snapshots, setSnapshots] = useState<KPISnapshot[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+
+  useEffect(() => {
+    (async () => {
+      const alive = await warmupBackend(60_000);
+      if (!alive) {
+        setErrorMsg('バックエンドに接続できません');
+        setIsLoading(false);
+        return;
+      }
+      try {
+        setSnapshots(await fetchKpiSnapshots());
+      } catch (e) {
+        setErrorMsg((e as Error).message);
+      } finally {
+        setIsLoading(false);
+      }
+    })();
+  }, []);
 
   const filtered = KPI_DEFS.filter(k =>
     activeCategory === 'all' ? true : k.category === activeCategory,
@@ -88,13 +110,25 @@ export default function KPIPage() {
         ))}
       </div>
 
+      {errorMsg && (
+        <div className="card p-3 border-loss/40 bg-loss/5 text-loss text-xs">
+          {errorMsg}
+        </div>
+      )}
+
       {/* KPI カード一覧 */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-        {filtered.map(def => {
-          const snap = MOCK_KPI_SNAPSHOTS.find(s => s.kpi_id === def.id);
-          return <KPICard key={def.id} def={def} snap={snap} />;
-        })}
-      </div>
+      {isLoading ? (
+        <div className="card p-6 text-center text-text-muted text-sm">
+          読み込み中...
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+          {filtered.map(def => {
+            const snap = snapshots.find(s => s.kpi_id === def.id);
+            return <KPICard key={def.id} def={def} snap={snap} />;
+          })}
+        </div>
+      )}
 
       {/* 連携ヒント */}
       <div className="card p-4 border-dashed border-border text-xs text-text-muted">
