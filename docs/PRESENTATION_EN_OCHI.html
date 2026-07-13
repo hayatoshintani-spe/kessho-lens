@@ -1,22 +1,24 @@
-<title>en Intelligence Brief — 越智社長向けご提案</title>
+<title>ウルトラマンIP × エン — 越智社長向け協業ご提案</title>
 <style>
   :root {
-    --accent: #A5333F;
-    --accent-soft: rgba(165, 51, 63, .08);
+    --accent: #BE3A34;
+    --accent-soft: rgba(190, 58, 52, .08);
+    --silver: #6E7889;
     --ink: #20242E;
     --ink-2: #545B6B;
     --ink-3: #8A92A3;
-    --ground: #F7F8FA;
+    --ground: #F6F7F9;
     --surface: #FFFFFF;
-    --line: #DDE1E8;
-    --line-soft: #E8EBF0;
+    --line: #DCE0E7;
+    --line-soft: #E7EAF0;
     --ok: #2E7D4F;
     --ok-soft: rgba(46, 125, 79, .10);
   }
   @media (prefers-color-scheme: dark) {
     :root {
-      --accent: #D9707B;
-      --accent-soft: rgba(217, 112, 123, .12);
+      --accent: #E06A60;
+      --accent-soft: rgba(224, 106, 96, .12);
+      --silver: #9AA3B4;
       --ink: #EAECF1; --ink-2: #ADB4C2; --ink-3: #7B8395;
       --ground: #12151C; --surface: #1B1F29;
       --line: #2D3340; --line-soft: #232936;
@@ -24,14 +26,14 @@
     }
   }
   :root[data-theme="light"] {
-    --accent: #A5333F; --accent-soft: rgba(165,51,63,.08);
+    --accent: #BE3A34; --accent-soft: rgba(190,58,52,.08); --silver: #6E7889;
     --ink: #20242E; --ink-2: #545B6B; --ink-3: #8A92A3;
-    --ground: #F7F8FA; --surface: #FFFFFF;
-    --line: #DDE1E8; --line-soft: #E8EBF0;
+    --ground: #F6F7F9; --surface: #FFFFFF;
+    --line: #DCE0E7; --line-soft: #E7EAF0;
     --ok: #2E7D4F; --ok-soft: rgba(46,125,79,.10);
   }
   :root[data-theme="dark"] {
-    --accent: #D9707B; --accent-soft: rgba(217,112,123,.12);
+    --accent: #E06A60; --accent-soft: rgba(224,106,96,.12); --silver: #9AA3B4;
     --ink: #EAECF1; --ink-2: #ADB4C2; --ink-3: #7B8395;
     --ground: #12151C; --surface: #1B1F29;
     --line: #2D3340; --line-soft: #232936;
@@ -63,13 +65,12 @@
   }
   .kicker::after { content: ""; height: 1px; background: var(--line); flex: 1; }
   h2 {
-    font-size: clamp(24px, 4vw, 38px); font-weight: 800; line-height: 1.4;
+    font-size: clamp(24px, 4vw, 38px); font-weight: 800; line-height: 1.45;
     letter-spacing: .01em; text-wrap: balance; margin: 0 0 14px;
   }
   h2 .a { color: var(--accent); }
   .sub { color: var(--ink-2); max-width: 44em; margin: 0 0 30px; }
 
-  /* counter */
   .counter {
     position: fixed; right: 20px; bottom: 16px; z-index: 10;
     font-size: 12px; letter-spacing: .12em; color: var(--ink-3);
@@ -79,17 +80,17 @@
   .counter b { color: var(--accent); font-weight: 700; }
 
   /* ---------- cover ---------- */
-  .cover { text-align: left; }
   .cover .to {
     font-size: 14px; color: var(--ink-2); margin-bottom: 40px;
     padding-bottom: 16px; border-bottom: 1px solid var(--line);
   }
   .cover .to b { font-size: 17px; color: var(--ink); font-weight: 700; display: block; margin-top: 2px; }
   .cover .brand {
-    font-size: 13px; letter-spacing: .3em; color: var(--accent); font-weight: 700; margin-bottom: 20px;
+    font-size: 13px; letter-spacing: .3em; color: var(--silver); font-weight: 700; margin-bottom: 20px;
   }
+  .cover .brand .x { color: var(--accent); }
   .cover h1 {
-    font-size: clamp(30px, 5.6vw, 52px); font-weight: 800; line-height: 1.35;
+    font-size: clamp(32px, 6vw, 56px); font-weight: 800; line-height: 1.35;
     letter-spacing: .01em; margin: 0 0 22px; text-wrap: balance;
   }
   .cover h1 .a { color: var(--accent); }
@@ -100,14 +101,12 @@
     color: var(--ink-3); font-size: 12px; letter-spacing: .2em;
   }
 
-  /* ---------- statement slide ---------- */
-  .statement h2 { font-size: clamp(28px, 5vw, 46px); line-height: 1.5; }
+  .statement h2 { font-size: clamp(30px, 5.4vw, 50px); line-height: 1.5; }
   .statement .sub { margin-top: 26px; }
 
-  /* ---------- generic cards ---------- */
+  /* ---------- cards ---------- */
   .grid { display: grid; gap: 12px; }
   .g2 { grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
-  .g3 { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
   .card {
     background: var(--surface); border: 1px solid var(--line-soft); border-radius: 10px;
     padding: 18px 20px;
@@ -119,87 +118,46 @@
     letter-spacing: .14em; margin-bottom: 8px;
   }
 
-  /* ---------- concept (IntelCard anatomy) ---------- */
-  .anatomy { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; margin-top: 8px; }
-  .an-step { background: var(--surface); border: 1px solid var(--line-soft); border-radius: 10px; padding: 16px 18px; position: relative; }
-  .an-step .lbl { font-size: 12px; letter-spacing: .16em; color: var(--ink-3); font-weight: 700; margin-bottom: 6px; }
-  .an-step .val { font-size: 15px; font-weight: 800; }
-  .an-step.hot { border-color: var(--accent); background: var(--accent-soft); }
-  .an-step.hot .lbl { color: var(--accent); }
-  .an-note { margin-top: 22px; color: var(--ink-2); font-size: 13.5px; max-width: 44em; }
-
-  /* ---------- flow slide ---------- */
-  .flow { display: flex; flex-direction: column; gap: 0; }
-  .flow-row {
-    background: var(--surface); border: 1px solid var(--line-soft); border-radius: 10px;
-    padding: 15px 20px; display: flex; gap: 14px; align-items: baseline; flex-wrap: wrap;
+  /* mirror (2つの思想) */
+  .mirror { display: grid; grid-template-columns: 1fr auto 1fr; gap: 14px; align-items: stretch; margin: 10px 0 24px; }
+  .mirror .side {
+    background: var(--surface); border: 1px solid var(--line-soft); border-radius: 12px; padding: 20px 22px;
   }
-  .flow-row .t { font-weight: 800; font-size: 15px; min-width: 11em; }
-  .flow-row .d { font-size: 13px; color: var(--ink-2); flex: 1; min-width: 240px; }
-  .flow-sep { text-align: left; padding: 2px 0 2px 26px; color: var(--accent); font-size: 15px; line-height: 1.4; }
-  .flow-row.final { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+  .mirror .side .who { font-size: 11px; letter-spacing: .2em; font-weight: 700; color: var(--silver); margin-bottom: 8px; }
+  .mirror .side.en .who { color: var(--accent); }
+  .mirror .side p { margin: 0; font-size: 14px; color: var(--ink-2); }
+  .mirror .side b { color: var(--ink); font-size: 15px; display: block; margin-bottom: 6px; }
+  .mirror .eq { display: flex; align-items: center; color: var(--accent); font-size: 22px; font-weight: 700; }
+  @media (max-width: 620px) { .mirror { grid-template-columns: 1fr; } .mirror .eq { justify-content: center; transform: rotate(90deg); } }
 
-  /* ---------- categories ---------- */
-  .cats { display: grid; grid-template-columns: repeat(auto-fit, minmax(235px, 1fr)); gap: 10px; }
-  .cat { background: var(--surface); border: 1px solid var(--line-soft); border-radius: 10px; padding: 14px 17px; }
-  .cat .no { font-size: 11px; font-weight: 700; color: var(--accent); letter-spacing: .14em; }
-  .cat h3 { font-size: 14px; font-weight: 800; margin: 2px 0 4px; }
-  .cat p { font-size: 12.5px; color: var(--ink-2); margin: 0; line-height: 1.65; }
+  /* packages */
+  .pkgs { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 12px; }
+  .pkg { background: var(--surface); border: 1px solid var(--line-soft); border-radius: 10px; padding: 18px 20px; }
+  .pkg .no { font-size: 12px; font-weight: 700; color: var(--accent); letter-spacing: .16em; }
+  .pkg h3 { font-size: 15px; font-weight: 800; margin: 4px 0 6px; }
+  .pkg p { font-size: 13px; color: var(--ink-2); margin: 0; }
+  .pkg .for { font-size: 11.5px; color: var(--ink-3); margin-top: 10px; padding-top: 8px; border-top: 1px solid var(--line-soft); }
+  .pkg .for b { color: var(--ink-2); font-weight: 600; }
 
-  /* ---------- experts ---------- */
-  .experts { display: grid; grid-template-columns: repeat(auto-fit, minmax(255px, 1fr)); gap: 10px; }
-  .exp { background: var(--surface); border: 1px solid var(--line-soft); border-radius: 10px; padding: 15px 18px; }
-  .exp h3 { font-size: 14px; font-weight: 800; margin: 0 0 4px; }
-  .exp .q { font-size: 12.5px; color: var(--ink-2); margin: 0; }
-  .exp .q::before { content: "問い　"; color: var(--accent); font-weight: 700; font-size: 11px; letter-spacing: .1em; }
-  .axis {
-    margin-top: 20px; border-left: 3px solid var(--accent); padding: 4px 18px;
-    color: var(--ink-2); font-size: 14px; max-width: 44em;
+  /* detail slide */
+  .detail { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; margin-bottom: 20px; }
+  .kpi-line {
+    border-left: 3px solid var(--accent); padding: 4px 18px; margin-top: 6px;
+    color: var(--ink-2); font-size: 13.5px; max-width: 46em;
   }
-  .axis b { color: var(--ink); }
+  .kpi-line b { color: var(--ink); }
 
-  /* ---------- output sample ---------- */
-  .sample {
-    background: var(--surface); border: 1px solid var(--line); border-radius: 12px;
-    padding: 22px 26px; margin-bottom: 14px;
-  }
-  .sample .tag {
-    display: inline-block; font-size: 11px; font-weight: 700; letter-spacing: .1em;
-    color: var(--accent); background: var(--accent-soft); border-radius: 5px;
-    padding: 3px 10px; margin-bottom: 10px;
-  }
-  .sample h3 { font-size: 16px; font-weight: 800; margin: 0 0 12px; line-height: 1.55; }
-  .sample dl { margin: 0; display: grid; gap: 7px; }
-  .sample .row { display: grid; grid-template-columns: 6.5em 1fr; gap: 10px; font-size: 13px; }
-  .sample dt { color: var(--ink-3); font-weight: 700; }
-  .sample dd { margin: 0; color: var(--ink-2); }
-  .sample dd b { color: var(--ink); }
-  .brief-lines { font-size: 13.5px; color: var(--ink-2); }
-  .brief-lines .h { font-weight: 800; color: var(--ink); font-size: 13px; letter-spacing: .06em; margin-bottom: 6px; }
-  .brief-lines ol { margin: 0; padding-left: 20px; }
-  .brief-lines li { margin: 3px 0; }
-
-  /* ---------- track record ---------- */
-  .proof { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
-  .proof .card b { color: var(--ink); }
-  .pill {
-    display: inline-flex; align-items: center; gap: 6px;
-    font-size: 12px; padding: 4px 12px; border-radius: 999px; font-weight: 600;
-    color: var(--ok); background: var(--ok-soft);
-  }
-  .pill::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--ok); }
-
-  /* ---------- steps ---------- */
-  .steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin-bottom: 26px; }
+  /* steps */
+  .steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin-bottom: 24px; }
   .step { background: var(--surface); border: 1px solid var(--line-soft); border-top: 3px solid var(--accent); border-radius: 10px; padding: 15px 18px; }
   .step .w { font-size: 11px; letter-spacing: .14em; color: var(--ink-3); font-weight: 700; }
   .step h3 { font-size: 14px; font-weight: 800; margin: 3px 0 5px; }
   .step p { font-size: 12.5px; color: var(--ink-2); margin: 0; }
-  .cost { font-size: 13.5px; color: var(--ink-2); border-top: 1px solid var(--line); padding-top: 16px; max-width: 46em; }
-  .cost b { color: var(--ink); }
+  .note { font-size: 13px; color: var(--ink-2); border-top: 1px solid var(--line); padding-top: 16px; max-width: 46em; }
+  .note b { color: var(--ink); }
 
-  /* ---------- closing ---------- */
-  .closing h2 { font-size: clamp(26px, 4.6vw, 42px); line-height: 1.5; }
+  /* closing */
+  .closing h2 { font-size: clamp(28px, 5vw, 46px); line-height: 1.5; }
   .closing .cta {
     margin-top: 34px; background: var(--surface); border: 1px solid var(--line);
     border-left: 4px solid var(--accent); border-radius: 10px; padding: 20px 24px;
@@ -209,155 +167,132 @@
   footer.slide { min-height: auto; padding: 26px 28px; border-bottom: none; }
   footer .inner { font-size: 12px; color: var(--ink-3); }
 
-  @media (max-width: 560px) {
-    .slide { padding: 56px 20px 64px; }
-    .sample .row { grid-template-columns: 1fr; gap: 2px; }
-  }
+  @media (max-width: 560px) { .slide { padding: 56px 20px 64px; } }
 </style>
 
 <!-- 01 cover -->
 <section class="slide cover" id="s1">
   <div class="inner">
     <p class="to">エン株式会社<b>代表取締役社長　越智 通勝 様</b></p>
-    <p class="brand num">EN INTELLIGENCE BRIEF</p>
-    <h1>HR業界の構造変化を、<br>毎朝の<span class="a">経営の意思決定材料</span>に。</h1>
-    <p class="lede">生成AI・スポットワーク・規制 — 変化のニュースは毎日届きます。それを「エンにとって何を意味するか」まで翻訳して、毎朝7時に経営のお手元へ届ける情報基盤のご提案です。</p>
+    <p class="brand num">ULTRAMAN IP <span class="x">×</span> en</p>
+    <h1>はたらく人を、<br><span class="a">ヒーローに。</span></h1>
+    <p class="lede">60年にわたり三世代に愛され続けるウルトラマンIPと、「入社後活躍」を掲げるエン。人の成長と可能性を信じる2つのブランドによる協業のご提案です。</p>
     <p class="date num">2026.07　ご提案資料</p>
   </div>
   <div class="scroll-hint">SCROLL ↓</div>
 </section>
 
-<!-- 02 question -->
+<!-- 02 problem -->
 <section class="slide statement" id="s2">
   <div class="inner">
-    <p class="kicker num">01 — 問題提起</p>
-    <h2>情報は溢れている。<br>しかし、<span class="a">意思決定の材料</span>は足りているか。</h2>
-    <p class="sub">業界ニュース・規制動向・競合の打ち手は毎日大量に流れてきます。それでも「読む」と「動く」の間には大きな距離があります。自社への示唆に翻訳する作業は、いまも各部門の属人的な情報収集に委ねられているのではないでしょうか。</p>
+    <p class="kicker num">01 — 問題意識</p>
+    <h2>人材サービスは、<br>「機能」では差がつきにくい時代へ。</h2>
+    <p class="sub">求人数・検索機能・価格 — 機能の戦いは、資本力の消耗戦になりつつあります。求職者と企業の心に残るのは、最後は「想起」と「好意」。機能ではなく、<b>物語の力で選ばれるブランド</b>をどう作るかが問われています。</p>
   </div>
 </section>
 
-<!-- 03 environment -->
+<!-- 03 why ultraman -->
 <section class="slide" id="s3">
   <div class="inner">
-    <p class="kicker num">02 — 環境認識</p>
-    <h2>4つの構造変化が、同時に進行している</h2>
-    <p class="sub">どれか一つでも事業モデルに触れる変化。それが同時に、しかも速く動いています。</p>
+    <p class="kicker num">02 — なぜウルトラマンか</p>
+    <h2>転職ボリュームゾーンの、ど真ん中にいるIP</h2>
     <div class="grid g2">
-      <div class="card"><span class="no num">SHIFT 1</span><h3>生成AIによる採用プロセスの再定義</h3><p>AI面接・スカウト自動生成・職務経歴書のAI作成が急速に普及。求人メディアと人材紹介のバリューチェーンそのものが問い直されている。</p></div>
-      <div class="card"><span class="no num">SHIFT 2</span><h3>スポットワーク市場の急拡大</h3><p>「雇用の前段階」の労働市場が生まれ、従来の求人広告・派遣モデルと交差し始めた。</p></div>
-      <div class="card"><span class="no num">SHIFT 3</span><h3>規制の多発</h3><p>職業安定法の的確表示義務、フリーランス新法、育成就労制度、EU AI Actの採用AI規制。事業に直結する法改正が国内外で相次ぐ。</p></div>
-      <div class="card"><span class="no num">SHIFT 4</span><h3>構造的な人手不足と労働移動</h3><p>賃上げ・リスキリング・ジョブ型・外国人材。中途採用市場とハイクラス市場の地図が塗り替わりつつある。</p></div>
+      <div class="card"><span class="no num">REASON 1</span><h3>世代がぴったり重なる</h3><p>平成ウルトラマンで育った世代は、いま20〜40代 — 転職市場のボリュームゾーンそのもの。さらに親子二世代・三世代で通じる、稀有な国民的IP。</p></div>
+      <div class="card"><span class="no num">REASON 2</span><h3>物語構造が「入社後活躍」と同型</h3><p>ウルトラマンは変身して終わりではない。仲間とともに、使命のために戦い続けてこそヒーロー。「入社して終わりではなく、活躍してこそ」というエンの思想と同じ骨格を持つ。</p></div>
+      <div class="card"><span class="no num">REASON 3</span><h3>アジアでの圧倒的認知</h3><p>中国・東南アジアで構造的に強い熱量。外国人材・グローバル採用領域(en world)との接続余地がある。</p></div>
+      <div class="card"><span class="no num">REASON 4</span><h3>ブランドセーフティの高さ</h3><p>子ども向けから大人向けまで企業タイアップの実績が豊富で、監修の型が確立。炎上リスクの低い、安心して組める国民的ヒーロー。</p></div>
     </div>
   </div>
 </section>
 
 <!-- 04 concept -->
-<section class="slide" id="s4">
+<section class="slide statement" id="s4">
   <div class="inner">
     <p class="kicker num">03 — コンセプト</p>
-    <h2>「読むためのニュース」ではなく、<br><span class="a">「動くためのインテリジェンス」</span></h2>
-    <p class="sub">AIがすべての情報を、4段構造の「IntelCard」に翻訳します。要約で終わらせず、必ず「示唆」と「次アクション」まで落とします。</p>
-    <div class="anatomy">
-      <div class="an-step"><div class="lbl num">STEP 1</div><div class="val">事実</div></div>
-      <div class="an-step"><div class="lbl num">STEP 2</div><div class="val">解釈</div></div>
-      <div class="an-step hot"><div class="lbl num">STEP 3</div><div class="val">エンへの示唆</div></div>
-      <div class="an-step hot"><div class="lbl num">STEP 4</div><div class="val">次アクション</div></div>
+    <h2>「その転職は、<span class="a">変身</span>だ。」</h2>
+    <p class="sub">新しい環境に飛び込み、力を得て、仲間とともに戦い続ける。ウルトラマンの物語は、はたらく人のキャリアの物語でもあります。</p>
+    <div class="mirror">
+      <div class="side">
+        <p class="who num">ULTRAMAN</p>
+        <p><b>変身して、終わりじゃない。</b>仲間と、使命のために戦い続けてこそヒーロー。</p>
+      </div>
+      <div class="eq">＝</div>
+      <div class="side en">
+        <p class="who num">en</p>
+        <p><b>入社して、終わりじゃない。</b>入社後に活躍してこそ、良い転職。</p>
+      </div>
     </div>
-    <p class="an-note">さらに各カードを重要度 A（経営アジェンダ化）〜 D（参考情報）に自動分類。経営会議で議論すべきものだけが、確実に上がってきます。</p>
+    <p class="sub">2つのブランドが同じ物語を語れる — これがこの協業の核です。</p>
   </div>
 </section>
 
-<!-- 05 product flow -->
+<!-- 05 packages -->
 <section class="slide" id="s5">
   <div class="inner">
-    <p class="kicker num">04 — 全体像</p>
-    <h2>毎朝7:00、経営のお手元に届くまで</h2>
-    <div class="flow">
-      <div class="flow-row"><span class="t">外部情報の監視</span><span class="d">業界ニュース・規制・技術・競合をAIが7カテゴリで日次収集・選別</span></div>
-      <div class="flow-sep">↓</div>
-      <div class="flow-row"><span class="t">IntelCard 生成</span><span class="d">事実→解釈→示唆→次アクションに翻訳し、重要度A〜Dで分類・蓄積</span></div>
-      <div class="flow-sep">↓</div>
-      <div class="flow-row"><span class="t">AI Council 議論</span><span class="d">重要トピックは6つの社内視点を持つAIエキスパートが議論し、採用/保留/要調査の結論と論点を残す</span></div>
-      <div class="flow-sep">↓</div>
-      <div class="flow-row final"><span class="t">Daily Brief 配信</span><span class="d">毎朝7:00にメール自動配信。ダッシュボード閲覧・社内Notionへの自動同期も</span></div>
+    <p class="kicker num">04 — 協業の全体像</p>
+    <h2>4つの協業パッケージ</h2>
+    <p class="sub">単発のキャンペーンで終わらせず、採用ブランディングから教育・グローバルまで段階的に広げられる設計です。</p>
+    <div class="pkgs">
+      <div class="pkg"><span class="no num">PKG A</span><h3>ブランドキャンペーン</h3><p>「その転職は、変身だ。」を軸にしたTVCM・交通・SNSキャンペーン。限定コラボコンテンツとノベルティで会員化まで導線設計。</p><p class="for"><b>対象:</b> 転職メディアの認知・想起・会員獲得</p></div>
+      <div class="pkg"><span class="no num">PKG B</span><h3>「まちを守る仕事」— 中小企業採用支援</h3><p>地域を支える中小企業を「まちを守るヒーロー企業」として特集。知名度で戦えない企業の求人に、物語の力を貸す。</p><p class="for"><b>対象:</b> 採用支援サービスの掲載社数・地方開拓</p></div>
+      <div class="pkg"><span class="no num">PKG C</span><h3>人材育成・研修コンテンツ</h3><p>ヒーローの成長物語を題材にしたリーダーシップ/チームビルディング研修、内定者フォロー・新人オンボーディング教材。</p><p class="for"><b>対象:</b> 教育研修事業・「入社後活躍」支援の商材強化</p></div>
+      <div class="pkg"><span class="no num">PKG D</span><h3>子ども向けキャリア教育・CSR</h3><p>「はたらくヒーロー」出張授業・親子イベント。未来の働き手に、働くことの意味をヒーローの言葉で届ける。</p><p class="for"><b>対象:</b> ブランド好意・社会貢献・ファミリー層接点</p></div>
     </div>
   </div>
 </section>
 
-<!-- 06 categories -->
+<!-- 06 pkg A detail -->
 <section class="slide" id="s6">
   <div class="inner">
-    <p class="kicker num">05 — 監視領域</p>
-    <h2>エン仕様の監視7カテゴリ</h2>
-    <p class="sub">カテゴリ・監視対象・観点は設定で定義されており、運用開始後も貴社の関心に合わせて随時調整できます。</p>
-    <div class="cats">
-      <div class="cat"><span class="no num">CAT 1</span><h3>採用・転職市場</h3><p>有効求人倍率、賃金動向、中途・新卒・リスキリング</p></div>
-      <div class="cat"><span class="no num">CAT 2</span><h3>HRテック・AI</h3><p>AI面接、スカウトAI、ATS、適性検査、生成AI各社</p></div>
-      <div class="cat"><span class="no num">CAT 3</span><h3>競合・プラットフォーム</h3><p>リクルート(Indeed)、パーソル、マイナビ、ビズリーチ、LinkedIn</p></div>
-      <div class="cat"><span class="no num">CAT 4</span><h3>働き方の構造変化</h3><p>スポットワーク、副業・兼業、フリーランス、ジョブ型</p></div>
-      <div class="cat"><span class="no num">CAT 5</span><h3>規制・労働法制</h3><p>職安法、派遣法、フリーランス新法、AI採用規制</p></div>
-      <div class="cat"><span class="no num">CAT 6</span><h3>グローバル人材・海外市場</h3><p>外国人材、越境採用、エグゼクティブ市場</p></div>
-      <div class="cat"><span class="no num">CAT 7</span><h3>資本市場・M&amp;A</h3><p>HR業界のM&amp;A・決算・SaaS評価、セクター評価</p></div>
+    <p class="kicker num">05 — PKG A 詳細</p>
+    <h2>ブランドキャンペーン「その転職は、変身だ。」</h2>
+    <div class="detail">
+      <div class="card"><h3>メッセージ展開</h3><p>TVCM・交通広告・SNSで「変身=転職、活躍=戦い続けること」の物語を展開。転職への不安を、変身への高揚感に書き換える。</p></div>
+      <div class="card"><h3>参加型コンテンツ</h3><p>「あなたはどのヒーロータイプ?」適性診断コンテンツで自然に会員登録へ。診断結果と求人レコメンドを接続。</p></div>
+      <div class="card"><h3>限定コラボ</h3><p>登録・応募・入社の節目に合わせた限定ノベルティ・デジタル特典。「入社後3ヶ月」の活躍タイミングにも特典を置き、思想を体験に変える。</p></div>
     </div>
+    <p class="kpi-line"><b>測定:</b> サービス想起率 / 指名検索数 / 新規会員登録 / 応募数 — キャンペーン前後で効果検証し、継続判断。</p>
   </div>
 </section>
 
-<!-- 07 experts -->
+<!-- 07 pkg B detail -->
 <section class="slide" id="s7">
   <div class="inner">
-    <p class="kicker num">06 — AI COUNCIL</p>
-    <h2>6つの社内視点が、毎朝「前さばき」をする</h2>
-    <p class="sub">重要トピックを6人のAIエキスパートが議論し、論点・選択肢・リスクを整理してから経営に上げます。</p>
-    <div class="experts">
-      <div class="exp"><h3>求人メディア戦略</h3><p class="q">この動きで求人メディアの価値は上がるか、下がるか</p></div>
-      <div class="exp"><h3>人材紹介・ハイクラス</h3><p class="q">ハイクラス/ミドル市場のどこに商機があるか</p></div>
-      <div class="exp"><h3>HRテック / AI</h3><p class="q">自社実装・提携・静観のどれが正解か</p></div>
-      <div class="exp"><h3>グローバル・新領域</h3><p class="q">どの新領域に優先投資すべきか。組む相手は誰か</p></div>
-      <div class="exp"><h3>CFO視点</h3><p class="q">投資額に対して何年で回収できるか</p></div>
-      <div class="exp"><h3>リスク管理</h3><p class="q">職安法・個情法・求職者保護の観点で問題はないか</p></div>
+    <p class="kicker num">06 — PKG B 詳細</p>
+    <h2>「まちを守る仕事」— 知名度なき企業に、物語を。</h2>
+    <p class="sub">中小企業の採用最大の壁は「知られていないこと」。ウルトラマンの「地域と人々を守る」文脈を借りて、地域を支える企業を主役にします。</p>
+    <div class="detail">
+      <div class="card"><h3>ヒーロー企業特集</h3><p>インフラ・医療・製造・物流など「まちを守る仕事」の特集企画。求人票を「使命の物語」として編集。</p></div>
+      <div class="card"><h3>自治体・商工会タイアップ</h3><p>地方自治体・商工会議所と連携した地域採用キャンペーン。地方創生の文脈でPR露出を獲得。</p></div>
+      <div class="card"><h3>社会テーマとしての発信</h3><p>人手不足という社会課題への取り組みとして発信し、営業機会とブランド好意を同時に獲得。</p></div>
     </div>
-    <p class="axis">エキスパートの人格と問いは貴社仕様に設計します。<b>「入社後活躍」の思想を全員の判断軸に組み込む</b> — 目先の応募数ではなく、入社後に活躍できるマッチングを強める打ち手か、を常に問わせます。</p>
+    <p class="kpi-line"><b>測定:</b> 特集参画社数 / 地方掲載社数の伸び / 特集経由の応募・入社数 / メディア露出。</p>
   </div>
 </section>
 
-<!-- 08 output sample -->
+<!-- 08 pkg C+D detail -->
 <section class="slide" id="s8">
   <div class="inner">
-    <p class="kicker num">07 — アウトプットイメージ</p>
-    <h2>届くのは、このような「動ける情報」です</h2>
-    <div class="sample">
-      <span class="tag num">IntelCard — HRテック・AI / 重要度 A</span>
-      <h3>大手ATSベンダー、生成AIによる一次面接自動化を国内展開へ</h3>
-      <dl>
-        <div class="row"><dt>事実</dt><dd>AI面接官による一次選考の国内提供を発表。選考工数を約6割削減と主張。</dd></div>
-        <div class="row"><dt>解釈</dt><dd>「面接の前工程」が商品化されると、人材評価の付加価値がプラットフォーム側に移る。</dd></div>
-        <div class="row"><dt>示唆</dt><dd><b>適性テスト・動画面接資産と「入社後活躍」データを組み合わせた独自の評価レイヤーは差別化余地。</b>一方、競合機能の搭載は時間の問題。</dd></div>
-        <div class="row"><dt>次アクション</dt><dd>競合機能のギャップ分析。提携/自社開発の初期判断を4週間以内に。</dd></div>
-      </dl>
+    <p class="kicker num">07 — PKG C・D 詳細</p>
+    <h2>「入社後活躍」と「次世代」への投資</h2>
+    <div class="detail">
+      <div class="card"><h3>ヒーローに学ぶ研修シリーズ</h3><p>チームで戦うこと、使命を持つこと、負けから立ち上がること — ヒーローの物語を教材化したリーダーシップ/チーム研修。記憶に残る研修として差別化。</p></div>
+      <div class="card"><h3>オンボーディング教材</h3><p>内定者フォロー・新人育成向けのストーリー教材。「変身直後がいちばん不安」という物語構造は、入社直後の定着支援とそのまま重なる。</p></div>
+      <div class="card"><h3>「はたらくヒーロー」教育プログラム</h3><p>子ども向けキャリア教育の出張授業・親子イベント。人材教育に力を注いでこられた貴社の思想を、次世代への投資として社会に示す。</p></div>
     </div>
-    <div class="sample brief-lines">
-      <span class="tag num">DAILY BRIEF — 毎朝 7:00 配信</span>
-      <p class="h">今日の要点(3行)</p>
-      <ol>
-        <li>AI一次面接の国内展開が本格化 — 評価レイヤーの主導権争いが始まった(重要度A・Council済み)</li>
-        <li>スポットワーク大手が正社員求人へ参入検討報道 — メディア事業と初の直接競合の可能性</li>
-        <li>フリーランス新法の運用指針改定案 — 紹介事業への影響は限定的、法務確認のみ</li>
-      </ol>
-    </div>
+    <p class="kpi-line"><b>測定:</b> 研修導入社数 / 受講満足度・定着率への寄与 / 教育プログラム実施校数・参加者数。</p>
   </div>
 </section>
 
-<!-- 09 proof -->
+<!-- 09 asia -->
 <section class="slide" id="s9">
   <div class="inner">
-    <p class="kicker num">08 — 実績と低リスク</p>
-    <h2>構想ではなく、<span class="a">日次運用中の基盤</span>です</h2>
-    <p class="sub"><span class="pill">エンタメ大手IP企業向けに毎朝配信で稼働中</span></p>
-    <div class="proof">
-      <div class="card"><h3>実績ある同一アーキテクチャ</h3><p>Daily Brief 自動配信・IntelCard蓄積・AI Council・Notion同期まで、<b>本番運用で磨かれた基盤</b>をそのまま利用します。</p></div>
-      <div class="card"><h3>貴社仕様化は「設定の差し替え」</h3><p>監視カテゴリ・AIエキスパート・ウォッチリストは設定ファイルで定義。<b>ゼロ開発ではなくカスタマイズ</b>なので短期間・低リスク。</p></div>
-      <div class="card"><h3>コストゼロで事前確認可能</h3><p>AI APIキーなしでもテンプレートベースで全機能が動作。<b>UI・運用フローを費用ゼロで体験</b>してから判断いただけます。</p></div>
-      <div class="card"><h3>データは貴社専用環境に</h3><p>カードとBriefは貴社専用環境と社内Notionに保存。API利用の<b>コスト上限ガード</b>も実装済み。</p></div>
+    <p class="kicker num">08 — 将来展開</p>
+    <h2>アジアへ — ウルトラマンの熱量が、<br>グローバル人材事業の入口になる</h2>
+    <p class="sub">ウルトラマンは中国・東南アジアで構造的に強い認知と熱量を持ちます。日本で働きたい外国人材、アジアへ進出する日本企業 — その双方への接点として、日本ブランドの親近感をそのまま採用マーケティングに転用できます。</p>
+    <div class="grid g2">
+      <div class="card"><h3>外国人材向け発信</h3><p>「日本で働く」ことへの親近感の入口としてIPを活用。日本語学習・就労情報コンテンツとの組み合わせ。</p></div>
+      <div class="card"><h3>アジア進出企業の採用支援</h3><p>現地での知名度が課題となる日本企業の採用ブランディングに、現地で認知のあるIPの物語を貸す。</p></div>
     </div>
   </div>
 </section>
@@ -365,15 +300,15 @@
 <!-- 10 steps -->
 <section class="slide" id="s10">
   <div class="inner">
-    <p class="kicker num">09 — 導入ステップ</p>
-    <h2>約4週間で「毎朝届く」状態をつくる</h2>
+    <p class="kicker num">09 — 進め方</p>
+    <h2>小さく実証し、大きく育てる</h2>
     <div class="steps">
-      <div class="step"><span class="w num">STEP 1 — 1週間</span><h3>要件すり合わせ</h3><p>監視カテゴリ・ウォッチリスト・エキスパート人格・配信先の確定(ワークショップ1〜2回)</p></div>
-      <div class="step"><span class="w num">STEP 2 — 2週間</span><h3>カスタマイズ &amp; 構築</h3><p>設定差し替え、貴社専用環境へのデプロイ、テスト配信</p></div>
-      <div class="step"><span class="w num">STEP 3 — 1週間〜</span><h3>試行運用</h3><p>経営企画・事業部長数名で毎朝のBriefを評価し、観点を調整</p></div>
-      <div class="step"><span class="w num">STEP 4</span><h3>本番運用</h3><p>配信先拡大、重要度Aカードの経営会議アジェンダ化フローを定着</p></div>
+      <div class="step"><span class="w num">STEP 1</span><h3>企画ワークショップ</h3><p>貴社×円谷プロダクションの顔合わせ。コンセプトと優先パッケージのすり合わせ</p></div>
+      <div class="step"><span class="w num">STEP 2</span><h3>スキーム設計</h3><p>期間限定タイアップとしてライセンス条件・監修体制・費用を設計</p></div>
+      <div class="step"><span class="w num">STEP 3</span><h3>パイロット実施</h3><p>PKG Aまたは Bから1本を実施し、想起・応募・掲載への効果を測定</p></div>
+      <div class="step"><span class="w num">STEP 4</span><h3>拡大</h3><p>効果検証を踏まえ、年間パートナーシップ・複数パッケージへ展開</p></div>
     </div>
-    <p class="cost"><b>費用構成:</b> インフラは月額数千円規模、AI APIは従量で月額数千〜数万円規模(上限ガードで制御)。初期カスタマイズは要件確定後にお見積り。<b>まず費用ゼロのデモ環境で体験いただく進め方を推奨します。</b></p>
+    <p class="note"><b>ブランド管理:</b> キャラクター使用はすべて円谷プロダクションの監修フローを通します。60年の運用で確立された型があるため、貴社のブランドを傷つけない座組みで進行できます。</p>
   </div>
 </section>
 
@@ -381,17 +316,17 @@
 <section class="slide closing" id="s11">
   <div class="inner">
     <p class="kicker num">10 — むすび</p>
-    <h2>変化と経営を毎朝つなぐ、<br>新しい<span class="a">「縁」</span>を。</h2>
-    <p class="sub">貴社が創業以来大切にされてきた「縁」— 人と企業の出会いを、入社後の活躍まで見届ける思想。その判断軸を組み込んだAIが、HR業界の変化と貴社の経営を毎朝結び直します。</p>
+    <h2>「縁」と「光」。<br>人の可能性を信じる者同士の協業を。</h2>
+    <p class="sub">エンは「縁」— 人と企業の出会いを、入社後の活躍まで見届ける会社。ウルトラマンは「光」— 人の中にある強さを信じ続けるヒーロー。この2つが組むことは、単なるタイアップではなく、同じ思想の共同表明だと考えています。</p>
     <div class="cta">
-      次の一歩として、<b>要件ワークショップ(1〜2時間 × 2回)</b> からのスタートをご提案します。<br>
-      その場で貴社仕様の監視カテゴリとAIエキスパートの骨格まで固まります。
+      次の一歩として、<b>円谷プロダクションを交えた企画ワークショップ(初回90分)</b> の場を設けさせてください。<br>
+      優先パッケージとパイロットの座組みまで、その場で骨格を固めます。
     </div>
   </div>
 </section>
 
 <footer class="slide">
-  <div class="inner">本資料の記載内容・スケジュール・費用は提案時点の想定であり、要件すり合わせの結果により変動する可能性があります。</div>
+  <div class="inner">本資料は協業検討のためのご提案であり、キャラクター・作品の使用はすべて権利者の承認・監修を前提とします。記載の施策・スケジュールは提案時点の想定です。</div>
 </footer>
 
 <div class="counter num" id="counter"><b id="cur">01</b> / 11</div>
