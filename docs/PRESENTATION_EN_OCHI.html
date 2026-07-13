@@ -1,0 +1,423 @@
+<title>en Intelligence Brief — 越智社長向けご提案</title>
+<style>
+  :root {
+    --accent: #A5333F;
+    --accent-soft: rgba(165, 51, 63, .08);
+    --ink: #20242E;
+    --ink-2: #545B6B;
+    --ink-3: #8A92A3;
+    --ground: #F7F8FA;
+    --surface: #FFFFFF;
+    --line: #DDE1E8;
+    --line-soft: #E8EBF0;
+    --ok: #2E7D4F;
+    --ok-soft: rgba(46, 125, 79, .10);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --accent: #D9707B;
+      --accent-soft: rgba(217, 112, 123, .12);
+      --ink: #EAECF1; --ink-2: #ADB4C2; --ink-3: #7B8395;
+      --ground: #12151C; --surface: #1B1F29;
+      --line: #2D3340; --line-soft: #232936;
+      --ok: #5CBF8A; --ok-soft: rgba(92, 191, 138, .13);
+    }
+  }
+  :root[data-theme="light"] {
+    --accent: #A5333F; --accent-soft: rgba(165,51,63,.08);
+    --ink: #20242E; --ink-2: #545B6B; --ink-3: #8A92A3;
+    --ground: #F7F8FA; --surface: #FFFFFF;
+    --line: #DDE1E8; --line-soft: #E8EBF0;
+    --ok: #2E7D4F; --ok-soft: rgba(46,125,79,.10);
+  }
+  :root[data-theme="dark"] {
+    --accent: #D9707B; --accent-soft: rgba(217,112,123,.12);
+    --ink: #EAECF1; --ink-2: #ADB4C2; --ink-3: #7B8395;
+    --ground: #12151C; --surface: #1B1F29;
+    --line: #2D3340; --line-soft: #232936;
+    --ok: #5CBF8A; --ok-soft: rgba(92,191,138,.13);
+  }
+
+  html { scroll-snap-type: y mandatory; scroll-behavior: smooth; background: var(--ground); }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+  body {
+    font-family: "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic Medium", "Yu Gothic", "Noto Sans JP", sans-serif;
+    color: var(--ink); background: var(--ground);
+    line-height: 1.8; font-size: 15px; -webkit-font-smoothing: antialiased;
+  }
+  .num { font-family: "Avenir Next", "Helvetica Neue", Arial, sans-serif; font-variant-numeric: tabular-nums; }
+
+  .slide {
+    min-height: 100vh; min-height: 100svh;
+    scroll-snap-align: start;
+    display: flex; align-items: center; justify-content: center;
+    padding: 64px 28px 72px;
+    border-bottom: 1px solid var(--line-soft);
+    position: relative;
+  }
+  .inner { width: 100%; max-width: 920px; }
+
+  .kicker {
+    font-size: 12px; letter-spacing: .22em; color: var(--accent);
+    font-weight: 700; margin-bottom: 18px; display: flex; align-items: center; gap: 12px;
+  }
+  .kicker::after { content: ""; height: 1px; background: var(--line); flex: 1; }
+  h2 {
+    font-size: clamp(24px, 4vw, 38px); font-weight: 800; line-height: 1.4;
+    letter-spacing: .01em; text-wrap: balance; margin: 0 0 14px;
+  }
+  h2 .a { color: var(--accent); }
+  .sub { color: var(--ink-2); max-width: 44em; margin: 0 0 30px; }
+
+  /* counter */
+  .counter {
+    position: fixed; right: 20px; bottom: 16px; z-index: 10;
+    font-size: 12px; letter-spacing: .12em; color: var(--ink-3);
+    background: var(--surface); border: 1px solid var(--line-soft);
+    border-radius: 999px; padding: 4px 14px;
+  }
+  .counter b { color: var(--accent); font-weight: 700; }
+
+  /* ---------- cover ---------- */
+  .cover { text-align: left; }
+  .cover .to {
+    font-size: 14px; color: var(--ink-2); margin-bottom: 40px;
+    padding-bottom: 16px; border-bottom: 1px solid var(--line);
+  }
+  .cover .to b { font-size: 17px; color: var(--ink); font-weight: 700; display: block; margin-top: 2px; }
+  .cover .brand {
+    font-size: 13px; letter-spacing: .3em; color: var(--accent); font-weight: 700; margin-bottom: 20px;
+  }
+  .cover h1 {
+    font-size: clamp(30px, 5.6vw, 52px); font-weight: 800; line-height: 1.35;
+    letter-spacing: .01em; margin: 0 0 22px; text-wrap: balance;
+  }
+  .cover h1 .a { color: var(--accent); }
+  .cover .lede { color: var(--ink-2); max-width: 40em; margin-bottom: 36px; }
+  .cover .date { font-size: 13px; color: var(--ink-3); letter-spacing: .1em; }
+  .scroll-hint {
+    position: absolute; bottom: 22px; left: 50%; transform: translateX(-50%);
+    color: var(--ink-3); font-size: 12px; letter-spacing: .2em;
+  }
+
+  /* ---------- statement slide ---------- */
+  .statement h2 { font-size: clamp(28px, 5vw, 46px); line-height: 1.5; }
+  .statement .sub { margin-top: 26px; }
+
+  /* ---------- generic cards ---------- */
+  .grid { display: grid; gap: 12px; }
+  .g2 { grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+  .g3 { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+  .card {
+    background: var(--surface); border: 1px solid var(--line-soft); border-radius: 10px;
+    padding: 18px 20px;
+  }
+  .card h3 { font-size: 15px; font-weight: 800; margin: 0 0 6px; }
+  .card p { font-size: 13px; color: var(--ink-2); margin: 0; line-height: 1.75; }
+  .card .no {
+    display: inline-block; font-size: 12px; font-weight: 700; color: var(--accent);
+    letter-spacing: .14em; margin-bottom: 8px;
+  }
+
+  /* ---------- concept (IntelCard anatomy) ---------- */
+  .anatomy { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; margin-top: 8px; }
+  .an-step { background: var(--surface); border: 1px solid var(--line-soft); border-radius: 10px; padding: 16px 18px; position: relative; }
+  .an-step .lbl { font-size: 12px; letter-spacing: .16em; color: var(--ink-3); font-weight: 700; margin-bottom: 6px; }
+  .an-step .val { font-size: 15px; font-weight: 800; }
+  .an-step.hot { border-color: var(--accent); background: var(--accent-soft); }
+  .an-step.hot .lbl { color: var(--accent); }
+  .an-note { margin-top: 22px; color: var(--ink-2); font-size: 13.5px; max-width: 44em; }
+
+  /* ---------- flow slide ---------- */
+  .flow { display: flex; flex-direction: column; gap: 0; }
+  .flow-row {
+    background: var(--surface); border: 1px solid var(--line-soft); border-radius: 10px;
+    padding: 15px 20px; display: flex; gap: 14px; align-items: baseline; flex-wrap: wrap;
+  }
+  .flow-row .t { font-weight: 800; font-size: 15px; min-width: 11em; }
+  .flow-row .d { font-size: 13px; color: var(--ink-2); flex: 1; min-width: 240px; }
+  .flow-sep { text-align: left; padding: 2px 0 2px 26px; color: var(--accent); font-size: 15px; line-height: 1.4; }
+  .flow-row.final { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+
+  /* ---------- categories ---------- */
+  .cats { display: grid; grid-template-columns: repeat(auto-fit, minmax(235px, 1fr)); gap: 10px; }
+  .cat { background: var(--surface); border: 1px solid var(--line-soft); border-radius: 10px; padding: 14px 17px; }
+  .cat .no { font-size: 11px; font-weight: 700; color: var(--accent); letter-spacing: .14em; }
+  .cat h3 { font-size: 14px; font-weight: 800; margin: 2px 0 4px; }
+  .cat p { font-size: 12.5px; color: var(--ink-2); margin: 0; line-height: 1.65; }
+
+  /* ---------- experts ---------- */
+  .experts { display: grid; grid-template-columns: repeat(auto-fit, minmax(255px, 1fr)); gap: 10px; }
+  .exp { background: var(--surface); border: 1px solid var(--line-soft); border-radius: 10px; padding: 15px 18px; }
+  .exp h3 { font-size: 14px; font-weight: 800; margin: 0 0 4px; }
+  .exp .q { font-size: 12.5px; color: var(--ink-2); margin: 0; }
+  .exp .q::before { content: "問い　"; color: var(--accent); font-weight: 700; font-size: 11px; letter-spacing: .1em; }
+  .axis {
+    margin-top: 20px; border-left: 3px solid var(--accent); padding: 4px 18px;
+    color: var(--ink-2); font-size: 14px; max-width: 44em;
+  }
+  .axis b { color: var(--ink); }
+
+  /* ---------- output sample ---------- */
+  .sample {
+    background: var(--surface); border: 1px solid var(--line); border-radius: 12px;
+    padding: 22px 26px; margin-bottom: 14px;
+  }
+  .sample .tag {
+    display: inline-block; font-size: 11px; font-weight: 700; letter-spacing: .1em;
+    color: var(--accent); background: var(--accent-soft); border-radius: 5px;
+    padding: 3px 10px; margin-bottom: 10px;
+  }
+  .sample h3 { font-size: 16px; font-weight: 800; margin: 0 0 12px; line-height: 1.55; }
+  .sample dl { margin: 0; display: grid; gap: 7px; }
+  .sample .row { display: grid; grid-template-columns: 6.5em 1fr; gap: 10px; font-size: 13px; }
+  .sample dt { color: var(--ink-3); font-weight: 700; }
+  .sample dd { margin: 0; color: var(--ink-2); }
+  .sample dd b { color: var(--ink); }
+  .brief-lines { font-size: 13.5px; color: var(--ink-2); }
+  .brief-lines .h { font-weight: 800; color: var(--ink); font-size: 13px; letter-spacing: .06em; margin-bottom: 6px; }
+  .brief-lines ol { margin: 0; padding-left: 20px; }
+  .brief-lines li { margin: 3px 0; }
+
+  /* ---------- track record ---------- */
+  .proof { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
+  .proof .card b { color: var(--ink); }
+  .pill {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 12px; padding: 4px 12px; border-radius: 999px; font-weight: 600;
+    color: var(--ok); background: var(--ok-soft);
+  }
+  .pill::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--ok); }
+
+  /* ---------- steps ---------- */
+  .steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin-bottom: 26px; }
+  .step { background: var(--surface); border: 1px solid var(--line-soft); border-top: 3px solid var(--accent); border-radius: 10px; padding: 15px 18px; }
+  .step .w { font-size: 11px; letter-spacing: .14em; color: var(--ink-3); font-weight: 700; }
+  .step h3 { font-size: 14px; font-weight: 800; margin: 3px 0 5px; }
+  .step p { font-size: 12.5px; color: var(--ink-2); margin: 0; }
+  .cost { font-size: 13.5px; color: var(--ink-2); border-top: 1px solid var(--line); padding-top: 16px; max-width: 46em; }
+  .cost b { color: var(--ink); }
+
+  /* ---------- closing ---------- */
+  .closing h2 { font-size: clamp(26px, 4.6vw, 42px); line-height: 1.5; }
+  .closing .cta {
+    margin-top: 34px; background: var(--surface); border: 1px solid var(--line);
+    border-left: 4px solid var(--accent); border-radius: 10px; padding: 20px 24px;
+    font-size: 15px;
+  }
+  .closing .cta b { color: var(--accent); }
+  footer.slide { min-height: auto; padding: 26px 28px; border-bottom: none; }
+  footer .inner { font-size: 12px; color: var(--ink-3); }
+
+  @media (max-width: 560px) {
+    .slide { padding: 56px 20px 64px; }
+    .sample .row { grid-template-columns: 1fr; gap: 2px; }
+  }
+</style>
+
+<!-- 01 cover -->
+<section class="slide cover" id="s1">
+  <div class="inner">
+    <p class="to">エン株式会社<b>代表取締役社長　越智 通勝 様</b></p>
+    <p class="brand num">EN INTELLIGENCE BRIEF</p>
+    <h1>HR業界の構造変化を、<br>毎朝の<span class="a">経営の意思決定材料</span>に。</h1>
+    <p class="lede">生成AI・スポットワーク・規制 — 変化のニュースは毎日届きます。それを「エンにとって何を意味するか」まで翻訳して、毎朝7時に経営のお手元へ届ける情報基盤のご提案です。</p>
+    <p class="date num">2026.07　ご提案資料</p>
+  </div>
+  <div class="scroll-hint">SCROLL ↓</div>
+</section>
+
+<!-- 02 question -->
+<section class="slide statement" id="s2">
+  <div class="inner">
+    <p class="kicker num">01 — 問題提起</p>
+    <h2>情報は溢れている。<br>しかし、<span class="a">意思決定の材料</span>は足りているか。</h2>
+    <p class="sub">業界ニュース・規制動向・競合の打ち手は毎日大量に流れてきます。それでも「読む」と「動く」の間には大きな距離があります。自社への示唆に翻訳する作業は、いまも各部門の属人的な情報収集に委ねられているのではないでしょうか。</p>
+  </div>
+</section>
+
+<!-- 03 environment -->
+<section class="slide" id="s3">
+  <div class="inner">
+    <p class="kicker num">02 — 環境認識</p>
+    <h2>4つの構造変化が、同時に進行している</h2>
+    <p class="sub">どれか一つでも事業モデルに触れる変化。それが同時に、しかも速く動いています。</p>
+    <div class="grid g2">
+      <div class="card"><span class="no num">SHIFT 1</span><h3>生成AIによる採用プロセスの再定義</h3><p>AI面接・スカウト自動生成・職務経歴書のAI作成が急速に普及。求人メディアと人材紹介のバリューチェーンそのものが問い直されている。</p></div>
+      <div class="card"><span class="no num">SHIFT 2</span><h3>スポットワーク市場の急拡大</h3><p>「雇用の前段階」の労働市場が生まれ、従来の求人広告・派遣モデルと交差し始めた。</p></div>
+      <div class="card"><span class="no num">SHIFT 3</span><h3>規制の多発</h3><p>職業安定法の的確表示義務、フリーランス新法、育成就労制度、EU AI Actの採用AI規制。事業に直結する法改正が国内外で相次ぐ。</p></div>
+      <div class="card"><span class="no num">SHIFT 4</span><h3>構造的な人手不足と労働移動</h3><p>賃上げ・リスキリング・ジョブ型・外国人材。中途採用市場とハイクラス市場の地図が塗り替わりつつある。</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- 04 concept -->
+<section class="slide" id="s4">
+  <div class="inner">
+    <p class="kicker num">03 — コンセプト</p>
+    <h2>「読むためのニュース」ではなく、<br><span class="a">「動くためのインテリジェンス」</span></h2>
+    <p class="sub">AIがすべての情報を、4段構造の「IntelCard」に翻訳します。要約で終わらせず、必ず「示唆」と「次アクション」まで落とします。</p>
+    <div class="anatomy">
+      <div class="an-step"><div class="lbl num">STEP 1</div><div class="val">事実</div></div>
+      <div class="an-step"><div class="lbl num">STEP 2</div><div class="val">解釈</div></div>
+      <div class="an-step hot"><div class="lbl num">STEP 3</div><div class="val">エンへの示唆</div></div>
+      <div class="an-step hot"><div class="lbl num">STEP 4</div><div class="val">次アクション</div></div>
+    </div>
+    <p class="an-note">さらに各カードを重要度 A（経営アジェンダ化）〜 D（参考情報）に自動分類。経営会議で議論すべきものだけが、確実に上がってきます。</p>
+  </div>
+</section>
+
+<!-- 05 product flow -->
+<section class="slide" id="s5">
+  <div class="inner">
+    <p class="kicker num">04 — 全体像</p>
+    <h2>毎朝7:00、経営のお手元に届くまで</h2>
+    <div class="flow">
+      <div class="flow-row"><span class="t">外部情報の監視</span><span class="d">業界ニュース・規制・技術・競合をAIが7カテゴリで日次収集・選別</span></div>
+      <div class="flow-sep">↓</div>
+      <div class="flow-row"><span class="t">IntelCard 生成</span><span class="d">事実→解釈→示唆→次アクションに翻訳し、重要度A〜Dで分類・蓄積</span></div>
+      <div class="flow-sep">↓</div>
+      <div class="flow-row"><span class="t">AI Council 議論</span><span class="d">重要トピックは6つの社内視点を持つAIエキスパートが議論し、採用/保留/要調査の結論と論点を残す</span></div>
+      <div class="flow-sep">↓</div>
+      <div class="flow-row final"><span class="t">Daily Brief 配信</span><span class="d">毎朝7:00にメール自動配信。ダッシュボード閲覧・社内Notionへの自動同期も</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- 06 categories -->
+<section class="slide" id="s6">
+  <div class="inner">
+    <p class="kicker num">05 — 監視領域</p>
+    <h2>エン仕様の監視7カテゴリ</h2>
+    <p class="sub">カテゴリ・監視対象・観点は設定で定義されており、運用開始後も貴社の関心に合わせて随時調整できます。</p>
+    <div class="cats">
+      <div class="cat"><span class="no num">CAT 1</span><h3>採用・転職市場</h3><p>有効求人倍率、賃金動向、中途・新卒・リスキリング</p></div>
+      <div class="cat"><span class="no num">CAT 2</span><h3>HRテック・AI</h3><p>AI面接、スカウトAI、ATS、適性検査、生成AI各社</p></div>
+      <div class="cat"><span class="no num">CAT 3</span><h3>競合・プラットフォーム</h3><p>リクルート(Indeed)、パーソル、マイナビ、ビズリーチ、LinkedIn</p></div>
+      <div class="cat"><span class="no num">CAT 4</span><h3>働き方の構造変化</h3><p>スポットワーク、副業・兼業、フリーランス、ジョブ型</p></div>
+      <div class="cat"><span class="no num">CAT 5</span><h3>規制・労働法制</h3><p>職安法、派遣法、フリーランス新法、AI採用規制</p></div>
+      <div class="cat"><span class="no num">CAT 6</span><h3>グローバル人材・海外市場</h3><p>外国人材、越境採用、エグゼクティブ市場</p></div>
+      <div class="cat"><span class="no num">CAT 7</span><h3>資本市場・M&amp;A</h3><p>HR業界のM&amp;A・決算・SaaS評価、セクター評価</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- 07 experts -->
+<section class="slide" id="s7">
+  <div class="inner">
+    <p class="kicker num">06 — AI COUNCIL</p>
+    <h2>6つの社内視点が、毎朝「前さばき」をする</h2>
+    <p class="sub">重要トピックを6人のAIエキスパートが議論し、論点・選択肢・リスクを整理してから経営に上げます。</p>
+    <div class="experts">
+      <div class="exp"><h3>求人メディア戦略</h3><p class="q">この動きで求人メディアの価値は上がるか、下がるか</p></div>
+      <div class="exp"><h3>人材紹介・ハイクラス</h3><p class="q">ハイクラス/ミドル市場のどこに商機があるか</p></div>
+      <div class="exp"><h3>HRテック / AI</h3><p class="q">自社実装・提携・静観のどれが正解か</p></div>
+      <div class="exp"><h3>グローバル・新領域</h3><p class="q">どの新領域に優先投資すべきか。組む相手は誰か</p></div>
+      <div class="exp"><h3>CFO視点</h3><p class="q">投資額に対して何年で回収できるか</p></div>
+      <div class="exp"><h3>リスク管理</h3><p class="q">職安法・個情法・求職者保護の観点で問題はないか</p></div>
+    </div>
+    <p class="axis">エキスパートの人格と問いは貴社仕様に設計します。<b>「入社後活躍」の思想を全員の判断軸に組み込む</b> — 目先の応募数ではなく、入社後に活躍できるマッチングを強める打ち手か、を常に問わせます。</p>
+  </div>
+</section>
+
+<!-- 08 output sample -->
+<section class="slide" id="s8">
+  <div class="inner">
+    <p class="kicker num">07 — アウトプットイメージ</p>
+    <h2>届くのは、このような「動ける情報」です</h2>
+    <div class="sample">
+      <span class="tag num">IntelCard — HRテック・AI / 重要度 A</span>
+      <h3>大手ATSベンダー、生成AIによる一次面接自動化を国内展開へ</h3>
+      <dl>
+        <div class="row"><dt>事実</dt><dd>AI面接官による一次選考の国内提供を発表。選考工数を約6割削減と主張。</dd></div>
+        <div class="row"><dt>解釈</dt><dd>「面接の前工程」が商品化されると、人材評価の付加価値がプラットフォーム側に移る。</dd></div>
+        <div class="row"><dt>示唆</dt><dd><b>適性テスト・動画面接資産と「入社後活躍」データを組み合わせた独自の評価レイヤーは差別化余地。</b>一方、競合機能の搭載は時間の問題。</dd></div>
+        <div class="row"><dt>次アクション</dt><dd>競合機能のギャップ分析。提携/自社開発の初期判断を4週間以内に。</dd></div>
+      </dl>
+    </div>
+    <div class="sample brief-lines">
+      <span class="tag num">DAILY BRIEF — 毎朝 7:00 配信</span>
+      <p class="h">今日の要点(3行)</p>
+      <ol>
+        <li>AI一次面接の国内展開が本格化 — 評価レイヤーの主導権争いが始まった(重要度A・Council済み)</li>
+        <li>スポットワーク大手が正社員求人へ参入検討報道 — メディア事業と初の直接競合の可能性</li>
+        <li>フリーランス新法の運用指針改定案 — 紹介事業への影響は限定的、法務確認のみ</li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<!-- 09 proof -->
+<section class="slide" id="s9">
+  <div class="inner">
+    <p class="kicker num">08 — 実績と低リスク</p>
+    <h2>構想ではなく、<span class="a">日次運用中の基盤</span>です</h2>
+    <p class="sub"><span class="pill">エンタメ大手IP企業向けに毎朝配信で稼働中</span></p>
+    <div class="proof">
+      <div class="card"><h3>実績ある同一アーキテクチャ</h3><p>Daily Brief 自動配信・IntelCard蓄積・AI Council・Notion同期まで、<b>本番運用で磨かれた基盤</b>をそのまま利用します。</p></div>
+      <div class="card"><h3>貴社仕様化は「設定の差し替え」</h3><p>監視カテゴリ・AIエキスパート・ウォッチリストは設定ファイルで定義。<b>ゼロ開発ではなくカスタマイズ</b>なので短期間・低リスク。</p></div>
+      <div class="card"><h3>コストゼロで事前確認可能</h3><p>AI APIキーなしでもテンプレートベースで全機能が動作。<b>UI・運用フローを費用ゼロで体験</b>してから判断いただけます。</p></div>
+      <div class="card"><h3>データは貴社専用環境に</h3><p>カードとBriefは貴社専用環境と社内Notionに保存。API利用の<b>コスト上限ガード</b>も実装済み。</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- 10 steps -->
+<section class="slide" id="s10">
+  <div class="inner">
+    <p class="kicker num">09 — 導入ステップ</p>
+    <h2>約4週間で「毎朝届く」状態をつくる</h2>
+    <div class="steps">
+      <div class="step"><span class="w num">STEP 1 — 1週間</span><h3>要件すり合わせ</h3><p>監視カテゴリ・ウォッチリスト・エキスパート人格・配信先の確定(ワークショップ1〜2回)</p></div>
+      <div class="step"><span class="w num">STEP 2 — 2週間</span><h3>カスタマイズ &amp; 構築</h3><p>設定差し替え、貴社専用環境へのデプロイ、テスト配信</p></div>
+      <div class="step"><span class="w num">STEP 3 — 1週間〜</span><h3>試行運用</h3><p>経営企画・事業部長数名で毎朝のBriefを評価し、観点を調整</p></div>
+      <div class="step"><span class="w num">STEP 4</span><h3>本番運用</h3><p>配信先拡大、重要度Aカードの経営会議アジェンダ化フローを定着</p></div>
+    </div>
+    <p class="cost"><b>費用構成:</b> インフラは月額数千円規模、AI APIは従量で月額数千〜数万円規模(上限ガードで制御)。初期カスタマイズは要件確定後にお見積り。<b>まず費用ゼロのデモ環境で体験いただく進め方を推奨します。</b></p>
+  </div>
+</section>
+
+<!-- 11 closing -->
+<section class="slide closing" id="s11">
+  <div class="inner">
+    <p class="kicker num">10 — むすび</p>
+    <h2>変化と経営を毎朝つなぐ、<br>新しい<span class="a">「縁」</span>を。</h2>
+    <p class="sub">貴社が創業以来大切にされてきた「縁」— 人と企業の出会いを、入社後の活躍まで見届ける思想。その判断軸を組み込んだAIが、HR業界の変化と貴社の経営を毎朝結び直します。</p>
+    <div class="cta">
+      次の一歩として、<b>要件ワークショップ(1〜2時間 × 2回)</b> からのスタートをご提案します。<br>
+      その場で貴社仕様の監視カテゴリとAIエキスパートの骨格まで固まります。
+    </div>
+  </div>
+</section>
+
+<footer class="slide">
+  <div class="inner">本資料の記載内容・スケジュール・費用は提案時点の想定であり、要件すり合わせの結果により変動する可能性があります。</div>
+</footer>
+
+<div class="counter num" id="counter"><b id="cur">01</b> / 11</div>
+
+<script>
+  const slides = Array.from(document.querySelectorAll('section.slide'));
+  const cur = document.getElementById('cur');
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        const i = slides.indexOf(e.target);
+        if (i >= 0) cur.textContent = String(i + 1).padStart(2, '0');
+      }
+    });
+  }, { threshold: 0.55 });
+  slides.forEach(s => io.observe(s));
+
+  document.addEventListener('keydown', (ev) => {
+    if (['ArrowDown','PageDown',' '].includes(ev.key)) { ev.preventDefault(); nav(1); }
+    if (['ArrowUp','PageUp'].includes(ev.key)) { ev.preventDefault(); nav(-1); }
+  });
+  function nav(dir) {
+    const y = window.scrollY + window.innerHeight * 0.5;
+    let idx = slides.findIndex(s => s.offsetTop <= y && y < s.offsetTop + s.offsetHeight);
+    if (idx < 0) idx = 0;
+    const next = Math.min(Math.max(idx + dir, 0), slides.length - 1);
+    slides[next].scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+  }
+</script>
