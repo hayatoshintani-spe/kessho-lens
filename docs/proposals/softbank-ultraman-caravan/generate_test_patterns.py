@@ -63,6 +63,18 @@ def textbox(slide, x, y, w, h, lines, align=PP_ALIGN.LEFT, anchor=MSO_ANCHOR.TOP
     return box
 
 
+def rect(slide, x, y, w, h, fill=None, shape=MSO_SHAPE.RECTANGLE):
+    sp = slide.shapes.add_shape(shape, x, y, w, h)
+    sp.shadow.inherit = False
+    if fill is None:
+        sp.fill.background()
+    else:
+        sp.fill.solid()
+        sp.fill.fore_color.rgb = fill
+    sp.line.fill.background()
+    return sp
+
+
 def footer(slide):
     textbox(slide, Inches(5.17), Inches(7.16), Inches(3.0), Inches(0.28),
             [("© TSUBURAYA PRODUCTIONS", 8, SILVER, False)], align=PP_ALIGN.CENTER)
@@ -177,6 +189,73 @@ for i, (period, desc, fill) in enumerate(steps):
 textbox(s, Inches(0.9), Inches(6.25), Inches(11.5), Inches(0.6), [
     [("ポイント:", 12.5, RED, True),
      ("2026年度は「作る・確かめる」に集中し、実働は2027年4月から空白なくスタート。パターン2の協賛実績が年間契約の社内稟議の裏付けになります。", 12.5, INK, False)],
+])
+
+# =============================================================================
+# 3. パイロットの成功基準と年間契約への接続
+# =============================================================================
+s = add_slide()
+header(s, "パイロットの成功基準と年間契約への接続(ご提案)",
+       "パイロットを「やって終わり」にしないため、成功基準と移行条件を事前にご合意いただく設計です")
+add_table(s, Inches(0.7), Inches(1.55), Inches(11.9),
+          ["成功基準(貴社と共同設定)", "測定方法", "目安"],
+          [
+              ["店頭集客(1開催あたり来場)", "会場カウント+キットQR読取数", "現行IP施策の同等水準(比80%以上)を基準に共同設定"],
+              ["撮影会参加組数", "参加受付数(1回30分×5回/日)", "同上"],
+              ["ブース接触→相談への転換", "QRアンケート+店頭相談記録", "パイロットで実測しベンチマーク化"],
+              ["現場運用品質", "店舗・代理店ヒアリング、事故・クレーム件数", "重大事故・クレームゼロ"],
+          ],
+          col_widths=[1.5, 1.4, 1.7], row_h=0.55, font_size=11.5)
+b = rect(s, Inches(0.7), Inches(4.45), Inches(11.9), Inches(1.85), fill=PALE_RED, shape=MSO_SHAPE.ROUNDED_RECTANGLE)
+b.adjustments[0] = 0.05
+textbox(s, Inches(1.0), Inches(4.62), Inches(11.3), Inches(1.6), [
+    ("年間契約への接続条件(基本合意書で事前にご合意)", 13.5, RED, True),
+    ("① 成功基準を達成した場合、年間契約へ移行することをパイロット開始前に基本合意(LOI)", 12.5, INK, False),
+    ("② 短期IP使用料300万円は、年間契約の初年度IP使用料に全額充当(=パイロット費用は実質ゼロに)", 12.5, INK, False),
+    ("③ パイロット期間中のご締結で、60周年記念素材・限定ビジュアルを初年度特典としてご提供", 12.5, INK, False),
+    ("④ 計測データは月次レポートで貴社ご報告用フォーマットに整えてご提出(社内ご説明にそのままご利用いただけます)", 12.5, INK, False),
+], gap=5)
+
+# =============================================================================
+# 4. 年間展開へのランプアップ計画
+# =============================================================================
+s = add_slide()
+header(s, "年間展開へのランプアップ計画",
+       "パイロットと並行して供給体制を整備し、判定後は待ち時間ゼロで全国拡大へ移行します")
+ramp = [
+    ("2027年4月〜6月", "パイロット:首都圏5〜10店舗・10〜20開催。月次レビューで基準進捗を確認", PALE),
+    ("2027年7月", "成功基準の判定 → 年間契約へ移行(基本合意済みのためスムーズに発効)", PALE_RED),
+    ("2027年7月〜9月", "夏休み商戦:約100開催規模へ拡大(関東+主要都市)", PALE),
+    ("2027年10月〜12月", "年末商戦:全国展開へ拡大(年率300〜600開催ペース)", PALE),
+    ("2028年1月〜3月", "春商戦:フル稼働。FY28のフル年間展開+複数年契約のご協議", None),
+]
+y = Inches(1.7)
+for i, (period, desc, fill) in enumerate(ramp):
+    is_last = i == len(ramp) - 1
+    bx = s.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(0.9), y, Inches(11.5), Inches(0.72))
+    bx.adjustments[0] = 0.12
+    bx.shadow.inherit = False
+    bx.fill.solid()
+    bx.fill.fore_color.rgb = NAVY if is_last else fill
+    bx.line.fill.background()
+    tf = bx.text_frame
+    tf.word_wrap = True
+    tf.margin_left = Inches(0.25)
+    tf.vertical_anchor = MSO_ANCHOR.MIDDLE
+    p = tf.paragraphs[0]
+    r1 = p.add_run(); r1.text = period + "  "
+    set_font(r1, 13, WHITE if is_last else RED, True)
+    r2 = p.add_run(); r2.text = desc
+    set_font(r2, 13, WHITE if is_last else INK, is_last)
+    y += Inches(0.86)
+    if not is_last:
+        ar = s.shapes.add_shape(MSO_SHAPE.DOWN_ARROW, Inches(6.5), y - Inches(0.16), Inches(0.22), Inches(0.14))
+        ar.shadow.inherit = False
+        ar.fill.solid(); ar.fill.fore_color.rgb = RED
+        ar.line.fill.background()
+textbox(s, Inches(0.9), Inches(6.25), Inches(11.5), Inches(0.6), [
+    [("ポイント:", 12.5, RED, True),
+     ("スーツ増産・指定アクターの研修はパイロット期間中に並行整備するため、判定後すぐに拡大できます。パイロットの計測データが、そのまま拡大時のKPI・出店計画の根拠になります。", 12.5, INK, False)],
 ])
 
 out = "テスト実施のご提案パターン.pptx"
