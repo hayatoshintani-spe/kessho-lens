@@ -383,5 +383,74 @@
     "speculation_notes": "パッケージの正式条件は政府文書の精読が必要。本カードは概要レベル。",
     "related_card_ids": [],
     "related_agents": ["global_expansion", "cfo", "ip_strategist"]
+  },
+  {
+    "id": "intel_2026-07-22_r0k1dj4pan",
+    "date": "2026-07-22",
+    "title": "Rokid スマートAIグラス日本発売、Makuake歴代1位からの本格展開",
+    "one_liner": "日本で最も勢いのあるARグラスが上陸、ウルトラマンIP協業の先行機会",
+    "category": "device_telecom",
+    "importance": "B",
+    "fact": "Rokid のスマートAIグラス（約49g、両眼Micro LED、12MPカメラ、価格109,890円）が2026年7月10日に日本で一般販売開始。Makuake先行販売では歴代応援購入額1位を記録し、Amazon・楽天に加えビックカメラ・ヨドバシ等 全国約75店舗で販売、5都市で体験ポップアップを展開中。日本総代理店はフューチャーモデル株式会社。",
+    "interpretation": "(解釈) ARグラスの国内普及は『機能訴求』フェーズから『毎日かけたくなる理由＝コンテンツ』フェーズへ移りつつある。Rokid はハード販路と話題性を確保済みだが情動的な購買動機が薄く、IP側にとっては小さい投資で『ARグラス上の最初のIP体験』を取りに行ける窓が開いている。発売日の7月10日が「ウルトラマンの日」と同日である点も記号として使える。",
+    "insight": {
+      "what_it_means": "ウルトラマンの中核モチーフ（変身・カラータイマー・光線・巨大化）は視界に重なるAR表現と親和性が高く、Rokid のプロモーション課題と正面から噛み合う。限定コラボモデル＋AR体験パック＋店頭体験の三層なら、デバイス開発リスクをRokid側に置いたまま先行事例とライセンス収入を獲得できる。",
+      "business_opportunity": [
+        "ウルトラマン限定コラボモデル（数量限定・カラータイマー意匠）の商品化ライセンス",
+        "巨大ウルトラマン召喚・光線AR撮影などの体験パック（UGC拡散装置）",
+        "全国5都市ポップアップ・店頭デモ機への体験コンテンツ供給",
+        "成果連動での中国・北米・欧州のRokidグローバル販路への拡張オプション"
+      ],
+      "risk": [
+        "中国本社企業との協業に伴う契約・データ取り扱い・地政学リスク",
+        "AR上のキャラクター表現品質が監修不足でブランド毀損する可能性",
+        "デバイス販売不振時の共倒れ（ミニマムギャランティと限定数量で下限管理）"
+      ]
+    },
+    "actions": [
+      {
+        "who": "ライセンス事業部",
+        "what": "日本総代理店（フューチャーモデル）経由でRokid社へコラボ初回打診",
+        "priority": "this_week"
+      },
+      {
+        "who": "IP戦略 / 法務",
+        "what": "ARグラスカテゴリでの独占条項の要否整理と、中国本社との契約スキームのリスク事前確認",
+        "priority": "this_week"
+      },
+      {
+        "who": "コンテンツ部門",
+        "what": "既存3DアセットのAR転用可否と監修工数の見積り",
+        "priority": "watch"
+      }
+    ],
+    "tags": ["Rokid", "ARグラス", "スマートグラス", "コラボ", "ライセンス", "日本市場"],
+    "sources": [
+      {
+        "title": "「Rokid スマートAIグラス」10日から一般販売。全国5都市で体験ポップアップ",
+        "url": "https://av.watch.impress.co.jp/docs/news/2123886.html",
+        "publisher": "AV Watch",
+        "published_at": "2026-07-08",
+        "access_status": "full"
+      },
+      {
+        "title": "AIグラス首位「Rokid」が攻める日本市場",
+        "url": "https://www.watch.impress.co.jp/docs/news/2123575.html",
+        "publisher": "Impress Watch",
+        "published_at": "2026-07-06",
+        "access_status": "full"
+      },
+      {
+        "title": "AI×ARスマートグラス「Rokid」日本初上陸",
+        "url": "https://prtimes.jp/main/html/rd/p/000000015.000032740.html",
+        "publisher": "PR TIMES（フューチャーモデル株式会社）",
+        "published_at": "2026-02-26",
+        "access_status": "full"
+      }
+    ],
+    "confidence": "high",
+    "speculation_notes": "Rokid の中国市場における既存IPコラボ契約の有無は未確認。独占条項の交渉前にデューデリで要確認。",
+    "related_card_ids": ["intel_2026-05-16_g7h8i9j0k1"],
+    "related_agents": ["ip_strategist", "md_licensing", "ai_trend", "risk_manager"]
   }
 ]

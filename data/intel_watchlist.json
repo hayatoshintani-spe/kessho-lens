@@ -30,11 +30,12 @@
     "category": "device_telecom",
     "label": "スマホ・通信・デバイス",
     "description": "ユーザー接点はどのデバイスに移るか / IP体験はどこで起きるか",
-    "targets": ["Apple Vision", "Meta Quest", "ARグラス", "RCS", "スマートTV", "ゲーム機"],
+    "targets": ["Apple Vision", "Meta Quest", "Rokid", "ARグラス", "RCS", "スマートTV", "ゲーム機"],
     "items": [
       {"keyword": "Apple Vision Pro", "category": "device_telecom", "rationale": "空間体験プラットフォームの先導役", "priority": "medium"},
       {"keyword": "Meta Quest", "category": "device_telecom", "rationale": "若年層・ゲーマーへの接点", "priority": "medium"},
-      {"keyword": "ARグラス各社", "category": "device_telecom", "rationale": "次世代IP体験の媒体", "priority": "low"},
+      {"keyword": "Rokid", "category": "device_telecom", "rationale": "日本上陸したAIグラス首位。ウルトラマンコラボ提案の交渉相手", "priority": "high"},
+      {"keyword": "ARグラス各社", "category": "device_telecom", "rationale": "次世代IP体験の媒体。Rokid日本上陸でコラボ具体化フェーズ", "priority": "high"},
       {"keyword": "5G/RCS", "category": "device_telecom", "rationale": "ファンCRM・通知体験への影響", "priority": "low"}
     ]
   },
