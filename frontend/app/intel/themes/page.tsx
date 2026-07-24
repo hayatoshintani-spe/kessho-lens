@@ -11,6 +11,7 @@ import {
   THEME_GROUPS,
 } from '@/lib/reform-taxonomies';
 import { enrichCards } from '@/lib/impact-score';
+import NoticeCard from '@/components/ui/NoticeCard';
 import type { IntelCard } from '@/lib/intel-types';
 import type { ThemeGroupId, ThemeId } from '@/lib/reform-types';
 import ImpactScoreBadge from '@/components/intel/ImpactScoreBadge';
@@ -84,7 +85,7 @@ export default function ThemesPage() {
       </div>
 
       {isLoading ? (
-        <div className="card p-8 text-center text-text-muted text-sm">読み込み中...</div>
+        <NoticeCard>読み込み中...</NoticeCard>
       ) : (
         <div className="space-y-6">
           {Object.values(THEME_GROUPS)

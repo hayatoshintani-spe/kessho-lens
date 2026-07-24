@@ -6,6 +6,9 @@ import { Database, Filter, Plus } from 'lucide-react';
 import { fetchIntelCards } from '@/lib/intel-api';
 import { warmupBackend } from '@/lib/api';
 import CardItem from '@/components/intel/CardItem';
+import PageHeader from '@/components/ui/PageHeader';
+import NoticeCard from '@/components/ui/NoticeCard';
+import { buttonClasses } from '@/components/ui/Button';
 import type { IntelCard, IntelCategory, Importance } from '@/lib/intel-types';
 import {
   CATEGORY_ICONS,
@@ -78,20 +81,17 @@ export default function CardsDBPage() {
 
   return (
     <div className="space-y-6 animate-fade-in max-w-7xl">
-      <div className="flex items-center gap-2">
-        <Database className="w-5 h-5 text-accent-gold" />
-        <h1 className="text-text-primary text-xl font-bold">カードDB</h1>
-        <span className="text-text-muted text-sm ml-2">
-          全 {cards.length} 件 / 絞り込み後 {filtered.length} 件
-        </span>
-        <Link
-          href="/intel/cards/new"
-          className="ml-auto inline-flex items-center gap-1 px-3 py-1.5 rounded bg-accent-gold/10 border border-accent-gold/40 text-accent-gold text-xs font-medium hover:bg-accent-gold/20"
-        >
-          <Plus className="w-3.5 h-3.5" />
-          新規カード
-        </Link>
-      </div>
+      <PageHeader
+        icon={Database}
+        title="カードDB"
+        meta={`全 ${cards.length} 件 / 絞り込み後 ${filtered.length} 件`}
+        actions={
+          <Link href="/intel/cards/new" className={buttonClasses('gold', 'sm')}>
+            <Plus className="w-3.5 h-3.5" />
+            新規カード
+          </Link>
+        }
+      />
 
       {/* 重要度別カウント */}
       <div className="grid grid-cols-4 gap-3">
@@ -127,7 +127,7 @@ export default function CardsDBPage() {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="タイトル・タグで検索..."
-          className="w-full bg-bg-elevated border border-border rounded px-3 py-2 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-accent-gold/40"
+          className="form-input"
         />
         <div className="flex flex-wrap gap-1.5">
           <button
@@ -158,11 +158,9 @@ export default function CardsDBPage() {
 
       {/* カード一覧 */}
       {isLoading ? (
-        <div className="card p-8 text-center text-text-muted text-sm">読み込み中...</div>
+        <NoticeCard>読み込み中...</NoticeCard>
       ) : filtered.length === 0 ? (
-        <div className="card p-8 text-center text-text-muted text-sm">
-          該当するカードがありません
-        </div>
+        <NoticeCard>該当するカードがありません</NoticeCard>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
           {filtered.map((c) => (

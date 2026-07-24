@@ -82,6 +82,14 @@ body {
   }
 }
 
+/* ─── Form ──────────────────────────────────────────────────────────────────── */
+
+@layer components {
+  .form-input {
+    @apply w-full bg-bg-elevated border border-border rounded px-3 py-2 text-sm text-text-primary outline-none transition-colors placeholder:text-text-muted focus:border-accent-gold/40;
+  }
+}
+
 /* ─── Card ──────────────────────────────────────────────────────────────────── */
 
 .card {

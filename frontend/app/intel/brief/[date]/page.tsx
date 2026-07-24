@@ -4,7 +4,10 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import { ArrowLeft, Calendar, AlertTriangle, MessageSquare } from 'lucide-react';
+import { Calendar, MessageSquare } from 'lucide-react';
+import Alert from '@/components/ui/Alert';
+import BackLink from '@/components/ui/BackLink';
+import NoticeCard from '@/components/ui/NoticeCard';
 import { fetchDailyBrief } from '@/lib/intel-api';
 import { warmupBackend } from '@/lib/api';
 import { formatDate } from '@/lib/utils';
@@ -50,26 +53,14 @@ export default function BriefDetailPage({ params }: PageProps) {
 
   return (
     <div className="space-y-6 animate-fade-in max-w-4xl">
-      <Link
-        href="/intel"
-        className="inline-flex items-center gap-1 text-text-muted hover:text-accent-gold text-xs"
-      >
-        <ArrowLeft className="w-3 h-3" /> ブリーフ一覧に戻る
-      </Link>
+      <BackLink href="/intel">ブリーフ一覧に戻る</BackLink>
 
-      {errorMsg && (
-        <div className="card p-4 border-loss/40 bg-loss/5">
-          <div className="flex items-center gap-2 text-loss text-sm">
-            <AlertTriangle className="w-4 h-4" />
-            <span>{errorMsg}</span>
-          </div>
-        </div>
-      )}
+      {errorMsg && <Alert>{errorMsg}</Alert>}
 
       {isLoading ? (
-        <div className="card p-8 text-center text-text-muted text-sm">読み込み中...</div>
+        <NoticeCard>読み込み中...</NoticeCard>
       ) : !brief ? (
-        <div className="card p-6 text-center text-text-muted">ブリーフが見つかりません</div>
+        <NoticeCard>ブリーフが見つかりません</NoticeCard>
       ) : (
         <>
           {/* Brief header */}

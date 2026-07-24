@@ -5,7 +5,6 @@ import Link from 'next/link';
 import {
   ArrowRight,
   Sparkles,
-  AlertTriangle,
   RefreshCw,
   Lightbulb,
   ShieldAlert,
@@ -26,6 +25,8 @@ import { formatDate } from '@/lib/utils';
 import CardItem from '@/components/intel/CardItem';
 import ImpactScoreBadge from '@/components/intel/ImpactScoreBadge';
 import ThemeChip from '@/components/intel/ThemeChip';
+import Alert from '@/components/ui/Alert';
+import NoticeCard from '@/components/ui/NoticeCard';
 import type {
   IntelCard,
   DailyBrief,
@@ -235,19 +236,10 @@ export default function IntelIndexPage() {
         )}
       </div>
 
-      {errorMsg && (
-        <div className="card p-4 border-loss/40 bg-loss/5">
-          <div className="flex items-center gap-2 text-loss text-sm">
-            <AlertTriangle className="w-4 h-4" />
-            <span>{errorMsg}</span>
-          </div>
-        </div>
-      )}
+      {errorMsg && <Alert>{errorMsg}</Alert>}
 
       {isLoading ? (
-        <div className="card p-8 text-center text-text-muted text-sm">
-          読み込み中...
-        </div>
+        <NoticeCard>読み込み中...</NoticeCard>
       ) : (
         <>
           {/* ── 上段: 本日見るべき重要シグナル ────────────────────────── */}

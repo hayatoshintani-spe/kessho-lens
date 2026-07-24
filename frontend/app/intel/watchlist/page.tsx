@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { Radar } from 'lucide-react';
+import NoticeCard from '@/components/ui/NoticeCard';
 import { fetchWatchlists } from '@/lib/intel-api';
 import { warmupBackend } from '@/lib/api';
 import type { CategoryWatchlist } from '@/lib/intel-types';
@@ -39,9 +40,7 @@ export default function WatchlistPage() {
       </div>
 
       {isLoading ? (
-        <div className="card p-8 text-center text-text-muted text-sm">
-          読み込み中...
-        </div>
+        <NoticeCard>読み込み中...</NoticeCard>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {watchlists.map((wl) => {

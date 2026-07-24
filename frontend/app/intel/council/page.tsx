@@ -9,6 +9,7 @@ import { formatDate } from '@/lib/utils';
 import CouncilDebate from '@/components/intel/CouncilDebate';
 import type { CouncilSession, IntelCard } from '@/lib/intel-types';
 import CardItem from '@/components/intel/CardItem';
+import NoticeCard from '@/components/ui/NoticeCard';
 
 export default function CouncilPage() {
   const [sessions, setSessions] = useState<CouncilSession[]>([]);
@@ -53,13 +54,9 @@ export default function CouncilPage() {
       </div>
 
       {isLoading ? (
-        <div className="card p-8 text-center text-text-muted text-sm">
-          読み込み中...
-        </div>
+        <NoticeCard>読み込み中...</NoticeCard>
       ) : sessions.length === 0 ? (
-        <div className="card p-8 text-center text-text-muted text-sm">
-          まだ会議セッションが生成されていません
-        </div>
+        <NoticeCard>まだ会議セッションが生成されていません</NoticeCard>
       ) : (
         <>
           {/* セッション選択 */}

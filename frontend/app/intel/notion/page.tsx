@@ -1,16 +1,17 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import Link from 'next/link';
 import {
-  ArrowLeft,
   ExternalLink,
   RefreshCw,
   CheckCircle2,
   XCircle,
-  AlertTriangle,
   Database,
 } from 'lucide-react';
+import Alert from '@/components/ui/Alert';
+import BackLink from '@/components/ui/BackLink';
+import Button from '@/components/ui/Button';
+import PageHeader from '@/components/ui/PageHeader';
 import {
   fetchNotionStatus,
   syncAllCardsToNotion,
@@ -101,28 +102,15 @@ export default function NotionSettingsPage() {
 
   return (
     <div className="space-y-5 animate-fade-in max-w-3xl">
-      <Link
-        href="/intel"
-        className="inline-flex items-center gap-1 text-text-muted hover:text-accent-gold text-xs"
-      >
-        <ArrowLeft className="w-3 h-3" /> Intelligence Brief に戻る
-      </Link>
+      <BackLink href="/intel">Intelligence Brief に戻る</BackLink>
 
-      <div>
-        <div className="flex items-center gap-2 mb-1">
-          <Database className="w-5 h-5 text-accent-gold" />
-          <h1 className="text-text-primary text-xl font-bold">Notion 連携</h1>
-        </div>
-        <p className="text-text-muted text-sm">
-          IntelCard を Notion DB に push 同期。社内編集・共有ワークフローを統合
-        </p>
-      </div>
+      <PageHeader
+        icon={Database}
+        title="Notion 連携"
+        description="IntelCard を Notion DB に push 同期。社内編集・共有ワークフローを統合"
+      />
 
-      {errorMsg && (
-        <div className="card p-3 border-loss/40 bg-loss/5 text-loss text-xs">
-          {errorMsg}
-        </div>
-      )}
+      {errorMsg && <Alert>{errorMsg}</Alert>}
 
       {/* 接続状況 */}
       <section className="card p-5">
@@ -185,12 +173,7 @@ export default function NotionSettingsPage() {
                 )}
               </div>
             )}
-            {status.db?.error && (
-              <div className="mt-3 p-2 rounded bg-loss/10 border border-loss/30 text-loss text-xs">
-                <AlertTriangle className="w-3 h-3 inline mr-1" />
-                {status.db.error}
-              </div>
-            )}
+            {status.db?.error && <Alert className="mt-3">{status.db.error}</Alert>}
           </div>
         ) : null}
       </section>
@@ -238,15 +221,14 @@ export default function NotionSettingsPage() {
               value={parentPageId}
               onChange={(e) => setParentPageId(e.target.value)}
               placeholder="親ページID（例: 123abc456def... または URL末尾）"
-              className="w-full bg-bg-elevated border border-border rounded px-3 py-2 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-accent-gold/40"
+              className="form-input"
             />
-            <button
+            <Button
               onClick={handleSetup}
               disabled={isSettingUp || !parentPageId.trim() || !status?.has_api_key}
-              className="px-4 py-2 rounded bg-accent-gold/10 border border-accent-gold/40 text-accent-gold text-sm font-medium hover:bg-accent-gold/20 disabled:opacity-40 disabled:cursor-not-allowed"
             >
               {isSettingUp ? 'DB作成中...' : 'DB作成'}
-            </button>
+            </Button>
             {!status?.has_api_key && (
               <div className="text-text-muted text-[10px]">
                 NOTION_API_KEY を先に設定してください
@@ -254,24 +236,12 @@ export default function NotionSettingsPage() {
             )}
           </div>
 
-          {setupResult && (
-            <div
-              className={`mt-3 p-3 rounded text-xs ${
-                setupResult.error
-                  ? 'bg-loss/10 border border-loss/30 text-loss'
-                  : 'bg-profit/10 border border-profit/30 text-text-secondary'
-              }`}
-            >
-              {setupResult.error ? (
-                <>
-                  <AlertTriangle className="w-3 h-3 inline mr-1" />
-                  {setupResult.error}
-                </>
-              ) : (
+          {setupResult &&
+            (setupResult.error ? (
+              <Alert className="mt-3">{setupResult.error}</Alert>
+            ) : (
+              <Alert variant="success" title="DB を作成しました" className="mt-3">
                 <div className="space-y-1.5">
-                  <div className="text-profit font-medium flex items-center gap-1">
-                    <CheckCircle2 className="w-3 h-3" /> DB を作成しました
-                  </div>
                   <div className="font-mono text-[10px] break-all">
                     NOTION_CARDS_DB_ID={setupResult.database_id}
                   </div>
@@ -289,9 +259,8 @@ export default function NotionSettingsPage() {
                     この database_id を環境変数に設定 → バックエンド再起動 → このページを更新
                   </div>
                 </div>
-              )}
-            </div>
-          )}
+              </Alert>
+            ))}
         </section>
       )}
 
@@ -302,13 +271,9 @@ export default function NotionSettingsPage() {
           <p className="text-text-secondary text-xs mb-3">
             全てのカードを Notion DB に push します（既存ページは Card ID で upsert）
           </p>
-          <button
-            onClick={handleSyncAll}
-            disabled={isSyncing}
-            className="px-4 py-2 rounded bg-accent-gold/10 border border-accent-gold/40 text-accent-gold text-sm font-medium hover:bg-accent-gold/20 disabled:opacity-40"
-          >
+          <Button onClick={handleSyncAll} disabled={isSyncing}>
             {isSyncing ? '同期中...' : '全カードを同期'}
-          </button>
+          </Button>
 
           {syncResult && (
             <div className="mt-3 p-3 rounded bg-bg-elevated border border-border">

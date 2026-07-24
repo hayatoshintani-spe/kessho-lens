@@ -3,8 +3,12 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowLeft, Sparkles, AlertTriangle, CheckCircle2 } from 'lucide-react';
+import { Sparkles } from 'lucide-react';
 import { createIntelCard, fetchIntelMeta } from '@/lib/intel-api';
+import Alert from '@/components/ui/Alert';
+import BackLink from '@/components/ui/BackLink';
+import Button from '@/components/ui/Button';
+import PageHeader from '@/components/ui/PageHeader';
 import { warmupBackend } from '@/lib/api';
 import type {
   IntelCategory,
@@ -110,55 +114,28 @@ export default function NewCardPage() {
 
   return (
     <div className="space-y-5 animate-fade-in max-w-3xl">
-      <Link
-        href="/intel/cards"
-        className="inline-flex items-center gap-1 text-text-muted hover:text-accent-gold text-xs"
-      >
-        <ArrowLeft className="w-3 h-3" /> カードDBに戻る
-      </Link>
+      <BackLink href="/intel/cards">カードDBに戻る</BackLink>
 
-      <div>
-        <div className="flex items-center gap-2 mb-1">
-          <Sparkles className="w-5 h-5 text-accent-gold" />
-          <h1 className="text-text-primary text-xl font-bold">新規カード生成</h1>
-        </div>
-        <p className="text-text-muted text-sm">
-          ニュースのタイトル・URL・要約を入力すると、円谷向けの IntelCard を自動生成します
-        </p>
-      </div>
+      <PageHeader
+        icon={Sparkles}
+        title="新規カード生成"
+        description="ニュースのタイトル・URL・要約を入力すると、円谷向けの IntelCard を自動生成します"
+      />
 
       {hasApiKey === false && (
-        <div className="card p-3 border-amber-500/30 bg-amber-500/5">
-          <div className="flex items-start gap-2 text-amber-500 text-xs">
-            <AlertTriangle className="w-4 h-4 flex-shrink-0 mt-0.5" />
-            <div>
-              <div className="font-semibold mb-0.5">API キー未設定</div>
-              <span className="text-text-secondary">
-                ANTHROPIC_API_KEY が未設定のため、ルールベースの fallback で生成します。
-                Claude による本格生成にはバックエンド側で API キーを設定してください。
-              </span>
-            </div>
-          </div>
-        </div>
+        <Alert variant="warning" title="API キー未設定">
+          ANTHROPIC_API_KEY が未設定のため、ルールベースの fallback で生成します。
+          Claude による本格生成にはバックエンド側で API キーを設定してください。
+        </Alert>
       )}
 
       {successId && (
-        <div className="card p-4 border-profit/40 bg-profit/5">
-          <div className="flex items-center gap-2 text-profit text-sm">
-            <CheckCircle2 className="w-4 h-4" />
-            <span>カードを生成しました（{successId}）— 詳細ページへ遷移中...</span>
-          </div>
-        </div>
+        <Alert variant="success">
+          カードを生成しました（{successId}）— 詳細ページへ遷移中...
+        </Alert>
       )}
 
-      {errorMsg && (
-        <div className="card p-4 border-loss/40 bg-loss/5">
-          <div className="flex items-center gap-2 text-loss text-sm">
-            <AlertTriangle className="w-4 h-4" />
-            <span>{errorMsg}</span>
-          </div>
-        </div>
-      )}
+      {errorMsg && <Alert>{errorMsg}</Alert>}
 
       <form onSubmit={handleSubmit} className="card p-5 space-y-4">
         <FormField label="タイトル *" required>
@@ -278,36 +255,11 @@ export default function NewCardPage() {
           >
             キャンセル
           </Link>
-          <button
-            type="submit"
-            disabled={isSubmitting || !title.trim()}
-            className="px-4 py-2 rounded bg-accent-gold/10 border border-accent-gold/40 text-accent-gold text-sm font-medium hover:bg-accent-gold/20 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-          >
+          <Button type="submit" disabled={isSubmitting || !title.trim()}>
             {isSubmitting ? '生成中...' : 'カードを生成'}
-          </button>
+          </Button>
         </div>
       </form>
-
-      <style jsx global>{`
-        .form-input {
-          width: 100%;
-          background-color: var(--bg-elevated);
-          border: 1px solid var(--border);
-          border-radius: 6px;
-          padding: 8px 12px;
-          color: var(--text-primary);
-          font-size: 13px;
-          outline: none;
-          transition: border-color 0.15s;
-        }
-        .form-input:focus {
-          border-color: rgba(200, 134, 10, 0.4);
-        }
-        .form-input::placeholder {
-          color: var(--text-secondary);
-          opacity: 0.6;
-        }
-      `}</style>
     </div>
   );
 }

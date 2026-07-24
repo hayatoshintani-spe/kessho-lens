@@ -1,9 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import Link from 'next/link';
 import {
-  ArrowLeft,
   Mail,
   CheckCircle2,
   XCircle,
@@ -13,6 +11,11 @@ import {
   Eye,
   RefreshCw,
 } from 'lucide-react';
+import Alert from '@/components/ui/Alert';
+import BackLink from '@/components/ui/BackLink';
+import Button from '@/components/ui/Button';
+import NoticeCard from '@/components/ui/NoticeCard';
+import PageHeader from '@/components/ui/PageHeader';
 import { warmupBackend } from '@/lib/api';
 import {
   fetchEmailStatus,
@@ -80,32 +83,18 @@ export default function DeliveryPage() {
 
   return (
     <div className="space-y-5 animate-fade-in max-w-3xl">
-      <Link
-        href="/intel"
-        className="inline-flex items-center gap-1 text-text-muted hover:text-accent-gold text-xs"
-      >
-        <ArrowLeft className="w-3 h-3" /> Intelligence Brief に戻る
-      </Link>
+      <BackLink href="/intel">Intelligence Brief に戻る</BackLink>
 
-      <div>
-        <div className="flex items-center gap-2 mb-1">
-          <Mail className="w-5 h-5 text-accent-gold" />
-          <h1 className="text-text-primary text-xl font-bold">メール配信設定</h1>
-        </div>
-        <p className="text-text-muted text-sm">
-          毎朝 Daily Brief を経営層に Resend 経由で自動配信します
-        </p>
-      </div>
+      <PageHeader
+        icon={Mail}
+        title="メール配信設定"
+        description="毎朝 Daily Brief を経営層に Resend 経由で自動配信します"
+      />
 
-      {errorMsg && (
-        <div className="card p-4 border-loss/40 bg-loss/5 flex items-center gap-2 text-loss text-sm">
-          <AlertTriangle className="w-4 h-4" />
-          <span>{errorMsg}</span>
-        </div>
-      )}
+      {errorMsg && <Alert>{errorMsg}</Alert>}
 
       {isLoading ? (
-        <div className="card p-8 text-center text-text-muted text-sm">読み込み中...</div>
+        <NoticeCard>読み込み中...</NoticeCard>
       ) : status ? (
         <>
           {/* 配信ステータス */}
@@ -198,23 +187,18 @@ export default function DeliveryPage() {
                 value={previewDate}
                 onChange={(e) => setPreviewDate(e.target.value)}
                 placeholder="YYYY-MM-DD (空欄=今日)"
-                className="flex-1 bg-bg-elevated border border-border rounded px-3 py-2 text-sm text-text-primary placeholder:text-text-muted focus:border-accent-gold/60 outline-none font-mono"
+                className="form-input flex-1 font-mono"
               />
-              <button
-                onClick={() => handleSend(true)}
-                disabled={isSending}
-                className="flex items-center justify-center gap-1.5 px-3 py-2 rounded border border-border hover:border-accent-gold/40 text-text-secondary hover:text-accent-gold transition-colors text-sm disabled:opacity-50"
-              >
+              <Button variant="ghost" onClick={() => handleSend(true)} disabled={isSending}>
                 <Eye className="w-4 h-4" /> プレビュー
-              </button>
-              <button
+              </Button>
+              <Button
                 onClick={() => handleSend(false)}
                 disabled={isSending || !status.enabled}
-                className="flex items-center justify-center gap-1.5 px-3 py-2 rounded bg-accent-gold/15 border border-accent-gold/40 text-accent-gold hover:bg-accent-gold/25 transition-colors text-sm disabled:opacity-50"
                 title={!status.enabled ? 'メール配信が無効です' : '実際に送信します'}
               >
                 <Send className="w-4 h-4" /> 送信
-              </button>
+              </Button>
             </div>
 
             {sendResult && <SendResultPanel result={sendResult} />}

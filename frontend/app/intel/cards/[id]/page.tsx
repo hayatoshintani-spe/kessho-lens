@@ -1,14 +1,17 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import Link from 'next/link';
-import { ArrowLeft, ExternalLink, AlertTriangle, Upload, CheckCircle2 } from 'lucide-react';
+import { ExternalLink, AlertTriangle, Upload, CheckCircle2 } from 'lucide-react';
 import { fetchIntelCard, syncCardToNotion, fetchNotionStatus } from '@/lib/intel-api';
 import { warmupBackend } from '@/lib/api';
 import { formatDate } from '@/lib/utils';
 import type { IntelCard } from '@/lib/intel-types';
 import ImportanceBadge from '@/components/intel/ImportanceBadge';
 import CategoryChip from '@/components/intel/CategoryChip';
+import Alert from '@/components/ui/Alert';
+import BackLink from '@/components/ui/BackLink';
+import Button from '@/components/ui/Button';
+import NoticeCard from '@/components/ui/NoticeCard';
 import {
   EXPERT_ICONS,
   EXPERT_LABELS_JA,
@@ -83,21 +86,14 @@ export default function CardDetailPage({ params }: PageProps) {
 
   return (
     <div className="space-y-5 animate-fade-in max-w-4xl">
-      <Link
-        href="/intel/cards"
-        className="inline-flex items-center gap-1 text-text-muted hover:text-accent-gold text-xs"
-      >
-        <ArrowLeft className="w-3 h-3" /> カードDBに戻る
-      </Link>
+      <BackLink href="/intel/cards">カードDBに戻る</BackLink>
 
       {isLoading ? (
-        <div className="card p-8 text-center text-text-muted text-sm">読み込み中...</div>
+        <NoticeCard>読み込み中...</NoticeCard>
       ) : errorMsg ? (
-        <div className="card p-4 border-loss/40 bg-loss/5 text-loss text-sm">
-          {errorMsg}
-        </div>
+        <Alert>{errorMsg}</Alert>
       ) : !card ? (
-        <div className="card p-6 text-center text-text-muted">カードが見つかりません</div>
+        <NoticeCard>カードが見つかりません</NoticeCard>
       ) : (
         <>
           {/* Notion 同期ボタン */}
@@ -131,14 +127,10 @@ export default function CardDetailPage({ params }: PageProps) {
                     )}
                   </span>
                 )}
-                <button
-                  onClick={handleSyncToNotion}
-                  disabled={isSyncing}
-                  className="px-3 py-1.5 rounded bg-accent-gold/10 border border-accent-gold/40 text-accent-gold text-xs font-medium hover:bg-accent-gold/20 disabled:opacity-40 flex items-center gap-1"
-                >
+                <Button size="sm" onClick={handleSyncToNotion} disabled={isSyncing}>
                   <Upload className="w-3 h-3" />
                   {isSyncing ? '同期中...' : 'Notion同期'}
-                </button>
+                </Button>
               </div>
             </div>
           )}
@@ -174,17 +166,9 @@ export default function CardDetailPage({ params }: PageProps) {
 
           {/* Confidence / Speculation 警告 */}
           {(card.confidence === 'low' || card.speculation_notes) && (
-            <div className="card p-4 border-amber-500/40 bg-amber-500/5">
-              <div className="flex items-start gap-2">
-                <AlertTriangle className="w-4 h-4 text-amber-500 flex-shrink-0 mt-0.5" />
-                <div className="text-xs text-text-secondary leading-relaxed">
-                  <div className="font-semibold text-amber-500 mb-1">
-                    Confidence: {card.confidence.toUpperCase()}
-                  </div>
-                  {card.speculation_notes && <p>{card.speculation_notes}</p>}
-                </div>
-              </div>
-            </div>
+            <Alert variant="warning" title={`Confidence: ${card.confidence.toUpperCase()}`}>
+              {card.speculation_notes && <p>{card.speculation_notes}</p>}
+            </Alert>
           )}
 
           {/* 事実 / 解釈 */}
