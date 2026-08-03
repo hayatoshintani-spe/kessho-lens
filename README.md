@@ -53,6 +53,13 @@ tsuburaya-intelligence-brief/
 
 ---
 
+## ドキュメント
+
+プロジェクト別のドキュメント索引は [`docs/README.md`](docs/README.md) を参照してください。
+デプロイ手順（初心者向け）は [`docs/projects/tsuburaya-intelligence-brief/DEPLOY_JA.md`](docs/projects/tsuburaya-intelligence-brief/DEPLOY_JA.md) にあります。
+
+---
+
 ## ローカル起動
 
 ### 前提条件
