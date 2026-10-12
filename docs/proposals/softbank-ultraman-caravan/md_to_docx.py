@@ -40,10 +40,45 @@ def add_runs(p, text, size=10.5, base_bold=False):
             set_run_font(r, size, bold=base_bold)
 
 
+def add_md_table(doc, rows):
+    # rows: list of lists of cell strings (先頭行=ヘッダー)
+    tbl = doc.add_table(rows=len(rows), cols=len(rows[0]))
+    tbl.style = 'Table Grid'
+    for i, row in enumerate(rows):
+        for j, text in enumerate(row):
+            if j >= len(tbl.rows[i].cells):
+                continue
+            cell = tbl.rows[i].cells[j]
+            cell.text = ''
+            p = cell.paragraphs[0]
+            add_runs(p, text, size=9.5, base_bold=(i == 0))
+            if i == 0:
+                from docx.oxml import OxmlElement
+                shd = OxmlElement('w:shd')
+                shd.set(qn('w:fill'), 'E8EAF2')
+                cell._tc.get_or_add_tcPr().append(shd)
+    doc.add_paragraph()
+
+
+def split_md_row(s):
+    return [c.strip() for c in s.strip().strip('|').split('|')]
+
+
 def convert(src_path, dst_path):
     doc = Document()
-    for line in open(src_path, encoding='utf-8').read().splitlines():
+    lines = open(src_path, encoding='utf-8').read().splitlines()
+    table_buf = []
+    for line in lines + ['']:
         s = line.rstrip()
+        if s.strip().startswith('|'):
+            cells = split_md_row(s)
+            if all(set(c) <= set('-: ') for c in cells):
+                continue  # 区切り行
+            table_buf.append(cells)
+            continue
+        if table_buf:
+            add_md_table(doc, table_buf)
+            table_buf = []
         if not s.strip():
             continue
         if s.startswith('# '):
