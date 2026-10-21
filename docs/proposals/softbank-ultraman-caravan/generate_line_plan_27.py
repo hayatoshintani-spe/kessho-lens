@@ -11,7 +11,7 @@ WHITE = "FFFFFF"
 F = "Meiryo"
 
 months = [f"2027年{m}月" for m in range(1, 13)] + [f"2028年{m}月" for m in range(1, 13)] + [f"2029年{m}月" for m in range(1, 4)]
-days = [10, 8, 8, 8, 10, 8, 9, 9, 8, 10, 8, 8] * 2 + [10, 8, 8]
+days = [10, 8, 8, 8, 10, 8, 9, 9, 8, 10, 8, 8] + [10, 8, 8, 10, 8, 8, 10, 8, 9, 9, 8, 10] + [8, 8, 9]  # 実カレンダーの土日数(2028年はうるう年で106日)
 BUFFER = {1, 4, 6, 11, 12}
 base = [15] * 27
 maxl = [20 if int(m.split("年")[1].rstrip("月")) in BUFFER else 15 for m in months]
