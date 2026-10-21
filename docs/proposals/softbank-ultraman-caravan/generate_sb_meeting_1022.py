@@ -234,6 +234,28 @@ add_table(s, Inches(0.7), Inches(1.55), Inches(11.9),
           ],
           col_widths=[1.4, 3.6, 1.0], row_h=0.6, font_size=11)
 
+# 5b. 連絡体制とフロー --------------------------------------------------------
+s = add_slide()
+header(s, "2. 連絡体制と回答リードタイム", "貴社の取りまとめ窓口と当社の総合窓口を1対1でつなぎ、当社内で用件別に振り分けます")
+rect(s, Inches(4.4), Inches(1.6), Inches(4.5), Inches(0.7), fill=NAVY, shape=MSO_SHAPE.ROUNDED_RECTANGLE)
+textbox(s, Inches(4.4), Inches(1.6), Inches(4.5), Inches(0.7), [("ソフトバンク様 取りまとめ窓口(1部署)", 13, WHITE, True)], align=PP_ALIGN.CENTER, anchor=MSO_ANCHOR.MIDDLE)
+textbox(s, Inches(4.4), Inches(2.35), Inches(4.5), Inches(0.35), [("↓ 連絡　↑ 回答", 12, SUB, True)], align=PP_ALIGN.CENTER)
+rect(s, Inches(4.4), Inches(2.7), Inches(4.5), Inches(0.7), fill=TSUB_NAVY, shape=MSO_SHAPE.ROUNDED_RECTANGLE)
+textbox(s, Inches(4.4), Inches(2.7), Inches(4.5), Inches(0.7), [("円谷プロ 総合窓口(専用メーリングリスト)", 13, WHITE, True)], align=PP_ALIGN.CENTER, anchor=MSO_ANCHOR.MIDDLE)
+textbox(s, Inches(0.7), Inches(3.45), Inches(11.9), Inches(0.35), [("当社内で用件別に振り分け", 11, SUB, False)], align=PP_ALIGN.CENTER)
+add_table(s, Inches(0.7), Inches(3.85), Inches(11.9),
+          ["窓口", "用件", "回答の目安"],
+          [
+              [("① イベント実施", True), "開催申請(エリア・会場・日程)のバッティング確認/実施確認書の確認", "5営業日(前月1日までに確定)"],
+              [("② 告知物", True), "告知物(KV・Web・チラシ等)の監修", "KV 3営業日/Web流用 1〜2営業日/チラシ+色校 1〜2営業日"],
+              [("③ 制作物", True), "仮申請(制作可否)/ノベルティ・キット・その他制作物のデザイン監修", "仮申請 約5営業日/デザイン監修 5営業日"],
+              [("④ 契約・精算", True), "発注・請求・最低保証の精算・実績報告", "随時"],
+          ],
+          col_widths=[1.3, 3.5, 2.2], row_h=0.55, font_size=11)
+textbox(s, Inches(0.7), Inches(6.7), Inches(11.9), Inches(0.4), [
+    ("※ 当社側メーリングリストは契約締結後にご案内します。開催当日の緊急連絡は会場ごとの当社担当(チーフスタッフ)と貴社運営ディレクター間で直接行います。", 10.5, SUB, False),
+])
+
 # 6. ご提供価格 --------------------------------------------------------------
 s = add_slide()
 header(s, "3. ご提供価格(ソフトバンク様特別プラン)", "通常販売価格から大幅な特別価格でご提供します。本特別価格は年間契約+最低開催数保証のご締結を前提とした本件限りの条件です")
