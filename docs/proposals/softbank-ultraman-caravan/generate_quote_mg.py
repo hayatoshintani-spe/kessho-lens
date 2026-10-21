@@ -189,7 +189,7 @@ add_table(s, Inches(0.7), Inches(1.55), Inches(11.9),
           ["区分", "費目", "単価・条件", "27ヶ月合計"],
           [
               [("固定(最低保証)", True), "キャラクターイベント稼働費(最低開催数保証)", f"10万円/日 × 基準15ライン × {tot_days}日 = {tot_sites:,}現場", (oku(tot_live), True, RED)],
-              [("固定", True), "年間IP使用料", "2,000万円/年(2029年1〜3月は3ヶ月分)", (man(tot_ip), True)],
+              [("固定", True), "IP使用料", "2,000万円/年×27ヶ月分。契約時に一括前払い", (man(tot_ip), True)],
               [("固定分 小計", True), "", "", (oku(tot_live + tot_ip), True, RED)],
               [("従量", True), "余裕月の増枠分(最大20ライン)", "10万円/日 × 増枠現場数(最大+470現場)", "最大 +4,700万円"],
               [("従量", True), "現場諸経費", "2万円/日 × 実施現場数", f"基準で {man(tot_exp)}"],
@@ -207,12 +207,14 @@ s = add_slide()
 header(s, "期別の最低保証額と精算スケジュール",
        "最低保証は3つの精算期間に区切り、各期末に実績との差額(未達分・増枠分)を精算します")
 rows = []
-for name, days, sites, live, ip, exp in rows_p:
-    rows.append([(name, True), f"{days}日", f"{sites:,}現場", (man(live), True), man(ip), (man(live + ip), True, RED), f"{man(exp)}"])
+for i, (name, days, sites, live, ip, exp) in enumerate(rows_p):
+    ip_txt = f"{man(tot_ip)}\n(27ヶ月分を契約時一括)" if i == 0 else "—"
+    ip_val = tot_ip if i == 0 else 0
+    rows.append([(name, True), f"{days}日", f"{sites:,}現場", (man(live), True), ip_txt, (man(live + ip_val), True, RED), f"{man(exp)}"])
 rows.append([("合計(27ヶ月)", True), f"{tot_days}日", f"{tot_sites:,}現場", (man(tot_live), True), man(tot_ip), (oku(tot_live + tot_ip), True, RED), man(tot_exp)])
 add_table(s, Inches(0.7), Inches(1.55), Inches(11.9),
           ["精算期間", "開催日数", "最低保証現場数", "稼働費(最低保証)", "IP使用料", "固定分 計", "現場諸経費(参考)"],
-          rows, col_widths=[2.2, 0.9, 1.2, 1.4, 1.1, 1.3, 1.3], row_h=0.6, font_size=11)
+          rows, col_widths=[2.2, 0.9, 1.2, 1.4, 1.4, 1.3, 1.2], row_h=0.6, font_size=11)
 b = rect(s, Inches(0.7), Inches(4.7), Inches(11.9), Inches(2.0), fill=PALE, shape=MSO_SHAPE.ROUNDED_RECTANGLE)
 b.adjustments[0] = 0.06
 textbox(s, Inches(1.0), Inches(4.85), Inches(11.3), Inches(1.8), [
@@ -220,7 +222,7 @@ textbox(s, Inches(1.0), Inches(4.85), Inches(11.3), Inches(1.8), [
     ("・各期の最低保証額は期初(第1期は契約時)に確定。四半期ごとの前払い(お支払い条件はご相談)", 11.5, INK, False),
     ("・期末に実績を集計。余裕月の増枠分は追加精算、最低保証を下回った場合も保証額をお支払いいただく", 11.5, INK, False),
     ("・第1期(2027年1〜3月)は立ち上げ期として、会場の確定状況にかかわらず15ライン体制を貴社専属で確保する定額期間", 11.5, INK, False),
-    ("・年間IP使用料は契約年度ごとの前払い(第1期は3ヶ月分)", 11.5, INK, False),
+    ("・IP使用料は27ヶ月分(4,500万円)を契約時に一括前払い", 11.5, INK, False),
 ], gap=4)
 
 # 4. 許諾料MG ------------------------------------------------------------------
@@ -255,7 +257,7 @@ add_table(s, Inches(0.7), Inches(1.55), Inches(11.9),
               [("ライン供給", True), "基準15ライン。余裕月(1・4・6・11・12月)は最大20ライン。2・3・8・9月は当社主催行事との調整月"],
               [("エリア・キャラクター", True), "関信越エリア(埼玉・茨城・群馬・栃木・山梨・長野・新潟)は2027年1〜3月は実施不可。ウルトラセブンは対象外。出演は8ヒーロー(権利調整により一部変動の場合あり)"],
               [("排他", True), "契約期間中、当社は国内の他の携帯キャリア(3社)との店頭イベント契約を行いません"],
-              [("お支払い", True), "貴社EDI発注・翌月末振込。最低保証契約のため期間一括の発注形態をご相談。すべて税別"],
+              [("お支払い", True), "貴社EDI発注・翌月末振込。IP使用料は契約時に27ヶ月分を一括前払い、最低保証分は四半期前払い(ご相談)。期間一括の発注形態をご相談。すべて税別"],
               [("有効期限", True), "本見積りの有効期限は発行日より30日"],
           ],
           col_widths=[1.4, 4.6], row_h=0.52, font_size=10.5)
