@@ -441,7 +441,7 @@ add_table(s, Inches(0.7), Inches(1.55), Inches(11.9),
               [("12月", True), "デザイン監修完了、量産開始(春節前)。1月開催分の会場確定(12月1日)。運営レクチャー", "両社"],
               [("2027年1月", True), "開始(基準15ライン。1月は最大20ライン)", "両社"],
           ],
-          col_widths=[1.4, 3.8, 0.8], row_h=0.58, font_size=11.5)
+          col_widths=[1.4, 3.8, 0.8], row_h=0.5, font_size=11)
 b = rect(s, Inches(0.7), Inches(5.75), Inches(11.9), Inches(1.0), fill=PALE_RED, shape=MSO_SHAPE.ROUNDED_RECTANGLE)
 b.adjustments[0] = 0.08
 textbox(s, Inches(1.0), Inches(5.88), Inches(11.3), Inches(0.8), [
