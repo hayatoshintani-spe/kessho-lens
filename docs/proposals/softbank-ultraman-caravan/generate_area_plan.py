@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""SB様提示用 エリア別ライン供給計画(2027年1月〜2029年3月)"""
+"""SB様提示用 エリア別ライン供給計画(2027年1月〜2028年12月)"""
 import os
 from openpyxl import Workbook
 from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
@@ -10,8 +10,8 @@ HI = "FBEAEB"
 WHITE = "FFFFFF"
 F = "Meiryo"
 
-months = [f"2027年{m}月" for m in range(1, 13)] + [f"2028年{m}月" for m in range(1, 13)] + [f"2029年{m}月" for m in range(1, 4)]
-days = [10, 8, 8, 8, 10, 8, 9, 9, 8, 10, 8, 8] + [10, 8, 8, 10, 8, 8, 10, 8, 9, 9, 8, 10] + [8, 8, 9]
+months = [f"2027年{m}月" for m in range(1, 13)] + [f"2028年{m}月" for m in range(1, 13)]
+days = [10, 8, 8, 8, 10, 8, 9, 9, 8, 10, 8, 8] + [10, 8, 8, 10, 8, 8, 10, 8, 9, 9, 8, 10]
 BUFFER = {1, 4, 6, 11, 12}
 
 # エリア別ライン配分(基準15/余裕月20)
@@ -46,15 +46,15 @@ def put(ws, r, c, v, bold=False, fill=None, color="1A1A1A", size=10.5, align="ce
 # ---- シート1:エリア×月 ライン数 ----
 ws = wb.active
 ws.title = "エリア別月別ライン数"
-put(ws, 1, 1, "エリア別 月別ライン供給計画(2027年1月〜2029年3月)", bold=True, size=14, align="left")
+put(ws, 1, 1, "エリア別 月別ライン供給計画(2027年1月〜2028年12月)", bold=True, size=14, align="left")
 ws.cell(row=1, column=1).border = Border()
 put(ws, 2, 1, "円谷プロダクション作成/基準15ライン・余裕月(1・4・6・11・12月)は最大20ライン/単位:同時稼働ライン数", size=9.5, align="left")
 ws.cell(row=2, column=1).border = Border()
 put(ws, 4, 1, "エリア", bold=True, fill=NAVY, color=WHITE)
 for j, m in enumerate(months, start=2):
     put(ws, 4, j, m.replace("年", "/").replace("月", ""), bold=True, fill=NAVY, color=WHITE, size=9.5)
-put(ws, 4, len(months) + 2, "27ヶ月 現場数(基準)", bold=True, fill=NAVY, color=WHITE, size=9.5)
-put(ws, 4, len(months) + 3, "27ヶ月 現場数(最大)", bold=True, fill=NAVY, color=WHITE, size=9.5)
+put(ws, 4, len(months) + 2, "24ヶ月 現場数(基準)", bold=True, fill=NAVY, color=WHITE, size=9.5)
+put(ws, 4, len(months) + 3, "24ヶ月 現場数(最大)", bold=True, fill=NAVY, color=WHITE, size=9.5)
 put(ws, 5, 1, "開催日数(土日)", bold=True, fill=PALE)
 for j, d in enumerate(days, start=2):
     put(ws, 5, j, d, fill=PALE)
@@ -90,7 +90,7 @@ ws.freeze_panes = "B6"
 
 # ---- シート2:エリア別サマリー ----
 ws2 = wb.create_sheet("エリア別サマリー")
-put(ws2, 1, 1, "エリア別 供給ラインのサマリー(27ヶ月)", bold=True, size=14, align="left")
+put(ws2, 1, 1, "エリア別 供給ラインのサマリー(24ヶ月)", bold=True, size=14, align="left")
 ws2.cell(row=1, column=1).border = Border()
 hdr = ["エリア", "基準ライン数", "余裕月の最大", "現場数(基準)", "稼働費(基準・税別)", "現場数(最大)", "稼働費(最大・税別)", "展開の考え方", "主な出演候補キャラクター"]
 for j, h in enumerate(hdr, start=1):

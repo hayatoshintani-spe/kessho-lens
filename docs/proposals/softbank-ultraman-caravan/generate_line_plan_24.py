@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""SB様提示用 月別ライン供給計画(27ヶ月版:2027年1月〜2029年3月、基準15・余裕月20)"""
+"""SB様提示用 月別ライン供給計画(24ヶ月版:2027年1月〜2028年12月、基準15・余裕月20)"""
 import os
 from openpyxl import Workbook
 from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
@@ -10,10 +10,10 @@ HI = "FBEAEB"
 WHITE = "FFFFFF"
 F = "Meiryo"
 
-months = [f"2027年{m}月" for m in range(1, 13)] + [f"2028年{m}月" for m in range(1, 13)] + [f"2029年{m}月" for m in range(1, 4)]
-days = [10, 8, 8, 8, 10, 8, 9, 9, 8, 10, 8, 8] + [10, 8, 8, 10, 8, 8, 10, 8, 9, 9, 8, 10] + [8, 8, 9]  # 実カレンダーの土日数(2028年はうるう年で106日)
+months = [f"2027年{m}月" for m in range(1, 13)] + [f"2028年{m}月" for m in range(1, 13)]
+days = [10, 8, 8, 8, 10, 8, 9, 9, 8, 10, 8, 8] + [10, 8, 8, 10, 8, 8, 10, 8, 9, 9, 8, 10]  # 実カレンダーの土日数(2028年はうるう年で106日)
 BUFFER = {1, 4, 6, 11, 12}
-base = [15] * 27
+base = [15] * 24
 maxl = [20 if int(m.split("年")[1].rstrip("月")) in BUFFER else 15 for m in months]
 notes = ["余裕月:最大20ラインまで増枠可" if x == 20 else "" for x in maxl]
 for i, m in enumerate(months):
@@ -40,7 +40,7 @@ def put(r, c, v, bold=False, fill=None, color="1A1A1A", size=10.5, align="center
     return cell
 
 
-put(1, 1, "ウルトラマンIP 店頭イベント 月別ライン供給計画(2027年1月〜2029年3月)", bold=True, size=14, align="left")
+put(1, 1, "ウルトラマンIP 店頭イベント 月別ライン供給計画(2027年1月〜2028年12月)", bold=True, size=14, align="left")
 ws.cell(row=1, column=1).border = Border()
 put(2, 1, "円谷プロダクション作成/単価:10万円(税別)/ライン・日(土日開催・当社2名派遣)/現場諸経費2万円/日・交通運搬費・宿泊費・スーツ送料は別途", size=9.5, align="left")
 ws.cell(row=2, column=1).border = Border()
@@ -64,9 +64,9 @@ for i, m in enumerate(months):
     put(r, 9, notes[i], fill=fill, align="left", size=9.5)
     r += 1
 
-tb = sum(base[i] * days[i] for i in range(27))
-tm = sum(maxl[i] * days[i] for i in range(27))
-put(r, 1, "27ヶ月 合計", bold=True, fill=NAVY, color=WHITE)
+tb = sum(base[i] * days[i] for i in range(24))
+tm = sum(maxl[i] * days[i] for i in range(24))
+put(r, 1, "24ヶ月 合計", bold=True, fill=NAVY, color=WHITE)
 put(r, 2, sum(days), bold=True, fill=NAVY, color=WHITE)
 put(r, 3, "15", bold=True, fill=NAVY, color=WHITE)
 put(r, 4, tb, bold=True, fill=NAVY, color=WHITE, num_fmt="#,##0")
@@ -98,7 +98,7 @@ for col, w in zip("ABCDEFGHI", [13, 9, 11, 11, 15, 11, 11, 15, 36]):
 ws.row_dimensions[4].height = 32
 ws.freeze_panes = "A5"
 
-OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "SB様提示用_月別ライン供給計画_27ヶ月版.xlsx")
+OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "SB様提示用_月別ライン供給計画_24ヶ月版.xlsx")
 wb.save(OUT)
 print("saved:", OUT)
 print("days:", sum(days), "base:", tb, tb * 100000, "max:", tm, tm * 100000)
